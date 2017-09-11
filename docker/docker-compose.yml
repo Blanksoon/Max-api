@@ -1,0 +1,17 @@
+max-api:
+  build: web/
+  tty: true
+  ports:
+    - "8898:7777"
+    - "3003:3000"
+  volumes:
+    - ../:/usr/share/nginx/html
+  links:
+    - mongo-db:mongo
+  container_name: max-api
+
+mongo-db:
+  build: mongo/
+  ports:
+    - "27106:27017"
+  container_name: mongo-db
