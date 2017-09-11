@@ -6,19 +6,27 @@ var mongoose = require('mongoose'),
 var defaultSuccessMessage = 'success';
 
 function setPaginationParams(params) {
+
   var paginationParams = {
     limit : parseInt(params.limit),
     offset : parseInt(params.offset)
   };
+
   return paginationParams;
 }
 
 function setQueryParams(params) {
+
   var queryParams = {};
+
+  if(params.search)
+    queryParams['title'] = new RegExp(params.search, "i");
+
   return queryParams;
 }
 
 function setData(data) {
+
   var output = [];
 
   data.forEach(function(record) {
@@ -42,11 +50,12 @@ exports.search = function(req, res) {
   var queryParams = setQueryParams(req.query);
   var paginationParams = setPaginationParams(req.query);
 
-  Vod.count().exec(function(err, count) {
+  Vod.count(queryParams).exec(function(err, count) {
      paginationParams.total_records = count;
   });
 
   Vod.find(queryParams, function(err, vod) {
+
     var output = {
       status : {
         code : 400,
@@ -77,7 +86,9 @@ exports.search = function(req, res) {
 exports.create = function(req, res) {
 
   var new_vod = new Vod(req.body);
+
   new_vod.save(function(err, vod) {
+
     var output = {
       status : {
         code : 400,
@@ -105,6 +116,7 @@ exports.create = function(req, res) {
 exports.get = function(req, res) {
 
   Vod.findById(req.params.vodId, function(err, vod) {
+
     var output = {
       status : {
         code : 400,
@@ -132,6 +144,7 @@ exports.get = function(req, res) {
 exports.update = function(req, res) {
 
   Vod.findOneAndUpdate({_id: req.params.vodId}, req.body, {new: true}, function(err, vod) {
+
     var output = {
       status : {
         code : 400,
@@ -161,6 +174,7 @@ exports.delete = function(req, res) {
   Vod.remove({
     _id: req.params.vodId
   }, function(err, vod) {
+
     var output = {
       status : {
         code : 400,
