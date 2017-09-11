@@ -1,4 +1,7 @@
 var app = require('express')();
+var bodyParser = require('body-parser');
+
+var Vods = require('./model/vods');
 
 var port = process.env.PORT || 7777;
 
@@ -9,37 +12,48 @@ app.all('/*', function(req, res, next) {
     next();
 });
 
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const dateParams = ['month','day','year'];
+const dateField = 'onAirDate';
+
 app.get('/vods', function (req, res) {
-    res.send({
-        status : {
-            code : 200,
-            status : true,
-            message : "get_success"
-        },
-        data : {
-            records : [
-                {
-                    id : "exampleMongoId",
-                    title : "video1",
-                    onAirDate : "2012-11-04 14:55:45",
-                    duration : 10.40,
-                    videoUrl : "example.com",
-                    longUrl : "example.com"
-                },
-                {
-                    id : "exampleMongoId",
-                    title : "video2",
-                    onAirDate : "2012-11-04 14:55:45",
-                    duration : 5.00,
-                    videoUrl : "example.com",
-                    longUrl : "example.com"
-                }
-            ],
-            next : {
-                url : "page=2&limit=4"
-            }
+
+    var limit = parseInt(req.query.limit) || null;
+    var offset = parseInt(req.query.offset) || 0;
+    var query = {};
+
+    if(req.query.search){
+        query.title = new RegExp(req.query.search, "i");
+    }
+
+    dateParams.forEach(function(name) {
+        if(req.query.hasOwnProperty(name))
+        {
+            query[dateField+'.'+name] = req.query[name];
         }
     });
+
+    Vods.find(query)
+    .limit(limit)
+    .skip(offset)
+    .exec(function(err,doc){
+        res.send({
+            status : {
+                code : 200,
+                status : true,
+                message : "get_success"
+            },
+            data : {
+                records : doc || [],
+                next : {
+                    url : "offset="+(offset+limit)+"&limit="+limit
+                }
+            }
+        });
+
+    });
+
 });
 
 app.listen(port, function() {
