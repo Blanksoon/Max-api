@@ -1,4 +1,5 @@
 var app = require('express')();
+var bodyParser = require('body-parser')
 
 var port = process.env.PORT || 7777;
 
@@ -9,12 +10,17 @@ app.all('/*', function(req, res, next) {
     next();
 });
 
+app.use(bodyParser.urlencoded({ extended: false }))
+
 app.get('/vods', function (req, res) {
     res.send({
         status : {
             code : 200,
             status : true,
             message : "get_success"
+        },
+        input : {
+            data : req.query
         },
         data : {
             records : [
