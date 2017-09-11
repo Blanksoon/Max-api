@@ -5,6 +5,21 @@ var mongoose = require('mongoose'),
 
 var defaultSuccessMessage = 'success';
 
+function genNextQueryParams(params) {
+  var nextQueryParams = "";
+
+  Object.keys(params).forEach(function(key) {
+    if(key=='offset')
+      nextQueryParams += "offset="+(parseInt(params.offset)+parseInt(params.limit))+"&"
+    else
+      nextQueryParams += key+"="+params[key]+"&"
+
+  });
+
+  return nextQueryParams;
+
+}
+
 function dateTime2Obj (dateTime) {
   var date = new Date(dateTime);
   var year = parseInt(date.getFullYear());
@@ -21,7 +36,8 @@ function setPaginationParams(params) {
 
   var paginationParams = {
     limit : parseInt(params.limit),
-    offset : parseInt(params.offset)
+    offset : parseInt(params.offset),
+    next_query_param : genNextQueryParams(params)
   };
 
   return paginationParams;
@@ -97,7 +113,9 @@ exports.search = function(req, res) {
     }
 
     res.json(output);
-  });
+  })
+  .limit(paginationParams.limit)
+  .skip(paginationParams.offset);
 
 };
 
