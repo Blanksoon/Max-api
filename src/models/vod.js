@@ -8,7 +8,7 @@ var VodSchema = new Schema({
     required: 'title is required'
   },
   on_air_date: {
-    type: Date,
+    type: Object,
     required: 'on_air_date is required'
   },
   duration: {

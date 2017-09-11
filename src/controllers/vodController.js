@@ -5,6 +5,18 @@ var mongoose = require('mongoose'),
 
 var defaultSuccessMessage = 'success';
 
+function dateTime2Obj (dateTime) {
+  var date = new Date(dateTime);
+  var year = parseInt(date.getFullYear());
+  var month = parseInt(date.getMonth())+1;
+  
+  return {
+    date : date,
+    month : month,
+    year : year
+  };
+}
+
 function setPaginationParams(params) {
 
   var paginationParams = {
@@ -20,7 +32,13 @@ function setQueryParams(params) {
   var queryParams = {};
 
   if(params.search)
-    queryParams['title'] = new RegExp(params.search, "i");
+    queryParams.title = new RegExp(params.search, "i");
+  
+  if(params.month)
+    queryParams['on_air_date.month'] = parseInt(params.month);
+
+  if(params.year)
+    queryParams['on_air_date.year'] = parseInt(params.year);
 
   return queryParams;
 }
@@ -34,7 +52,7 @@ function setData(data) {
       id          : record._id,
       title       : record.title,
       duration    : record.duration,
-      on_air_date : record.on_air_date,
+      on_air_date : record.on_air_date.date,
       video_url   : record.video_url,
       long_url    : record.long_url
     };
@@ -84,6 +102,9 @@ exports.search = function(req, res) {
 };
 
 exports.create = function(req, res) {
+  
+  var createObject = req.body;
+  createObject.on_air_date = dateTime2Obj(createObject.on_air_date);
 
   var new_vod = new Vod(req.body);
 
@@ -143,7 +164,10 @@ exports.get = function(req, res) {
 
 exports.update = function(req, res) {
 
-  Vod.findOneAndUpdate({_id: req.params.vodId}, req.body, {new: true}, function(err, vod) {
+  var updateObject = req.body;
+  updateObject.on_air_date = dateTime2Obj(updateObject.on_air_date);
+
+  Vod.findOneAndUpdate({_id: req.params.vodId}, updateObject, {new: true}, function(err, vod) {
 
     var output = {
       status : {
