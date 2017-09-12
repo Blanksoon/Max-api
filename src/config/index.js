@@ -1,15 +1,21 @@
 var config = {
   local: {
-      mode: 'local',
-      port: 3000
+    secret: 'examplesecretkey',
+    tokenLifetime : (60*60),
+    mode: 'local',
+    port: 3001
   },
   staging: {
-      mode: 'staging',
-      port: 4000
+    secret: 'examplesecretkey',
+    tokenLifetime : (60*60),
+    mode: 'staging',
+    port: 4000
   },
   production: {
-      mode: 'production',
-      port: 5000
+    secret: 'examplesecretkey',
+    tokenLifetime : (60*60),
+    mode: 'production',
+    port: 5000
   }
 }
 module.exports = function(mode) {

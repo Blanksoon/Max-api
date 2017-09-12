@@ -1,8 +1,9 @@
-var config = require('./config')();
-var app = require('express')();
-var mongoose = require('mongoose');
-var Vod = require('./models/vod');
-var bodyParser = require('body-parser');
+var config      = require('./config')();
+    app         = require('express')();
+    mongoose    = require('mongoose');
+    Vod         = require('./models/vod');
+    User        = require('./models/user');
+    bodyParser  = require('body-parser');
 
 mongoose.connect('mongodb://localhost/max_api',{
   useMongoClient : true
@@ -10,6 +11,8 @@ mongoose.connect('mongodb://localhost/max_api',{
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.set('secret', config.secret);
+app.set('tokenLifetime', config.tokenLifetime);
 
 var routes = require('./config/route');
 routes(app);

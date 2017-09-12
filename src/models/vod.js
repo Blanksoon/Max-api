@@ -26,9 +26,9 @@ var VodSchema = new Schema({
   status: {
     type: [{
       type: String,
-      enum: ['active', 'inactive']
+      enum: ['pending','active','inactive']
     }],
-    default: 'active'
+    default: 'pending'
   },
   versionKey: false
 });
