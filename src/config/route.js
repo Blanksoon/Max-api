@@ -7,7 +7,7 @@ var verifyToken = function verifyToken(req, res, next) {
     if (token) {
       jwt.verify(token, req.app.get('secret'), function(err, decoded) {      
         if (err) {
-          return res.json({ success: false, message: 'Failed to authenticate token.' });    
+          return res.json({ status :{ code:403, success: false, message: 'Failed to authenticate token.' },data : []});    
         } else {
           req.decoded = decoded;    
           next();
