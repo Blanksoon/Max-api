@@ -5,7 +5,8 @@ var Schema = mongoose.Schema;
 var VodSchema = new Schema({
   title: {
     type: String,
-    required: 'title is required'
+    required: 'title is required',
+    unique: true
   },
   on_air_date: {
     type: Object,

@@ -45,7 +45,7 @@ module.exports = function(app) {
   // User Routes
   app.route('/users')
     .get(middleware,user.search)
-    .post(middleware,user.create);
+    .post(user.create);
   
   app.route('/users/:userId')
     .get(middleware,user.get)
