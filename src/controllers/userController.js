@@ -79,13 +79,6 @@ exports.login = function(req, res) {
       output.status.message = err.message;
     }
     else if(user){
-
-      console.log({
-        user : user,
-        secret : req.app.get('secret'),
-        expiresInMinutes : req.app.get('tokenLifetime')
-      });
-
       var token = jwt.sign( { data : user }, req.app.get('secret'), {
         expiresIn: req.app.get('tokenLifetime')
       });
