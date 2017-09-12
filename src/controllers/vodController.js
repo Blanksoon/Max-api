@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
   Vod = mongoose.model('Vod');
 
 var defaultSuccessMessage = 'success';
+var defaultErrorMessage = 'data_not_found';
 
 function genNextQueryParams(params) {
   var nextQueryParams = "";
@@ -94,7 +95,7 @@ exports.search = function(req, res) {
       status : {
         code : 400,
         success : false,
-        message : ''
+        message : defaultErrorMessage
       },
       data : {
         pagination : paginationParams,
@@ -105,7 +106,7 @@ exports.search = function(req, res) {
     if (err) {
       output.status.message = err.message;
     }
-    else {
+    else if(vod) {
       output.status.code = 200;
       output.status.success = true;
       output.status.message = defaultSuccessMessage;
@@ -140,7 +141,7 @@ exports.create = function(req, res) {
     if (err) {
       output.status.message = err.message;
     }
-    else {
+    else if(vod) {
       output.status.code = 200;
       output.status.success = true;
       output.status.message = defaultSuccessMessage;
@@ -160,7 +161,7 @@ exports.get = function(req, res) {
       status : {
         code : 400,
         success : false,
-        message : ''
+        message : defaultErrorMessage
       },
       data : []
     }
@@ -168,7 +169,7 @@ exports.get = function(req, res) {
     if (err) {
       output.status.message = err.message;
     }
-    else {
+    else if(vod) {
       output.status.code = 200;
       output.status.success = true;
       output.status.message = defaultSuccessMessage;
@@ -191,7 +192,7 @@ exports.update = function(req, res) {
       status : {
         code : 400,
         success : false,
-        message : ''
+        message : defaultErrorMessage
       },
       data : []
     }
@@ -199,7 +200,7 @@ exports.update = function(req, res) {
     if (err) {
       output.status.message = err.message;
     }
-    else {
+    else if(vod) {
       output.status.code = 200;
       output.status.success = true;
       output.status.message = defaultSuccessMessage;
@@ -221,7 +222,7 @@ exports.delete = function(req, res) {
       status : {
         code : 400,
         success : false,
-        message : ''
+        message : defaultErrorMessage
       },
       data : {
         id: req.params.vodId
@@ -231,7 +232,7 @@ exports.delete = function(req, res) {
     if (err) {
       output.status.message = err.message;
     }
-    else {
+    else if(vod) {
       output.status.code = 200;
       output.status.success = true;
       output.status.message = defaultSuccessMessage;
