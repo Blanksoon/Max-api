@@ -28,9 +28,18 @@ var verifyToken = function verifyToken(req, res, next) {
 
 module.exports = function(app) {
 
+  
+
   var middleware = [verifyToken];
   var vod = require('../controllers/vodController');
   var user = require('../controllers/userController');
+
+  app.all('/*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+  });
 
   // vod Routes
   app.route('/vods')
@@ -55,5 +64,8 @@ module.exports = function(app) {
   // Login and Validate Token Routes
   app.route('/login')
     .post(user.login)
+
+  app.route('/social_login')
+    .post(user.socialLogin)
 
 };

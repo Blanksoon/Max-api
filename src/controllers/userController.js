@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
 var mongoose = require('mongoose'),
     User     = mongoose.model('User'),
-    jwt      = require('jsonwebtoken');
+    jwt      = require('jsonwebtoken')
 
-var defaultSuccessMessage = 'success';
-var defaultErrorMessage = 'data_not_found';
+var defaultSuccessMessage = 'success'
+var defaultErrorMessage = 'data_not_found'
 
 function genNextQueryParams(params) {
-  var nextQueryParams = "";
+  var nextQueryParams = ""
 
   Object.keys(params).forEach(function(key) {
     if(key=='offset')
@@ -16,9 +16,9 @@ function genNextQueryParams(params) {
     else
       nextQueryParams += key+"="+params[key]+"&"
 
-  });
+  })
 
-  return nextQueryParams;
+  return nextQueryParams
 
 }
 
@@ -28,35 +28,35 @@ function setPaginationParams(params) {
     limit : parseInt(params.limit),
     offset : parseInt(params.offset),
     next_query_param : genNextQueryParams(params)
-  };
+  }
 
-  return paginationParams;
+  return paginationParams
 }
 
 function setQueryParams(params) {
 
-  var queryParams = {};
+  var queryParams = {}
 
   if(params.search)
-    queryParams.email = new RegExp(params.search, "i");
+    queryParams.email = new RegExp(params.search, "i")
 
-  return queryParams;
+  return queryParams
 }
 
 function setData(data) {
 
-  var output = [];
+  var output = []
 
   data.forEach(function(record) {
     var newData = {
       id          : record._id,
       email       : record.email
-    };
+    }
 
-    output.push(newData);
-  });
+    output.push(newData)
+  })
 
-  return output;
+  return output
 }
 
 exports.login = function(req, res) {
@@ -64,7 +64,7 @@ exports.login = function(req, res) {
   var queryParams = {
       email : req.body.email,
       password : req.body.password
-  };
+  }
 
   User.findOne(queryParams, function(err, user) {
     var output = {
@@ -77,32 +77,32 @@ exports.login = function(req, res) {
     }
 
     if (err) {
-      output.status.message = err.message;
+      output.status.message = err.message
     }
     else if(user){
       var token = jwt.sign( { data : user }, req.app.get('secret'), {
         expiresIn: req.app.get('tokenLifetime')
-      });
-      output.status.code = 200;
-      output.status.success = true;
-      output.status.message = defaultSuccessMessage;
+      })
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
       output.data = {
         token : token
-      };
+      }
     }
 
-    res.json(output);
-  });
-};
+    res.json(output)
+  })
+}
 
 exports.search = function(req, res) {
 
-  var queryParams = setQueryParams(req.query);
-  var paginationParams = setPaginationParams(req.query);
+  var queryParams = setQueryParams(req.query)
+  var paginationParams = setPaginationParams(req.query)
 
   User.count(queryParams).exec(function(err, count) {
-     paginationParams.total_records = count;
-  });
+     paginationParams.total_records = count
+  })
 
   User.find(queryParams, function(err, user) {
 
@@ -119,27 +119,27 @@ exports.search = function(req, res) {
     }
 
     if (err) {
-      output.status.message = err.message;
+      output.status.message = err.message
     }
     else if(user) {
-      output.status.code = 200;
-      output.status.success = true;
-      output.status.message = defaultSuccessMessage;
-      output.data.records = setData(user);
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data.records = setData(user)
     }
 
-    res.json(output);
+    res.json(output)
   })
   .limit(paginationParams.limit)
-  .skip(paginationParams.offset);
+  .skip(paginationParams.offset)
 
-};
+}
 
 exports.create = function(req, res) {
   
-  var createObject = req.body;
+  var createObject = req.body
 
-  var new_user = new User(req.body);
+  var new_user = new User(req.body)
 
   new_user.save(function(err, user) {
 
@@ -153,19 +153,25 @@ exports.create = function(req, res) {
     }
 
     if (err) {
-      output.status.message = err.message;
+      output.status.message = err.message
     }
-    else if(user) {
-      output.status.code = 200;
-      output.status.success = true;
-      output.status.message = defaultSuccessMessage;
-      output.data = setData([user]);
-    }
+    else
+    {
+      var token = jwt.sign( { data : user }, req.app.get('secret'), {
+        expiresIn: req.app.get('tokenLifetime')
+      })
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data = {
+        token : token
+      }
+    } 
+    
+    res.json(output)
+  })
 
-    res.json(output);
-  });
-
-};
+}
 
 exports.get = function(req, res) {
 
@@ -181,23 +187,23 @@ exports.get = function(req, res) {
     }
 
     if (err) {
-      output.status.message = err.message;
+      output.status.message = err.message
     }
     else if(user) {
-      output.status.code = 200;
-      output.status.success = true;
-      output.status.message = defaultSuccessMessage;
-      output.data = setData([user]);
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data = setData([user])
     }
 
-    res.json(output);
-  });
+    res.json(output)
+  })
 
-};
+}
 
 exports.update = function(req, res) {
 
-  var updateObject = req.body;
+  var updateObject = req.body
 
   User.findOneAndUpdate({_id: req.params.userId}, updateObject, {new: true}, function(err, user) {
 
@@ -211,19 +217,19 @@ exports.update = function(req, res) {
     }
 
     if (err) {
-      output.status.message = err.message;
+      output.status.message = err.message
     }
     else if(user) {
-      output.status.code = 200;
-      output.status.success = true;
-      output.status.message = defaultSuccessMessage;
-      output.data = setData([user]);
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data = setData([user])
     }
 
-    res.json(output);
-  });
+    res.json(output)
+  })
 
-};
+}
 
 exports.delete = function(req, res) {
 
@@ -243,15 +249,87 @@ exports.delete = function(req, res) {
     }
 
     if (err) {
-      output.status.message = err.message;
+      output.status.message = err.message
     }
     else if(user) {
-      output.status.code = 200;
-      output.status.success = true;
-      output.status.message = defaultSuccessMessage;
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
     }
 
-    res.json(output);
-  });
+    res.json(output)
+  })
 
-};
+}
+
+var socialAuthen = []
+
+socialAuthen['facebook'] = async function (app,providerData) {
+  console.log('1')
+  let facebookData = providerData
+  try {
+    var user = await User.findOneAndUpdate({email: facebookData.email}, {fb_info : facebookData}, {new: true}).exec()
+    if(!user) {
+      var createObject = {
+        email : facebookData.email,
+        password : Date.now(),
+        fb_info : facebookData
+      }
+      var new_user = new User(createObject)
+      try {
+        user = await new_user.save()
+      } catch (err) {
+        return {
+          status : {
+            code : 400,
+            success : false,
+            message : err.message
+          },
+          data : []
+        }
+      }
+    }
+    return {
+      status: {
+        code : 400,
+        success : true,
+        message : 'success'
+      },
+      data: {
+        token : await jwt.sign( { data : user }, app.get('secret'), {
+          expiresIn: app.get('tokenLifetime')
+        }) 
+      }
+    }
+  } catch (err) {
+    return {
+      status : {
+        code : 400,
+        success : false,
+        message : err.message
+      },
+      data : []
+    }
+  }
+}
+
+exports.socialLogin = async function(req, res) {
+  var providerName = req.body.provider_name
+  var providerData = req.body.provider_data
+
+  if(!socialAuthen[providerName])
+    res.json({
+      status : {
+        code : 400,
+        success : false,
+        message : providerName+' is not support'
+      },
+      data : []
+    })
+  else
+  {
+    var response = await socialAuthen[providerName](req.app,providerData)
+    res.json(response)
+  }
+    
+}
