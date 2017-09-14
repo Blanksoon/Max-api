@@ -2,7 +2,8 @@
 
 var mongoose = require('mongoose'),
     User     = mongoose.model('User'),
-    jwt      = require('jsonwebtoken')
+    jwt      = require('jsonwebtoken'),
+    fetch    = require('node-fetch');
 
 var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
@@ -265,8 +266,41 @@ exports.delete = function(req, res) {
 var socialAuthen = []
 
 socialAuthen['facebook'] = async function (app,providerData) {
-  console.log('1')
   let facebookData = providerData
+  var response = {}
+  try {
+    response = await fetch('https://graph.facebook.com/me?access_token='+facebookData.accessToken).then(response => response.json());
+    if(response.error) {
+      return {
+        status : {
+          code : 400,
+          success : false,
+          message : response.error.message
+        },
+        data : []
+      }
+    }
+    if ((response.id!=facebookData.id)||(response.name!=facebookData.name)) {
+      return {
+        status : {
+          code : 400,
+          success : false,
+          message : 'token is invalid'
+        },
+        data : []
+      }
+    }
+  } catch(err) {
+    return {
+      status : {
+        code : 400,
+        success : false,
+        message : err.message
+      },
+      data : []
+    }
+  }
+
   try {
     var user = await User.findOneAndUpdate({email: facebookData.email}, {fb_info : facebookData}, {new: true}).exec()
     if(!user) {
@@ -293,7 +327,7 @@ socialAuthen['facebook'] = async function (app,providerData) {
       status: {
         code : 400,
         success : true,
-        message : 'success'
+        message : defaultSuccessMessage
       },
       data: {
         token : await jwt.sign( { data : user }, app.get('secret'), {
