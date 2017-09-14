@@ -1,0 +1,112 @@
+{ 
+  "_id" : ObjectId("59b6cef467109a358a69190c"), 
+  "title" : "video", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : ISODate("2012-11-04T07:55:45.000+0000"), 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6cf2be85e4635dbf0f269"), 
+  "title" : "aaaaaa", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : ISODate("2012-11-04T07:55:45.000+0000"), 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6cf31e85e4635dbf0f26a"), 
+  "title" : "aaba", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : ISODate("2012-11-04T07:55:45.000+0000"), 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6d5babf63e13c4332ab9a"), 
+  "title" : "aaba", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : ISODate("2012-11-04T07:55:45.000+0000"), 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6d5c5fdfe1e3e1eeb0a2a"), 
+  "title" : "aaba", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : {
+      "year" : NumberInt(2012), 
+      "month" : NumberInt(11), 
+      "date" : ISODate("2012-11-04T07:55:45.000+0000")
+  }, 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6d7004f2d003fa6d76d02"), 
+  "title" : "aaba", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : {
+      "year" : NumberInt(2012), 
+      "month" : NumberInt(5), 
+      "date" : ISODate("2012-05-04T07:55:45.000+0000")
+  }, 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6d77711a0f640676e0b15"), 
+  "title" : "aaba", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : {
+      "year" : NumberInt(2012), 
+      "month" : NumberInt(5), 
+      "date" : ISODate("2012-05-04T07:55:45.000+0000")
+  }, 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
+{ 
+  "_id" : ObjectId("59b6d78211a0f640676e0b16"), 
+  "title" : "aaba", 
+  "duration" : NumberInt(5), 
+  "video_url" : "example.com", 
+  "long_url" : "example.com", 
+  "on_air_date" : {
+      "year" : NumberInt(2016), 
+      "month" : NumberInt(7), 
+      "date" : ISODate("2016-07-04T07:55:45.000+0000")
+  }, 
+  "status" : [
+      "active"
+  ], 
+  "__v" : NumberInt(0)
+}
