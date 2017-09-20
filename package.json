@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "max-muaythai api",
   "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -58,6 +61,7 @@
     "muri": "^1.2.2",
     "negotiator": "^0.6.1",
     "node-fetch": "^1.7.3",
+    "nodemon": "^1.12.1",
     "on-finished": "^2.3.0",
     "parseurl": "^1.3.2",
     "path-to-regexp": "^2.0.0",
@@ -85,9 +89,6 @@
     "vary": "^1.1.1"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "mocha"
-  },
   "author": "",
   "license": "ISC",
   "keywords": [],
