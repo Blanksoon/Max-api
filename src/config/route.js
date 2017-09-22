@@ -37,6 +37,7 @@ module.exports = function(app) {
   //var middleware = []; uneble Token
   var vod = require('../controllers/vodController')
   var user = require('../controllers/userController')
+  var order = require('../controllers/orderController')
 
   app.all('/*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -69,8 +70,10 @@ module.exports = function(app) {
     .put(middleware, user.update)
     .delete(middleware, user.delete)
 
+  app.route('/order').post(middleware, order.search)
+
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
 
-  app.route('/social_login').post(user.socialLogin)
+  app.route('/fb-login').post(user.fbLogin)
 }

@@ -246,7 +246,7 @@ var socialAuthen = []
 
 socialAuthen['facebook'] = async function(app, providerData) {
   let facebookData = providerData
-  console.log('hi', facebookData)
+  //console.log('hi',facebookData)
   var response = {}
   try {
     response = await fetch(
@@ -333,7 +333,7 @@ socialAuthen['facebook'] = async function(app, providerData) {
   }
 }
 
-exports.socialLogin = async function(req, res) {
+exports.fbLogin = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
   //console.log('hi', req)

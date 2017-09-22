@@ -3,6 +3,7 @@ app = require('express')()
 mongoose = require('mongoose')
 Vod = require('./models/vod')
 User = require('./models/user')
+Order = require('./models/order')
 bodyParser = require('body-parser')
 
 mongoose.connect('mongodb://localhost/max_api', {
