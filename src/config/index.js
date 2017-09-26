@@ -1,7 +1,7 @@
 var config = {
   local: {
     secret: 'examplesecretkey',
-    tokenLifetime: 500 * 500,
+    tokenLifetime: 5000 * 5000,
     mode: 'local',
     port: 3001,
   },
@@ -13,7 +13,7 @@ var config = {
   },
   production: {
     secret: 'examplesecretkey',
-    tokenLifetime: 60 * 60,
+    tokenLifetime: 5000 * 5000,
     mode: 'production',
     port: 5000,
   },
