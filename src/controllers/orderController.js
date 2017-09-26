@@ -94,3 +94,82 @@ exports.search = function(req, res) {
     res.json(output)
   }
 }
+
+exports.subscribe = function(req, res) {
+  var queryParams = {
+    userId: req.decoded.data.email,
+    productId: req.body.promocode,
+  }
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  if (req.body.promocode == '1001') {
+    Order.findOne(queryParams, function(err, order) {
+      if (order) {
+        console.log('hiiii', order)
+        output.status.code = 400
+        output.status.success = false
+        output.status.message = 'you have purchase'
+        return res.json(output)
+      }
+      var dateNow = new Date()
+      var endDate = moment(dateNow).add(3, 'days')
+      var order = {
+        userId: req.decoded.data.email,
+        productId: req.body.promocode,
+        endDate: endDate,
+      }
+      var newOrder = new Order(order)
+      newOrder.save(function(err, order) {
+        if (err) {
+          output.status.message = err.message
+          return res.json(output)
+        } else {
+          output.status.code = 200
+          output.status.success = true
+          output.status.message = defaultSuccessMessage
+          output.data = order
+        }
+        return res.json(output)
+      })
+    })
+  } else if (req.body.promocode == '1002') {
+    Order.findOne(queryParams, function(err, order) {
+      if (order) {
+        output.status.code = 400
+        output.status.success = false
+        output.status.message = 'you have purchase'
+        return res.json(output)
+      }
+      var dateNow = new Date()
+      var endDate = moment(dateNow).add(1, 'months')
+      var order = {
+        userId: req.decoded.data.email,
+        productId: req.body.promocode,
+        endDate: endDate,
+      }
+      var newOrder = new Order(order)
+      newOrder.save(function(err, order) {
+        if (err) {
+          output.status.message = err.message
+          return res.json(output)
+        } else {
+          output.status.code = 200
+          output.status.success = true
+          output.status.message = defaultSuccessMessage
+          output.data = order
+        }
+        return res.json(output)
+      })
+    })
+  } else {
+    console.log('output', output)
+    output.status.message = 'invalid promocode'
+    res.json(output)
+  }
+}

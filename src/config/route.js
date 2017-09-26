@@ -2,6 +2,36 @@
 
 var jwt = require('jsonwebtoken')
 
+exports.verifyToken = function verifyToken(req, res, next) {
+  var token = req.body.token || req.query.token || req.headers['x-access-token']
+  if (token) {
+    jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+      if (err) {
+        return res.json({
+          status: {
+            code: 403,
+            success: false,
+            message: 'Failed to authenticate token.',
+          },
+          data: [],
+        })
+      } else {
+        req.decoded = decoded
+        next()
+      }
+    })
+  } else {
+    return res.json({
+      status: {
+        code: 403,
+        success: false,
+        message: 'No token provided.',
+      },
+      data: [],
+    })
+  }
+}
+
 var verifyToken = function verifyToken(req, res, next) {
   var token = req.body.token || req.query.token || req.headers['x-access-token']
   if (token) {
@@ -38,6 +68,7 @@ module.exports = function(app) {
   var vod = require('../controllers/vodController')
   var user = require('../controllers/userController')
   var order = require('../controllers/orderController')
+  var live = require('../controllers/liveController')
 
   app.all('/*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -50,7 +81,8 @@ module.exports = function(app) {
   app
     .route('/vods')
     .get(vod.search)
-    .post(middleware, vod.create)
+    .post(vod.vods)
+  //.post(middleware, vod.create)
 
   app
     .route('/vods/:vodId')
@@ -71,6 +103,9 @@ module.exports = function(app) {
     .delete(middleware, user.delete)
 
   app.route('/order').post(middleware, order.search)
+  app.route('/subscribe').post(middleware, order.subscribe)
+
+  app.route('/live').post(live.lives)
 
   // Login and Validate Token Routes
   app.route('/login').post(user.login)

@@ -6,19 +6,17 @@ var OrderSchema = new Schema({
   userId: {
     type: String,
     required: 'userId is required',
-    unique: true,
   },
-  itemId: {
+  productId: {
     type: String,
     required: 'itemId is required',
   },
   startDate: {
-    type: String,
-    default: 'startDate is required',
+    type: Date,
+    default: Date.now,
   },
   endDate: {
-    type: String,
-    default: 'endDate is required',
+    type: Date,
   },
   versionKey: false,
 })
