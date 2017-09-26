@@ -1,107 +1,275 @@
 exports.VodsLogin = [
   {
+    id: '1',
     title: 'video',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live1',
+    thumbnail: 'example.com',
+    channel: 'live1',
     feature: 'active',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-11-04T07:55:45.000+0000',
+    onAirDate: '2012-11-04T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '2',
+    title: 'video',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live1',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2012-11-04T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '3',
     title: 'aaaaaa',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live1',
+    thumbnail: 'example.com',
+    channel: 'live1',
     feature: 'unactive',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-11-05T07:55:45.000+0000',
+    onAirDate: '2012-11-05T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '4',
     title: 'aaba',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live1',
+    thumbnail: 'example.com',
+    channel: 'live1',
     feature: 'unactive',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-11-06T07:55:45.000+0000',
+    onAirDate: '2012-11-06T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '5',
     title: 'aaba',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live1',
+    thumbnail: 'example.com',
+    channel: 'live1',
     feature: 'unactive',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-11-07T07:55:45.000+0000',
+    onAirDate: '2012-11-07T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '6',
     title: 'aaba',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live1',
-    promo_url:
+    thumbnail: 'example.com',
+    channel: 'live2',
+    feature: 'unactive',
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-11-08T07:55:45.000+0000',
+    onAirDate: '2012-05-09T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '7',
     title: 'aaba',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live2',
+    thumbnail: 'example.com',
+    channel: 'live2',
     feature: 'unactive',
-    feature: 'unactive',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-05-09T07:55:45.000+0000',
-
+    onAirDate: '2012-05-010T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '8',
     title: 'aaba',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live2',
+    thumbnail: 'example.com',
+    channel: 'live2',
     feature: 'unactive',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2012-05-010T07:55:45.000+0000',
+    onAirDate: '2016-07-011T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
   {
+    id: '9',
     title: 'aaba',
     duration: '',
-    video_url:
+    videoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    img_url: 'example.com',
-    program: 'live2',
+    thumbnail: 'example.com',
+    channel: 'live2',
     feature: 'unactive',
-    promo_url:
+    promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    on_air_date: '2016-07-011T07:55:45.000+0000',
+    onAirDate: '2016-07-011T07:55:45.000+0000',
     status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '10',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live3',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2012-05-09T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '11',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live3',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2012-05-010T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '12',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live3',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2016-07-011T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '13',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live3',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2016-07-011T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '14',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live4',
+    feature: 'unactive',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2012-05-09T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '15',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live4',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2012-05-010T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '16',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live4',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2016-07-011T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
+  },
+  {
+    id: '17',
+    title: 'aaba',
+    duration: '',
+    videoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    thumbnail: 'example.com',
+    channel: 'live4',
+    feature: 'unactive',
+    promoUrl:
+      'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
+    onAirDate: '2016-07-011T07:55:45.000+0000',
+    status: 'active',
+    description: '1',
+    cadlogo: '1',
   },
 ]
