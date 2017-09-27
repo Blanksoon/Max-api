@@ -14,6 +14,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '2',
@@ -30,6 +31,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '3',
@@ -46,6 +48,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '4',
@@ -62,6 +65,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '5',
@@ -78,6 +82,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '6',
@@ -94,6 +99,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '7',
@@ -110,6 +116,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '8',
@@ -126,6 +133,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '9',
@@ -142,6 +150,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '10',
@@ -158,6 +167,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '11',
@@ -174,6 +184,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '12',
@@ -190,6 +201,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '13',
@@ -206,6 +218,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '14',
@@ -223,6 +236,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '15',
@@ -239,6 +253,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '16',
@@ -255,6 +270,7 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
   {
     id: '17',
@@ -271,5 +287,6 @@ exports.VodsLogin = [
     status: 'active',
     description: '1',
     cadlogo: '1',
+    programName: '',
   },
 ]
