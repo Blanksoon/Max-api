@@ -320,6 +320,7 @@ socialAuthen['facebook'] = async function(app, providerData) {
         token: await jwt.sign({ data: user }, app.get('secret'), {
           expiresIn: app.get('tokenLifetime'),
         }),
+        email: facebookData.email,
       },
     }
   } catch (err) {
@@ -338,7 +339,6 @@ exports.fbLogin = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
   var j = JSON.stringify(req.body)
-  //console.log('hi', j)
 
   if (!socialAuthen[providerName])
     res.json({
