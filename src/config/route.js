@@ -79,7 +79,7 @@ module.exports = function(app) {
 
   // vod Routes
   app
-    .route('/vods')
+    .route('/vod')
     .get(vod.search)
     .post(vod.vods)
   //.post(middleware, vod.create)
