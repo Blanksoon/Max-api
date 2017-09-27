@@ -1,6 +1,7 @@
 var config = require('./config')()
 app = require('express')()
 mongoose = require('mongoose')
+cors = require('cors')
 Vod = require('./models/vod')
 User = require('./models/user')
 Order = require('./models/order')
@@ -12,6 +13,7 @@ mongoose.connect('mongodb://localhost/max_api', {
 //console.log('secret', config.secret)
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(cors())
 app.set('secret', config.secret)
 app.set('tokenLifetime', config.tokenLifetime)
 

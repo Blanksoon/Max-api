@@ -112,6 +112,7 @@ exports.search = function(req, res) {
 exports.vods = function(req, res) {
   var decoded = {}
   var token = req.body.token
+  console.log(req.body)
   if (req.body.token == null) {
     res.json(vods)
   } else {

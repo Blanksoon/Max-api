@@ -25,6 +25,7 @@
     "cookie": "^0.3.1",
     "cookie-signature": "^1.0.6",
     "core-util-is": "^1.0.2",
+    "cors": "^2.8.4",
     "debug": "^3.0.1",
     "depd": "^1.1.1",
     "destroy": "^1.0.4",
