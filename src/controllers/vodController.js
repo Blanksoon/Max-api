@@ -1,6 +1,6 @@
 'use strict'
 var vods = require('../../data/vods/vods')
-var vodsLogin = require('../../data/vods/buyVods')
+var vodslogin = require('../../data/vods/buyvods')
 var mongoose = require('mongoose'),
   Vod = mongoose.model('Vod')
 Order = mongoose.model('Order')
@@ -112,10 +112,24 @@ exports.search = function(req, res) {
 exports.vods = function(req, res) {
   var decoded = {}
   var token = req.body.token
-  console.log(req.body)
-  if (req.body.token == null) {
-    res.json(vods)
+  //console.log('test', req.body)
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  if (token == undefined) {
+    //console.log('1')
+    output.status.code = 200
+    output.status.success = true
+    output.status.message = defaultSuccessMessage
+    output.data = vods
+    return res.json(output)
   } else {
+    //console.log('2')
     if (token) {
       jwt.verify(token, req.app.get('secret'), function(err, decoded) {
         if (err) {
@@ -134,21 +148,13 @@ exports.vods = function(req, res) {
             productId: '1002',
           }
           Order.findOne(queryParams, function(err, order) {
-            var output = {
-              status: {
-                code: 400,
-                success: false,
-                message: defaultErrorMessage,
-              },
-              data: [],
-            }
             if (err) {
               output.status.message = err.message
             } else if (order) {
               output.status.code = 200
               output.status.success = true
               output.status.message = defaultSuccessMessage
-              output.data = vodsLogin
+              output.data = vodslogin
             }
             return res.json(output)
           })

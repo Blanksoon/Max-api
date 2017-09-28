@@ -1,4 +1,4 @@
-exports.VodsLogin = [
+exports.vodslogin = [
   {
     id: '1',
     title: 'video',

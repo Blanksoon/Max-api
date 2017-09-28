@@ -1,4 +1,4 @@
-exports.Vods = [
+exports.vods = [
   {
     id: '1',
     title: 'video',
