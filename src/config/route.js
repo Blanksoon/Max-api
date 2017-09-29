@@ -103,6 +103,7 @@ module.exports = function(app) {
     .delete(middleware, user.delete)
 
   app.route('/order').post(middleware, order.search)
+  app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   app.route('/subscribe').post(middleware, order.subscribe)
 
   app.route('/live').post(live.lives)

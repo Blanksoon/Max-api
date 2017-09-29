@@ -95,7 +95,40 @@ exports.search = function(req, res) {
   }
 }
 
+exports.checkSubScribe = function(req, res) {
+  //console.log('userId', req)
+  //console.log('1')
+  var queryParams = {
+    userId: req.decoded.data.email,
+    productId: 1002,
+  }
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  Order.findOne(queryParams, function(err, order) {
+    if (order) {
+      //console.log('hiiii', order)
+      output.status.code = 400
+      output.status.success = false
+      output.status.message = 'you have purchase'
+      //console.log('hiiii', output)
+      return res.json(output)
+    } else {
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = 'you do not have ticket'
+      return res.json(output)
+    }
+  })
+}
+
 exports.subscribe = function(req, res) {
+  //console.log('22')
   var queryParams = {
     userId: req.decoded.data.email,
     productId: req.body.promocode,
@@ -111,7 +144,7 @@ exports.subscribe = function(req, res) {
   if (req.body.promocode == '1001') {
     Order.findOne(queryParams, function(err, order) {
       if (order) {
-        console.log('hiiii', order)
+        //console.log('hiiii', order)
         output.status.code = 400
         output.status.success = false
         output.status.message = 'you have purchase'
@@ -168,7 +201,7 @@ exports.subscribe = function(req, res) {
       })
     })
   } else {
-    console.log('output', output)
+    //console.log('output', output)
     output.status.message = 'invalid promocode'
     res.json(output)
   }
