@@ -312,7 +312,7 @@ socialAuthen['facebook'] = async function(app, providerData) {
     }
     return {
       status: {
-        code: 400,
+        code: 200,
         success: true,
         message: defaultSuccessMessage,
       },
