@@ -1,6 +1,6 @@
 'use strict'
 var vods = require('../../data/vods/vods')
-var vodslogin = require('../../data/vods/buyvods')
+var vodslogin = require('../../data/vods/buyVods')
 var mongoose = require('mongoose'),
   Vod = mongoose.model('Vod')
 Order = mongoose.model('Order')
