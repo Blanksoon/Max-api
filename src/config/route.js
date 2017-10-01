@@ -79,7 +79,7 @@ module.exports = function(app) {
 
   // vod Routes
   app
-    .route('/vod')
+    .route('/vods')
     .get(vod.search)
     .post(vod.vods)
   //.post(middleware, vod.create)
@@ -106,7 +106,7 @@ module.exports = function(app) {
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   app.route('/subscribe').post(middleware, order.subscribe)
 
-  app.route('/live').post(live.lives)
+  app.route('/lives').post(live.lives)
 
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
