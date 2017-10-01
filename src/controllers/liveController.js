@@ -122,7 +122,7 @@ exports.lives = function(req, res) {
       if (err) {
         output.status.message = err.message
       } else if (lives) {
-        console.log('live', lives)
+        //console.log('live', lives)
         responseLive = lives
         output.status.code = 200
         output.status.success = true
@@ -151,7 +151,6 @@ exports.lives = function(req, res) {
           }
           Order.findOne(queryParams, function(err, order) {
             if (err) {
-              console.log(err.message)
               output.status.message = err.message
               return res.json(output)
             } else if (order) {
