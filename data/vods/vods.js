@@ -9,7 +9,7 @@ exports.vods = [
     feature: 'active',
     promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    onAirDate: '2012-11-04T07:55:45.000+0000',
+    onAirDate: 'On air - Aug 11,2017',
     status: 'active',
     descriptionEn: '1',
     descriptionTh: '1',
@@ -26,7 +26,7 @@ exports.vods = [
     feature: 'unactive',
     promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    onAirDate: '2012-11-04T07:55:45.000+0000',
+    onAirDate: 'On air - Aug 11,2017',
     status: 'active',
     descriptionEn: '1',
     descriptionTh: '1',
@@ -42,7 +42,7 @@ exports.vods = [
     feature: 'unactive',
     promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    onAirDate: '2012-11-05T07:55:45.000+0000',
+    onAirDate: 'On air - Aug 11,2017',
     status: 'active',
     descriptionEn: '1',
     descriptionTh: '1',
@@ -59,7 +59,7 @@ exports.vods = [
     feature: 'unactive',
     promoUrl:
       'https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8',
-    onAirDate: '2012-11-06T07:55:45.000+0000',
+    onAirDate: 'On air - Aug 11,2017',
     status: 'active',
     descriptionEn: '1',
     descriptionTh: '1',
