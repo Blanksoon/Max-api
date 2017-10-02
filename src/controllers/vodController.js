@@ -54,22 +54,113 @@ function setQueryParams(params) {
   return queryParams
 }
 
-function setData(data) {
+// function setData(data) {
+//   var output = []
+
+//   data.forEach(function(record) {
+//     var newData = {
+//       id: record._id,
+//       title: record.title,
+//       duration: record.duration,
+//       on_air_date: record.on_air_date.date,
+//       video_url: record.video_url,
+//       long_url: record.long_url,
+//     }
+
+//     output.push(newData)
+//   })
+
+//   return output
+// }
+
+function setData(data, message) {
   var output = []
-
-  data.forEach(function(record) {
-    var newData = {
-      id: record._id,
-      title: record.title,
-      duration: record.duration,
-      on_air_date: record.on_air_date.date,
-      video_url: record.video_url,
-      long_url: record.long_url,
+  var vodUrl = ''
+  if (message == 'not-paid') {
+    if (data.vods == undefined) {
+      data.vodslogin.forEach(function(record) {
+        var newData = {
+          id: record.id,
+          title: record.title,
+          duration: record.duration,
+          videoUrl: record.videoUrl,
+          thumbnail: record.thumbnail,
+          channel: record.channel,
+          feature: record.feature,
+          promoUrl: record.promoUrl,
+          onAirDate: record.onAirDate,
+          status: record.status,
+          descriptionEn: record.descriptionEn,
+          descriptionTh: record.descriptionTh,
+          cadlogo: record.cadlogo,
+          programName: record.programName,
+        }
+        output.push(newData)
+      })
+    } else {
+      data.vods.forEach(function(record) {
+        var newData = {
+          id: record.id,
+          title: record.title,
+          duration: record.duration,
+          videoUrl: '',
+          thumbnail: record.thumbnail,
+          channel: record.channel,
+          feature: record.feature,
+          promoUrl: record.promoUrl,
+          onAirDate: record.onAirDate,
+          status: record.status,
+          descriptionEn: record.descriptionEn,
+          descriptionTh: record.descriptionTh,
+          cadlogo: record.cadlogo,
+          programName: record.programName,
+        }
+        output.push(newData)
+      })
     }
-
-    output.push(newData)
-  })
-
+  } else {
+    if (data.vods == undefined) {
+      data.vodslogin.forEach(function(record) {
+        var newData = {
+          id: record.id,
+          title: record.title,
+          duration: record.duration,
+          videoUrl: record.videoUrl,
+          thumbnail: record.thumbnail,
+          channel: record.channel,
+          feature: record.feature,
+          promoUrl: record.promoUrl,
+          onAirDate: record.onAirDate,
+          status: record.status,
+          descriptionEn: record.descriptionEn,
+          descriptionTh: record.descriptionTh,
+          cadlogo: record.cadlogo,
+          programName: record.programName,
+        }
+        output.push(newData)
+      })
+    } else {
+      data.vods.forEach(function(record) {
+        var newData = {
+          id: record.id,
+          title: record.title,
+          duration: record.duration,
+          videoUrl: '',
+          thumbnail: record.thumbnail,
+          channel: record.channel,
+          feature: record.feature,
+          promoUrl: record.promoUrl,
+          onAirDate: record.onAirDate,
+          status: record.status,
+          descriptionEn: record.descriptionEn,
+          descriptionTh: record.descriptionTh,
+          cadlogo: record.cadlogo,
+          programName: record.programName,
+        }
+        output.push(newData)
+      })
+    }
+  }
   return output
 }
 
@@ -100,7 +191,7 @@ exports.search = function(req, res) {
       output.status.code = 200
       output.status.success = true
       output.status.message = defaultSuccessMessage
-      output.data.records = setData(vod)
+      output.data.records = setData(vod, not - paid)
     }
 
     res.json(output)
@@ -126,7 +217,7 @@ exports.vods = function(req, res) {
     output.status.code = 200
     output.status.success = true
     output.status.message = defaultSuccessMessage
-    output.data = vods
+    output.data = setData(vods, 'not-paid')
     return res.json(output)
   } else {
     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
@@ -153,13 +244,13 @@ exports.vods = function(req, res) {
             output.status.code = 200
             output.status.success = true
             output.status.message = defaultSuccessMessage
-            output.data = vodslogin
+            output.data = setData(vodslogin, 'paid')
             return res.json(output)
           } else {
             output.status.code = 200
             output.status.success = true
             output.status.message = defaultSuccessMessage
-            output.data = vods
+            output.data = setData(vods, 'not-paid')
             return res.json(output)
           }
         })
