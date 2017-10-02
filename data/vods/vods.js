@@ -14,7 +14,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Muay Thai Battle',
   },
   {
     id: '2',
@@ -31,6 +31,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
+    programName: 'Muay Thai Battle',
   },
   {
     id: '3',
@@ -47,7 +48,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Muay Thai Battle',
   },
   {
     id: '4',
@@ -64,7 +65,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Muay Thai Battle',
   },
   {
     id: '5',
@@ -81,7 +82,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Thairath Muaythai Fighter',
   },
   {
     id: '6',
@@ -98,7 +99,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Thairath Muaythai Fighter',
   },
   {
     id: '7',
@@ -115,7 +116,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Thairath Muaythai Fighter',
   },
   {
     id: '8',
@@ -132,7 +133,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Thairath Muaythai Fighter',
   },
   {
     id: '9',
@@ -149,7 +150,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'The Champion Muay Thai',
   },
   {
     id: '10',
@@ -166,7 +167,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'The Champion Muay Thai',
   },
   {
     id: '11',
@@ -183,6 +184,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
+    programName: 'The Champion Muay Thai',
   },
   {
     id: '12',
@@ -199,7 +201,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'The Champion Muay Thai',
   },
   {
     id: '13',
@@ -216,7 +218,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Max Ultimate Fight',
   },
   {
     id: '14',
@@ -234,7 +236,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Max Ultimate Fight',
   },
   {
     id: '15',
@@ -251,7 +253,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Max Ultimate Fight',
   },
   {
     id: '16',
@@ -268,7 +270,7 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Max Ultimate Fight',
   },
   {
     id: '17',
@@ -285,6 +287,6 @@ exports.vods = [
     descriptionEn: '1',
     descriptionTh: '1',
     cadlogo: '1',
-    programName: '',
+    programName: 'Max Ultimate Fight',
   },
 ]

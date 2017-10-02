@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 
 var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
-
+var nodemailer = require('nodemailer')
 function genNextQueryParams(params) {
   var nextQueryParams = ''
 
@@ -333,6 +333,41 @@ socialAuthen['facebook'] = async function(app, providerData) {
       data: [],
     }
   }
+}
+
+exports.sendEmail = function(req, res) {
+  console.log('req', req.body)
+  // Not the movie transporter!
+  var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'fanzytrees@gmail.com', // Your email id
+      pass: 'newtree2013', // Your password
+    },
+  })
+
+  var text = 'Hello world from'
+  var mailOptions = {
+    from: '<farm1771@gmail.com>', // sender address
+    to: 'farm1771@gmail.com', // list of receivers
+    subject: 'Email Example', // Subject line
+    text:
+      'From E-mail: ' +
+      req.body.userEmail.email +
+      '\n' +
+      'Message: ' +
+      req.body.userEmail.message, //, // plaintext body
+    // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+  }
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      console.log(error)
+      res.json({ yo: 'error' })
+    } else {
+      console.log('Message sent: ' + info.response)
+      res.json({ yo: 'success' })
+    }
+  })
 }
 
 exports.fbLogin = async function(req, res) {
