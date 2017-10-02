@@ -15,6 +15,11 @@ var LiveSchema = new Schema({
     type: String,
     required: 'title_th is required',
   },
+  OnAirTime: {
+    type: String,
+    required: 'OnAirTime is required',
+    //default: Date.now,
+  },
   OnAirDate: {
     type: String,
     required: 'OnAirDate is required',
