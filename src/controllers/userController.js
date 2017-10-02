@@ -341,15 +341,15 @@ exports.sendEmail = function(req, res) {
   var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'fanzytrees@gmail.com', // Your email id
-      pass: 'newtree2013', // Your password
+      user: 'topscores@gmail.com', // Your email id
+      pass: 'pr0visi0n', // Your password
     },
   })
 
   var text = 'Hello world from'
   var mailOptions = {
     from: '<farm1771@gmail.com>', // sender address
-    to: 'farm1771@gmail.com', // list of receivers
+    to: 'topscores@gmail.com', // list of receivers
     subject: 'Email Example', // Subject line
     text:
       'From E-mail: ' +
