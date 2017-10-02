@@ -1,11 +1,11 @@
 [
   {
-    "programName": "Muay Thai Battle / มวยไทยแบทเทิล (วันศุกร์ 06.00pm - 7.45pm)",
-    "title_en": "1",
+    "programName": "Muay Thai Battle",
+    "title_en": "Muay Thai Battle / มวยไทยแบทเทิล (วันศุกร์ 06.00pm - 7.45pm)",
     "title_th": "1",
     "OnAirTime": "2017-10-23, 12:39:24",
     "OnAirDate": "Muay Thai Battle (ทุกวันศุกร์ 06.00pm - 7.45pm)",
-    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
+    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/mmt_live_preview/MuayThaiBattle_,48,72,108,0p.mp4.csmil/master.m3u8",
     "fightcardUrl": "http://139.59.127.206:3001/images/Battle/fightcard.jpg",
     "videoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
     "description_en": "Battle Muay Thai 6 Fights of Hard core Muay Thai With MAX 3 Rounds action format.",
@@ -17,12 +17,12 @@
     "channel": "Muay Thai Battle (CH8)"
   },
   {
-    "programName": "Thairath Muaythai Fighter / ไทยรัฐมวยไทย ไฟต์เตอร์  (วันเสาร์ บ่าย 02.00pm - 04.00pm)",
-    "title_en": "1",
+    "programName": "Thairath Muaythai Fighter",
+    "title_en": "Thairath Muaythai Fighter / ไทยรัฐมวยไทย ไฟต์เตอร์  (วันเสาร์ บ่าย 02.00pm - 04.00pm)",
     "title_th": "1",
     "OnAirTime": "2017-10-23, 12:39:24",
     "OnAirDate": "Thairath Muaythai Fighter (ทุก บ่าย วันเสาร์ 02.00pm - 04.00pm)",
-    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
+    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/mmt_live_preview/ThairathMuaythaiFighter_,48,72,108,0p.mp4.csmil/master.m3u8",
     "fightcardUrl": "1",
     "videoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
     "description_en": "Muay Thai Fighter 5 Round of Extreme Muay Thai",
@@ -34,12 +34,12 @@
     "channel": "Thairath Muaythai Fighter (Thairath TV HD32)"
   },
   {
-    "programName": "The Champion Muay Thai / The Champion มวยไทยตัดเชือก (วันเสาร์ เย็น 07.20pm - 09.50pm)",
-    "title_en": "1",
+    "programName": "The Champion Muay Thai",
+    "title_en": "The Champion Muay Thai / The Champion มวยไทยตัดเชือก (วันเสาร์ เย็น 07.20pm - 09.50pm)",
     "title_th": "1",
     "OnAirTime": "2017-10-23, 12:39:24",
     "OnAirDate": "The Champion Muay Thai / The Champion มวยไทยตัดเชือก (วันเสาร์ เย็น 07.20pm - 09.50pm)",
-    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
+    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/mmt_live_preview/TheChampion_,48,72,108,0p.mp4.csmil/master.m3u8",
     "fightcardUrl": "http://139.59.127.206:3001/images/TheChampion/fightcard.jpg",
     "videoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
     "description_en": "The Champion Muay Thai - “ Watch the 69 KG Tournament Championship this Saturday. October 7th, 2017 4 Thai Fighter battling out for the ultimate prize of 50,000 Bath Cash and The Champion Belt + 4 Ultimate Fights”",
@@ -51,12 +51,12 @@
     "channel": "The Champion Muay Thai / The Champion มวยไทยตัดเชือก  CH8)"
   },
   {
-    "programName": "Max Ultimate Fight / แม็กซ์มวยไทย (วันอาทิตย์ 07.20pm - 09.50pm)",
-    "title_en": "1",
+    "programName": "Max Ultimate Fight",
+    "title_en": "Max Ultimate Fight / แม็กซ์มวยไทย (วันอาทิตย์ 07.20pm - 09.50pm)",
     "title_th": "1",
     "OnAirTime": "2017-10-23, 12:39:24",
     "OnAirDate": "Max Ultimate Fight (วันนอาทิตย์  07.20pm - 09.50pm)",
-    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
+    "promoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/mmt_live_preview/MAXMuayThai_,48,72,108,0p.mp4.csmil/master.m3u8",
     "fightcardUrl": "http://139.59.127.206:3001/images/MAX/fightcard.jpg",
     "videoUrl": "https://wittestvod-vh.akamaihd-staging.net/i/wittestvod/SampleVideo/luke_,3,6,11,000k.mp4.csmil/master.m3u8",
     "description_en": "MAX - “Max Muaythai stadium in Pattaya is ready for another thrilling night of fights on the 7th of October . As our team of top Thai fighters take on boxers from Around the World. All of them ready to explode with action.”",
