@@ -108,6 +108,8 @@ module.exports = function(app) {
 
   app.route('/lives').post(live.lives)
 
+  app.route('/lives/:liveId').post(live.livesById)
+
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
 

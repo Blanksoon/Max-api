@@ -19,10 +19,6 @@ app.use(cors())
 app.set('secret', config.secret)
 app.set('tokenLifetime', config.tokenLifetime)
 app.use(express.static('./public'))
-// app.use('/static', express.static('public'))
-// app.use(express.static('/static/images' + '/static'))
-// app.use('/img',express.static(path.join(__dirname, 'public/images')));
-//app.use(express.static('./static'))
 
 var routes = require('./src/config/route')
 routes(app)

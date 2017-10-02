@@ -4,56 +4,6 @@ var jwt = require('jsonwebtoken')
 var mongoose = require('mongoose'),
   Order = mongoose.model('Order')
 Live = mongoose.model('Live')
-// var live = require('../../data/live/live')
-// var buyLive = require('../../data/live/buyLive')
-
-// exports.lives = function(req, res) {
-//   var decoded = {}
-//   var token = req.body.token
-//   if (req.body.token == null) {
-//     res.json(live)
-//   } else {
-//     if (token) {
-//       jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-//         if (err) {
-//           return res.json({
-//             status: {
-//               code: 403,
-//               success: false,
-//               message: 'Failed to authenticate token.',
-//             },
-//             data: [],
-//           })
-//         } else {
-//           decoded = decoded
-//           var queryParams = {
-//             userId: decoded.data.email,
-//             productId: '1001',
-//           }
-//           Order.findOne(queryParams, function(err, order) {
-//             var output = {
-//               status: {
-//                 code: 400,
-//                 success: false,
-//                 message: defaultErrorMessage,
-//               },
-//               data: [],
-//             }
-//             if (err) {
-//               output.status.message = err.message
-//             } else if (order) {
-//               output.status.code = 200
-//               output.status.success = true
-//               output.status.message = defaultSuccessMessage
-//               output.data = buyLive
-//             }
-//             return res.json(output)
-//           })
-//         }
-//       })
-//     }
-//   }
-// }
 
 function setData(data, message) {
   var output = []
@@ -108,7 +58,6 @@ function setData(data, message) {
 exports.lives = function(req, res) {
   var decoded = {}
   var token = req.body.token
-  //console.log('test', req.body)
   var output = {
     status: {
       code: 400,
@@ -122,7 +71,6 @@ exports.lives = function(req, res) {
       if (err) {
         output.status.message = err.message
       } else if (lives) {
-        //console.log('live', lives)
         responseLive = lives
         output.status.code = 200
         output.status.success = true
@@ -132,7 +80,6 @@ exports.lives = function(req, res) {
       return res.json(output)
     })
   } else {
-    //console.log('2')
     if (token) {
       jwt.verify(token, req.app.get('secret'), function(err, decoded) {
         if (err) {
@@ -159,12 +106,107 @@ exports.lives = function(req, res) {
                   output.status.message = err.message
                   return res.json(output)
                 } else if (lives) {
-                  //console.log('live', lives)
                   responseLive = lives
                   output.status.code = 200
                   output.status.success = true
                   output.status.message = defaultSuccessMessage
                   output.data = setData(lives, 'paid')
+                }
+                return res.json(output)
+              })
+            } else {
+              Live.find({}, function(err, lives) {
+                if (err) {
+                  output.status.message = err.message
+                } else if (lives) {
+                  responseLive = lives
+                  output.status.code = 200
+                  output.status.success = true
+                  output.status.message = defaultSuccessMessage
+                  output.data = setData(lives, 'not-paid')
+                }
+                return res.json(output)
+              })
+            }
+          })
+        }
+      })
+    }
+  }
+}
+
+exports.livesById = function(req, res) {
+  var decoded = {}
+  var token = req.body.token
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  var queryParams = {
+    _id: req.params.liveId,
+  }
+  if (token == undefined) {
+    Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
+      if (err) {
+        output.status.message = err.message
+      } else if (lives) {
+        responseLive = lives
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = setData(lives, 'not-paid')
+      }
+      return res.json(output)
+    })
+  } else {
+    if (token) {
+      jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+        if (err) {
+          return res.json({
+            status: {
+              code: 403,
+              success: false,
+              message: 'Failed to authenticate token.',
+            },
+            data: [],
+          })
+        } else {
+          decoded = decoded
+          var queryParams = {
+            userId: decoded.data.email,
+          }
+          Order.findOne(queryParams, function(err, order) {
+            if (err) {
+              output.status.message = err.message
+              return res.json(output)
+            } else if (order) {
+              Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
+                if (err) {
+                  output.status.message = err.message
+                  return res.json(output)
+                } else if (lives) {
+                  responseLive = lives
+                  output.status.code = 200
+                  output.status.success = true
+                  output.status.message = defaultSuccessMessage
+                  output.data = setData(lives, 'paid')
+                }
+                return res.json(output)
+              })
+            } else {
+              Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
+                if (err) {
+                  output.status.message = err.message
+                } else if (lives) {
+                  responseLive = lives
+                  output.status.code = 200
+                  output.status.success = true
+                  output.status.message = defaultSuccessMessage
+                  output.data = setData(lives, 'not-paid')
                 }
                 return res.json(output)
               })
