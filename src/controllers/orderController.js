@@ -87,16 +87,16 @@ exports.search = function(req, res) {
       }
       res.json(output)
     })
-    console.log(`it'equal`, newOrder)
+    //console.log(`it'equal`, newOrder)
   } else {
-    console.log('output', output)
+    //console.log('output', output)
     output.status.message = 'invalid promocode'
     res.json(output)
   }
 }
 
 exports.checkSubScribe = function(req, res) {
-  console.log('userId', req.body)
+  //console.log('userId', req.decoded.data)
   //console.log('1')
   var queryParams = {
     userId: req.decoded.data.email,

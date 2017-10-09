@@ -244,10 +244,69 @@ exports.delete = function(req, res) {
 
 var socialAuthen = []
 
-socialAuthen['facebook'] = async function(app, providerData) {
+socialAuthen['local'] = async function(providerData) {
+  let localData = providerData
+  var response = {}
+  try {
+    var token = ''
+    var user = await User.findOne({ email: localData.email }).exec()
+    if (!user) {
+      var createObject = {
+        email: localData.email,
+        password: localData.password,
+      }
+      var new_user = new User(createObject)
+      try {
+        user = await new_user.save()
+      } catch (err) {
+        return {
+          status: {
+            code: 400,
+            success: false,
+            message: err.message,
+          },
+          data: [],
+        }
+      }
+      token = await jwt.sign({ data: user }, app.get('secret'), {
+        expiresIn: app.get('tokenLifetime'),
+      })
+      return {
+        status: {
+          code: 200,
+          success: true,
+          message: defaultSuccessMessage,
+        },
+        data: {
+          token: token,
+        },
+      }
+    } else {
+      return {
+        status: {
+          code: 400,
+          success: false,
+          message: 'You already register',
+        },
+        data: [],
+      }
+    }
+  } catch (err) {
+    return {
+      status: {
+        code: 400,
+        success: false,
+        message: err.message,
+      },
+      data: [],
+    }
+  }
+}
+
+socialAuthen['facebook'] = async function(providerData) {
   let facebookData = providerData
   //console.log('hi',facebookData)
-  console.log('app', app)
+  //console.log('app', app)
   var response = {}
   try {
     response = await fetch(
@@ -285,6 +344,7 @@ socialAuthen['facebook'] = async function(app, providerData) {
   }
 
   try {
+    var token = ''
     var user = await User.findOneAndUpdate(
       { email: facebookData.email },
       { fb_info: facebookData },
@@ -309,7 +369,14 @@ socialAuthen['facebook'] = async function(app, providerData) {
           data: [],
         }
       }
+      token = await jwt.sign({ data: user }, app.get('secret'), {
+        expiresIn: app.get('tokenLifetime'),
+      })
     }
+    token = await jwt.sign({ data: user }, app.get('secret'), {
+      expiresIn: app.get('tokenLifetime'),
+    })
+
     return {
       status: {
         code: 200,
@@ -317,9 +384,7 @@ socialAuthen['facebook'] = async function(app, providerData) {
         message: defaultSuccessMessage,
       },
       data: {
-        token: await jwt.sign({ data: user }, app.get('secret'), {
-          expiresIn: app.get('tokenLifetime'),
-        }),
+        token: token,
         email: facebookData.email,
       },
     }
@@ -336,7 +401,7 @@ socialAuthen['facebook'] = async function(app, providerData) {
 }
 
 exports.sendEmail = function(req, res) {
-  console.log('req', req.body)
+  //console.log('req', req.body)
   // Not the movie transporter!
   var transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -361,20 +426,19 @@ exports.sendEmail = function(req, res) {
   }
   transporter.sendMail(mailOptions, function(error, info) {
     if (error) {
-      console.log(error)
+      //console.log(error)
       res.json({ yo: 'error' })
     } else {
-      console.log('Message sent: ' + info.response)
+      //console.log('Message sent: ' + info.response)
       res.json({ yo: 'success' })
     }
   })
 }
-
-exports.fbLogin = async function(req, res) {
+exports.localRegister = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
   var j = JSON.stringify(req.body)
-
+  console.log('jjjjjjjj', j)
   if (!socialAuthen[providerName])
     res.json({
       status: {
@@ -385,7 +449,26 @@ exports.fbLogin = async function(req, res) {
       data: [],
     })
   else {
-    var response = await socialAuthen[providerName](req.app, providerData)
+    var response = await socialAuthen[providerName](providerData)
+    return res.json(response)
+  }
+}
+exports.fbLogin = async function(req, res) {
+  var providerName = req.body.provider_name
+  var providerData = req.body.provider_data
+  var j = JSON.stringify(req.body)
+  //console.log('req.app', req.app)
+  if (!socialAuthen[providerName])
+    res.json({
+      status: {
+        code: 400,
+        success: false,
+        message: providerName + ' is not support',
+      },
+      data: [],
+    })
+  else {
+    var response = await socialAuthen[providerName](providerData)
     return res.json(response)
   }
 }

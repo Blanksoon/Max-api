@@ -114,5 +114,6 @@ module.exports = function(app) {
   app.route('/login').post(user.login)
 
   app.route('/fb-login').post(user.fbLogin)
+  app.route('/local-register').post(user.localRegister)
   app.post('/email', user.sendEmail)
 }
