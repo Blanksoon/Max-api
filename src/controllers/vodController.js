@@ -373,3 +373,32 @@ exports.delete = function(req, res) {
     }
   )
 }
+
+exports.getProgramName = function(req, res) {
+  var output = {
+    status: {
+      code: 200,
+      success: true,
+      message: defaultSuccessMessage,
+    },
+    data: [
+      {
+        title_en: 'Max Muay Thai',
+        title_th: 'แม็กซ์มวยไทย',
+      },
+      {
+        title_en: 'Muay Thai Battle',
+        title_th: 'มวยไทย แบทเทิล',
+      },
+      {
+        title_en: 'Muaythai Fighter',
+        title_th: 'มวยไทย ไฟต์เตอร์',
+      },
+      {
+        title_en: 'The Champion Muay Thai',
+        title_th: 'เดอะแชมป์เปี้ยน มวยไทย ตัดเชือก',
+      },
+    ],
+  }
+  return res.json(output)
+}

@@ -116,4 +116,5 @@ module.exports = function(app) {
   app.route('/fb-login').post(user.fbLogin)
   app.route('/local-register').post(user.localRegister)
   app.post('/email', user.sendEmail)
+  app.get('/program-name', vod.getProgramName)
 }
