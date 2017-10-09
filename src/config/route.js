@@ -115,4 +115,5 @@ module.exports = function(app) {
 
   app.route('/fb-login').post(user.fbLogin)
   app.post('/email', user.sendEmail)
+  app.get('/program-name', vod.getProgramName)
 }
