@@ -96,7 +96,7 @@ exports.search = function(req, res) {
 }
 
 exports.checkSubScribe = function(req, res) {
-  //console.log('userId', req)
+  console.log('userId', req.body)
   //console.log('1')
   var queryParams = {
     userId: req.decoded.data.email,
