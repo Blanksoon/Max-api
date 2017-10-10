@@ -106,9 +106,9 @@ module.exports = function(app) {
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   app.route('/subscribe').post(middleware, order.subscribe)
 
-  app.route('/lives').post(live.lives)
+  app.route('/lives').get(live.lives)
 
-  app.route('/lives/:liveId').post(live.livesById)
+  app.route('/lives/:liveId').get(live.livesById)
 
   // Login and Validate Token Routes
   app.route('/login').post(user.login)

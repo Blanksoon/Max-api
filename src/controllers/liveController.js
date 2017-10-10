@@ -31,14 +31,6 @@ function setData(data, message) {
         promoUrl: record.promoUrl,
         bannerUrl: record.bannerUrl,
         logoUrl: record.logoUrl,
-        // OnAirTime: record.OnAirTime,
-        // OnAirDate: record.OnAirDate,
-        // description_en: record.description_en,
-        // description_th: record.description_th,
-        // thumbnailUrl: record.thumbnailUrl,
-        // shortDescription_en: record.shortDescription_en,
-        // shortDescription_th: record.shortDescription_th,
-        // channel: record.channel,
       }
       output.push(newData)
     })
@@ -65,14 +57,6 @@ function setData(data, message) {
         promoUrl: record.promoUrl,
         bannerUrl: record.bannerUrl,
         logoUrl: record.logoUrl,
-        // OnAirTime: record.OnAirTime,
-        // OnAirDate: record.OnAirDate,
-        // description_en: record.description_en,
-        // description_th: record.description_th,
-        // thumbnailUrl: record.thumbnailUrl,
-        // shortDescription_en: record.shortDescription_en,
-        // shortDescription_th: record.shortDescription_th,
-        // channel: record.channel,
       }
       output.push(newData)
     })
@@ -135,7 +119,8 @@ exports.insertValue = function(req, res) {
 
 exports.lives = function(req, res) {
   var decoded = {}
-  var token = req.body.token
+  var token = req.query.token
+  //console.log('req', req.query.token)
   var output = {
     status: {
       code: 400,
@@ -215,7 +200,7 @@ exports.lives = function(req, res) {
 
 exports.livesById = function(req, res) {
   var decoded = {}
-  var token = req.body.token
+  var token = req.query.token
   var output = {
     status: {
       code: 400,
