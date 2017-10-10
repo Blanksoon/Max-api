@@ -9,7 +9,7 @@ Live = require('./src/models/live')
 bodyParser = require('body-parser')
 express = require('express')
 
-mongoose.connect('mongodb://localhost/max_api', {
+mongoose.connect('mongodb://localhost/max_api_phase2', {
   useMongoClient: true,
 })
 //console.log('secret', config.secret)

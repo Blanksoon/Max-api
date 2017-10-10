@@ -74,88 +74,105 @@ function setQueryParams(params) {
 // }
 
 function setData(data, message) {
+  console.log('data', data)
   var output = []
   var vodUrl = ''
   if (message == 'not-paid') {
     if (data.vods == undefined) {
-      data.vodslogin.forEach(function(record) {
+      data.forEach(function(record) {
         var newData = {
-          id: record.id,
-          title: record.title,
-          duration: record.duration,
+          id: record._id,
+          programName_en: record.programName_en,
+          programName_th: record.programName_th,
+          promoFromTime: record.promoFromTime,
+          promoToTime: record.promoToTime,
+          free: record.free,
+          logoUrl: record.logoUrl,
           videoUrl: record.videoUrl,
-          thumbnail: record.thumbnail,
-          channel: record.channel,
-          feature: record.feature,
-          promoUrl: record.promoUrl,
+          thumbnailUrl: record.thumbnailUrl,
+          title_en: record.title_en,
+          title_th: record.title_th,
+          onAirDateStr_en: record.onAirDateStr_en,
+          onAirDateStr_th: record.onAirDateStr_th,
           onAirDate: record.onAirDate,
-          status: record.status,
-          descriptionEn: record.descriptionEn,
-          descriptionTh: record.descriptionTh,
-          cadlogo: record.cadlogo,
-          programName: record.programName,
+          desc_en: record.desc_en,
+          desc_th: record.desc_th,
+          duration: record.duration,
+          feature: record.feature,
         }
         output.push(newData)
       })
     } else {
-      data.vods.forEach(function(record) {
+      data.forEach(function(record) {
         var newData = {
-          id: record.id,
-          title: record.title,
-          duration: record.duration,
+          id: record._id,
+          programName_en: record.programName_en,
+          programName_th: record.programName_th,
+          promoFromTime: record.promoFromTime,
+          promoToTime: record.promoToTime,
+          free: record.free,
+          logoUrl: record.logoUrl,
           videoUrl: '',
-          thumbnail: record.thumbnail,
-          channel: record.channel,
-          feature: record.feature,
-          promoUrl: record.promoUrl,
+          thumbnailUrl: record.thumbnailUrl,
+          title_en: record.title_en,
+          title_th: record.title_th,
+          onAirDateStr_en: record.onAirDateStr_en,
+          onAirDateStr_th: record.onAirDateStr_th,
           onAirDate: record.onAirDate,
-          status: record.status,
-          descriptionEn: record.descriptionEn,
-          descriptionTh: record.descriptionTh,
-          cadlogo: record.cadlogo,
-          programName: record.programName,
+          desc_en: record.desc_en,
+          desc_th: record.desc_th,
+          duration: record.duration,
+          feature: record.feature,
         }
         output.push(newData)
       })
     }
   } else {
     if (data.vods == undefined) {
-      data.vodslogin.forEach(function(record) {
+      data.forEach(function(record) {
         var newData = {
-          id: record.id,
-          title: record.title,
-          duration: record.duration,
+          id: record._id,
+          programName_en: record.programName_en,
+          programName_th: record.programName_th,
+          promoFromTime: record.promoFromTime,
+          promoToTime: record.promoToTime,
+          free: record.free,
+          logoUrl: record.logoUrl,
           videoUrl: record.videoUrl,
-          thumbnail: record.thumbnail,
-          channel: record.channel,
-          feature: record.feature,
-          promoUrl: record.promoUrl,
+          thumbnailUrl: record.thumbnailUrl,
+          title_en: record.title_en,
+          title_th: record.title_th,
+          onAirDateStr_en: record.onAirDateStr_en,
+          onAirDateStr_th: record.onAirDateStr_th,
           onAirDate: record.onAirDate,
-          status: record.status,
-          descriptionEn: record.descriptionEn,
-          descriptionTh: record.descriptionTh,
-          cadlogo: record.cadlogo,
-          programName: record.programName,
+          desc_en: record.desc_en,
+          desc_th: record.desc_th,
+          duration: record.duration,
+          feature: record.feature,
         }
         output.push(newData)
       })
     } else {
-      data.vods.forEach(function(record) {
+      data.forEach(function(record) {
         var newData = {
-          id: record.id,
-          title: record.title,
-          duration: record.duration,
+          id: record._id,
+          programName_en: record.programName_en,
+          programName_th: record.programName_th,
+          promoFromTime: record.promoFromTime,
+          promoToTime: record.promoToTime,
+          free: record.free,
+          logoUrl: record.logoUrl,
           videoUrl: '',
-          thumbnail: record.thumbnail,
-          channel: record.channel,
-          feature: record.feature,
-          promoUrl: record.promoUrl,
+          thumbnailUrl: record.thumbnailUrl,
+          title_en: record.title_en,
+          title_th: record.title_th,
+          onAirDateStr_en: record.onAirDateStr_en,
+          onAirDateStr_th: record.onAirDateStr_th,
           onAirDate: record.onAirDate,
-          status: record.status,
-          descriptionEn: record.descriptionEn,
-          descriptionTh: record.descriptionTh,
-          cadlogo: record.cadlogo,
-          programName: record.programName,
+          desc_en: record.desc_en,
+          desc_th: record.desc_th,
+          duration: record.duration,
+          feature: record.feature,
         }
         output.push(newData)
       })
@@ -213,12 +230,23 @@ exports.vods = function(req, res) {
     data: [],
   }
   if (token == undefined) {
+    Vod.find({}, function(err, vods) {
+      if (err) {
+        output.status.message = err.message
+      } else if (vods) {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = setData(vods, 'not-paid')
+      }
+      return res.json(output)
+    }).sort({ onAirDate: 1 })
     //console.log('1')
-    output.status.code = 200
-    output.status.success = true
-    output.status.message = defaultSuccessMessage
-    output.data = setData(vods, 'not-paid')
-    return res.json(output)
+    // output.status.code = 200
+    // output.status.success = true
+    // output.status.message = defaultSuccessMessage
+    // output.data = setData(vods, 'not-paid')
+    // return res.json(output)
   } else {
     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
       if (err) {
@@ -257,6 +285,64 @@ exports.vods = function(req, res) {
       }
     })
   }
+}
+
+exports.insertValue = function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  var liveFromDate = new Date('2017-10-28T19:20:00')
+  var liveToDate = new Date('2017-10-28T19:20:00')
+  var Dates = new Date()
+  Dates = Date.now()
+  var value = {
+    programName_en: 'Battle Muay Thai',
+    programName_th: 'มวยไทย แบทเทิล',
+    promoFromTime: '1.14.40',
+    promoToTime: '1.15.00',
+    free: '0',
+    thumbnailUrl: 'http://139.59.127.206:3001/images/BATTLE/vod/22-09-17.jpg',
+    logoUrl: '01-10-17.jpg',
+    videoUrl: 'null',
+    title_en: 'Muay Thai Battle',
+    title_th: 'มวยไทย แบทเทิล',
+    onAirDateStr_en: 'Fri. Sep 22th, 2017',
+    onAirDateStr_th: 'null',
+    onAirDate: Dates,
+    desc_en: 'The No.1 Rated Live Fighting TV Show in Thailand',
+    desc_th: 'null',
+    duration: '1.52.33',
+    feature: 'unactive',
+  }
+  // var i = 0
+  // var obj = {}
+  // console.log(value.length)
+  // while (i < value.length) {
+  //   obj = value[i]
+  //   console.log(obj)
+  var vod = new Vod(value)
+  vod.save(function(err, value) {
+    if (err) {
+      output.status.message = err.message
+      return res.json(output)
+    } else {
+      return res.sendStatus(200)
+      // console.log(i)
+      // output.status.code = 200
+      // output.status.success = true
+      // output.status.message = defaultSuccessMessage
+      // output.data = value
+      //i = i + 1
+    }
+  })
+  // }
+
+  //return res.sendStatus(200)
 }
 
 exports.create = function(req, res) {

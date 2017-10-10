@@ -3,7 +3,7 @@ var config = {
     secret: 'examplesecretkey',
     tokenLifetime: 5000 * 5000,
     mode: 'local',
-    port: 3001,
+    port: 3002,
   },
   staging: {
     secret: 'examplesecretkey',

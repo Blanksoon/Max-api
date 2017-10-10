@@ -117,4 +117,6 @@ module.exports = function(app) {
   app.route('/local-register').post(user.localRegister)
   app.post('/email', user.sendEmail)
   app.get('/program-name', vod.getProgramName)
+  app.post('/insert-live', live.insertValue)
+  app.post('/insert-vod', vod.insertValue)
 }

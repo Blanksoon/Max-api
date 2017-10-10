@@ -15,18 +15,49 @@ var LiveSchema = new Schema({
     type: String,
     required: 'title_th is required',
   },
-  OnAirTime: {
-    type: String,
-    required: 'OnAirTime is required',
-    //default: Date.now,
+  showOrder: {
+    type: Number,
+    required: 'showOrder is required',
   },
-  OnAirDate: {
+  liveDateStr_en: {
     type: String,
-    required: 'OnAirDate is required',
+    required: 'liveDateStr_en is required',
   },
-  promoUrl: {
+  liveDateStr_th: {
     type: String,
-    required: 'promoUrl is required',
+    required: 'liveDateStr_th is required',
+  },
+  liveFromDate: {
+    type: Date,
+    required: 'liveFromDate is required',
+  },
+  liveToDate: {
+    type: Date,
+    required: 'liveToDate is required',
+  },
+  shortDesc1_en: {
+    type: String,
+    required: 'shortDesc1_en is required',
+  },
+  shortDesc1_th: {
+    type: String,
+    required: 'shortDesc1_th is required',
+  },
+  shortDesc2_en: {
+    type: String,
+    required: 'shortDesc2_en is required',
+  },
+  shortDesc2_th: {
+    type: String,
+    required: 'shortDesc1_th is required',
+  },
+  desc_en: {
+    type: String,
+    required: 'desc_en is required',
+  },
+  desc_th: {
+    type: String,
+    required: 'desc_th is required',
   },
   fightcardUrl: {
     type: String,
@@ -36,34 +67,51 @@ var LiveSchema = new Schema({
     type: String,
     required: 'videoUrl is required',
   },
-  description_en: {
+  promoUrl: {
     type: String,
-    required: 'description_en is required',
-  },
-  description_th: {
-    type: String,
-    required: 'description_th is required',
+    required: 'promoUrl is required',
   },
   bannerUrl: {
     type: String,
     required: 'bannerUrl is required',
   },
-  thumbnailUrl: {
+  logoUrl: {
     type: String,
-    required: 'thumbnailUrl is required',
+    required: 'logoUrl is required',
   },
-  shortDescription_en: {
-    type: String,
-    required: 'shortDescription_en is required',
-  },
-  shortDescription_th: {
-    type: String,
-    required: 'shortDescription_th is required',
-  },
-  channel: {
-    type: String,
-    required: 'channel is required',
-  },
+  // description_en: {
+  // OnAirTime: {
+  //   type: String,
+  //   required: 'OnAirTime is required',
+  //default: Date.now,
+  // },
+  // OnAirDate: {
+  //   type: String,
+  //   required: 'OnAirDate is required',
+  // },
+  //   type: String,
+  //   required: 'description_en is required',
+  // },
+  // description_th: {
+  //   type: String,
+  //   required: 'description_th is required',
+  // },
+  // thumbnailUrl: {
+  //   type: String,
+  //   required: 'thumbnailUrl is required',
+  // },
+  // shortDescription_en: {
+  //   type: String,
+  //   required: 'shortDescription_en is required',
+  // },
+  // shortDescription_th: {
+  //   type: String,
+  //   required: 'shortDescription_th is required',
+  // },
+  // channel: {
+  //   type: String,
+  //   required: 'channel is required',
+  // },
   versionKey: false,
 })
 
