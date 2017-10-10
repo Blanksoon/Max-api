@@ -74,7 +74,7 @@ function setQueryParams(params) {
 // }
 
 function setData(data, message) {
-  console.log('data', data)
+  //console.log('data', data)
   var output = []
   var vodUrl = ''
   if (message == 'not-paid') {
