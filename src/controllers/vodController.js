@@ -78,105 +78,55 @@ function setData(data, message) {
   var output = []
   var vodUrl = ''
   if (message == 'not-paid') {
-    if (data.vods == undefined) {
-      data.forEach(function(record) {
-        var newData = {
-          id: record._id,
-          programName_en: record.programName_en,
-          programName_th: record.programName_th,
-          promoFromTime: record.promoFromTime,
-          promoToTime: record.promoToTime,
-          free: record.free,
-          logoUrl: record.logoUrl,
-          videoUrl: record.videoUrl,
-          thumbnailUrl: record.thumbnailUrl,
-          title_en: record.title_en,
-          title_th: record.title_th,
-          onAirDateStr_en: record.onAirDateStr_en,
-          onAirDateStr_th: record.onAirDateStr_th,
-          onAirDate: record.onAirDate,
-          desc_en: record.desc_en,
-          desc_th: record.desc_th,
-          duration: record.duration,
-          feature: record.feature,
-        }
-        output.push(newData)
-      })
-    } else {
-      data.forEach(function(record) {
-        var newData = {
-          id: record._id,
-          programName_en: record.programName_en,
-          programName_th: record.programName_th,
-          promoFromTime: record.promoFromTime,
-          promoToTime: record.promoToTime,
-          free: record.free,
-          logoUrl: record.logoUrl,
-          videoUrl: '',
-          thumbnailUrl: record.thumbnailUrl,
-          title_en: record.title_en,
-          title_th: record.title_th,
-          onAirDateStr_en: record.onAirDateStr_en,
-          onAirDateStr_th: record.onAirDateStr_th,
-          onAirDate: record.onAirDate,
-          desc_en: record.desc_en,
-          desc_th: record.desc_th,
-          duration: record.duration,
-          feature: record.feature,
-        }
-        output.push(newData)
-      })
-    }
+    data.forEach(function(record) {
+      var newData = {
+        id: record._id,
+        programName_en: record.programName_en,
+        programName_th: record.programName_th,
+        promoFromTime: record.promoFromTime,
+        promoToTime: record.promoToTime,
+        free: record.free,
+        logoUrl: record.logoUrl,
+        videoUrl: 'null',
+        promoUrl: record.promoUrl,
+        thumbnailUrl: record.thumbnailUrl,
+        title_en: record.title_en,
+        title_th: record.title_th,
+        onAirDateStr_en: record.onAirDateStr_en,
+        onAirDateStr_th: record.onAirDateStr_th,
+        onAirDate: record.onAirDate,
+        desc_en: record.desc_en,
+        desc_th: record.desc_th,
+        duration: record.duration,
+        feature: record.feature,
+      }
+      output.push(newData)
+    })
   } else {
-    if (data.vods == undefined) {
-      data.forEach(function(record) {
-        var newData = {
-          id: record._id,
-          programName_en: record.programName_en,
-          programName_th: record.programName_th,
-          promoFromTime: record.promoFromTime,
-          promoToTime: record.promoToTime,
-          free: record.free,
-          logoUrl: record.logoUrl,
-          videoUrl: record.videoUrl,
-          thumbnailUrl: record.thumbnailUrl,
-          title_en: record.title_en,
-          title_th: record.title_th,
-          onAirDateStr_en: record.onAirDateStr_en,
-          onAirDateStr_th: record.onAirDateStr_th,
-          onAirDate: record.onAirDate,
-          desc_en: record.desc_en,
-          desc_th: record.desc_th,
-          duration: record.duration,
-          feature: record.feature,
-        }
-        output.push(newData)
-      })
-    } else {
-      data.forEach(function(record) {
-        var newData = {
-          id: record._id,
-          programName_en: record.programName_en,
-          programName_th: record.programName_th,
-          promoFromTime: record.promoFromTime,
-          promoToTime: record.promoToTime,
-          free: record.free,
-          logoUrl: record.logoUrl,
-          videoUrl: '',
-          thumbnailUrl: record.thumbnailUrl,
-          title_en: record.title_en,
-          title_th: record.title_th,
-          onAirDateStr_en: record.onAirDateStr_en,
-          onAirDateStr_th: record.onAirDateStr_th,
-          onAirDate: record.onAirDate,
-          desc_en: record.desc_en,
-          desc_th: record.desc_th,
-          duration: record.duration,
-          feature: record.feature,
-        }
-        output.push(newData)
-      })
-    }
+    data.forEach(function(record) {
+      var newData = {
+        id: record._id,
+        programName_en: record.programName_en,
+        programName_th: record.programName_th,
+        promoFromTime: record.promoFromTime,
+        promoToTime: record.promoToTime,
+        free: record.free,
+        logoUrl: record.logoUrl,
+        videoUrl: record.videoUrl,
+        promoUrl: record.promoUrl,
+        thumbnailUrl: record.thumbnailUrl,
+        title_en: record.title_en,
+        title_th: record.title_th,
+        onAirDateStr_en: record.onAirDateStr_en,
+        onAirDateStr_th: record.onAirDateStr_th,
+        onAirDate: record.onAirDate,
+        desc_en: record.desc_en,
+        desc_th: record.desc_th,
+        duration: record.duration,
+        feature: record.feature,
+      }
+      output.push(newData)
+    })
   }
   return output
 }
@@ -219,7 +169,7 @@ exports.search = function(req, res) {
 
 exports.vods = function(req, res) {
   var decoded = {}
-  var token = req.body.token
+  var token = req.query.token
   //console.log('test', req.body)
   var output = {
     status: {
@@ -241,12 +191,6 @@ exports.vods = function(req, res) {
       }
       return res.json(output)
     }).sort({ onAirDate: 1 })
-    //console.log('1')
-    // output.status.code = 200
-    // output.status.success = true
-    // output.status.message = defaultSuccessMessage
-    // output.data = setData(vods, 'not-paid')
-    // return res.json(output)
   } else {
     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
       if (err) {
@@ -269,17 +213,29 @@ exports.vods = function(req, res) {
             output.status.message = err.message
             return res.json(output)
           } else if (order) {
-            output.status.code = 200
-            output.status.success = true
-            output.status.message = defaultSuccessMessage
-            output.data = setData(vodslogin, 'paid')
-            return res.json(output)
+            Vod.find({}, function(err, vods) {
+              if (err) {
+                output.status.message = err.message
+              } else if (vods) {
+                output.status.code = 200
+                output.status.success = true
+                output.status.message = defaultSuccessMessage
+                output.data = setData(vods, 'paid')
+              }
+              return res.json(output)
+            }).sort({ onAirDate: 1 })
           } else {
-            output.status.code = 200
-            output.status.success = true
-            output.status.message = defaultSuccessMessage
-            output.data = setData(vods, 'not-paid')
-            return res.json(output)
+            Vod.find({}, function(err, vods) {
+              if (err) {
+                output.status.message = err.message
+              } else if (vods) {
+                output.status.code = 200
+                output.status.success = true
+                output.status.message = defaultSuccessMessage
+                output.data = setData(vods, 'not-paid')
+              }
+              return res.json(output)
+            }).sort({ onAirDate: 1 })
           }
         })
       }

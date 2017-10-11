@@ -35,6 +35,10 @@ var VodSchema = new Schema({
     type: String,
     required: 'videoUrl is required',
   },
+  promoUrl: {
+    type: String,
+    required: 'promoUrl is required',
+  },
   title_en: {
     type: String,
     required: 'title_en is required',
