@@ -117,4 +117,5 @@ module.exports = function(app) {
   app.get('/program-name', vod.getProgramName)
   app.post('/insert-live', live.insertValue)
   app.post('/insert-vod', vod.insertValue)
+  app.get('/vods-feature', vod.featureVods)
 }

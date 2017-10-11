@@ -102,6 +102,29 @@ function setData(data, message) {
       }
       output.push(newData)
     })
+  } else if (message == 'feature-vod') {
+    var newData = {
+      id: data._id,
+      programName_en: data.programName_en,
+      programName_th: data.programName_th,
+      promoFromTime: data.promoFromTime,
+      promoToTime: data.promoToTime,
+      free: data.free,
+      logoUrl: data.logoUrl,
+      videoUrl: '',
+      promoUrl: data.promoUrl,
+      thumbnailUrl: data.thumbnailUrl,
+      title_en: data.title_en,
+      title_th: data.title_th,
+      onAirDateStr_en: data.onAirDateStr_en,
+      onAirDateStr_th: data.onAirDateStr_th,
+      onAirDate: data.onAirDate,
+      desc_en: data.desc_en,
+      desc_th: data.desc_th,
+      duration: data.duration,
+      feature: data.feature,
+    }
+    output.push(newData)
   } else {
     data.forEach(function(record) {
       var newData = {
@@ -170,7 +193,8 @@ exports.search = function(req, res) {
 exports.vods = function(req, res) {
   var decoded = {}
   var token = req.query.token
-  //console.log('test', req.body)
+  var progName = req.query.progname
+  console.log('test', req.query.token)
   var output = {
     status: {
       code: 400,
@@ -179,7 +203,19 @@ exports.vods = function(req, res) {
     },
     data: [],
   }
-  if (token == undefined) {
+  if (progName) {
+    Vod.find({ programName_en: progName }, function(err, vods) {
+      if (err) {
+        output.status.message = err.message
+      } else if (vods) {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = setData(vods, 'not-paid')
+      }
+      return res.json(output)
+    }).sort({ onAirDate: 1 })
+  } else if (token == undefined || token == '') {
     Vod.find({}, function(err, vods) {
       if (err) {
         output.status.message = err.message
@@ -241,6 +277,28 @@ exports.vods = function(req, res) {
       }
     })
   }
+}
+
+exports.featureVods = function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  Vod.findOne({ feature: 'active' }, function(err, vods) {
+    if (err) {
+      output.status.message = err.message
+    } else if (vods) {
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data = setData(vods, 'feature-vod')
+    }
+    return res.json(output)
+  })
 }
 
 exports.insertValue = function(req, res) {
