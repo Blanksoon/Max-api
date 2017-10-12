@@ -10,6 +10,7 @@ function setData(data, message) {
   var vodUrl = ''
   if (message == 'not-paid') {
     data.forEach(function(record) {
+      //console.log('record.liveFromDate', record.liveFromDate)
       var newData = {
         id: record._id,
         programName: record.programName,
@@ -212,8 +213,9 @@ exports.livesById = function(req, res) {
   var queryParams = {
     _id: req.params.liveId,
   }
-  if (token == undefined || token == 'undefined') {
-    Live.findOne({ _id: `${req.params.liveId}` }, function(err, lives) {
+  if (token == undefined || token == 'undefined' || token == '') {
+    console.log('h1')
+    Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
       if (err) {
         output.status.message = err.message
       } else if (lives) {
