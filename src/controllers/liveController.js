@@ -212,7 +212,7 @@ exports.livesById = function(req, res) {
   var queryParams = {
     _id: req.params.liveId,
   }
-  if (token == undefined) {
+  if (token == undefined || token == 'undefined') {
     Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
       if (err) {
         output.status.message = err.message
