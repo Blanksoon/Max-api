@@ -194,6 +194,7 @@ exports.vods = function(req, res) {
   var decoded = {}
   var token = req.query.token
   var progName = req.query.progname
+  console.log('progName', progName)
   //console.log('test', req.query.token)
   var output = {
     status: {
@@ -203,7 +204,8 @@ exports.vods = function(req, res) {
     },
     data: [],
   }
-  if (progName) {
+  if (progName != 'undefined') {
+    console.log('hi1')
     Vod.find({ programName_en: progName }, function(err, vods) {
       if (err) {
         output.status.message = err.message
@@ -211,11 +213,16 @@ exports.vods = function(req, res) {
         output.status.code = 200
         output.status.success = true
         output.status.message = defaultSuccessMessage
-        output.data = setData(vods, 'not-paid')
+        if (token == 'undefined') {
+          output.data = setData(vods, 'not-paid')
+        } else {
+          output.data = setData(vods, 'not-paid')
+        }
       }
       return res.json(output)
     }).sort({ onAirDate: 1 })
-  } else if (token == undefined || token == '') {
+  } else if (token == undefined || token == '' || token == 'undefined') {
+    console.log('hi2')
     Vod.find({}, function(err, vods) {
       if (err) {
         output.status.message = err.message
