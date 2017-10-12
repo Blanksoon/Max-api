@@ -125,6 +125,29 @@ function setData(data, message) {
       feature: data.feature,
     }
     output.push(newData)
+  } else if ((message = 'feature-vod-paid')) {
+    var newData = {
+      id: data._id,
+      programName_en: data.programName_en,
+      programName_th: data.programName_th,
+      promoFromTime: data.promoFromTime,
+      promoToTime: data.promoToTime,
+      free: data.free,
+      logoUrl: data.logoUrl,
+      videoUrl: data.videoUrl,
+      promoUrl: data.promoUrl,
+      thumbnailUrl: data.thumbnailUrl,
+      title_en: data.title_en,
+      title_th: data.title_th,
+      onAirDateStr_en: data.onAirDateStr_en,
+      onAirDateStr_th: data.onAirDateStr_th,
+      onAirDate: data.onAirDate,
+      desc_en: data.desc_en,
+      desc_th: data.desc_th,
+      duration: data.duration,
+      feature: data.feature,
+    }
+    output.push(newData)
   } else {
     data.forEach(function(record) {
       var newData = {
@@ -355,17 +378,78 @@ exports.featureVods = function(req, res) {
     },
     data: [],
   }
-  Vod.findOne({ feature: 'active' }, function(err, vods) {
-    if (err) {
-      output.status.message = err.message
-    } else if (vods) {
-      output.status.code = 200
-      output.status.success = true
-      output.status.message = defaultSuccessMessage
-      output.data = setData(vods, 'feature-vod')
-    }
-    return res.json(output)
-  })
+  var token = req.query.token
+  if (token == 'undefined' || token == '' || token == undefined) {
+    Vod.findOne({ feature: 'active' }, function(err, vods) {
+      if (err) {
+        output.status.message = err.message
+      } else if (vods) {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = setData(vods, 'feature-vod')
+      }
+      return res.json(output)
+    })
+  } else {
+    jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+      if (err) {
+        return res.json({
+          status: {
+            code: 403,
+            success: false,
+            message: 'Failed to authenticate token.',
+          },
+          data: [],
+        })
+      } else {
+        decoded = decoded
+        var queryParams = {
+          userId: decoded.data.email,
+          //productId: '1002',
+        }
+        Order.findOne(queryParams, function(err, order) {
+          if (err) {
+            Vod.find({ programName_en: progName }, function(err, vods) {
+              if (err) {
+                output.status.message = err.message
+              } else if (vods) {
+                output.status.code = 200
+                output.status.success = true
+                output.status.message = defaultSuccessMessage
+                output.data = setData(vods, 'feature-vod')
+              }
+              return res.json(output)
+            })
+          } else if (order) {
+            Vod.findOne({ feature: 'active' }, function(err, vods) {
+              if (err) {
+                output.status.message = err.message
+              } else if (vods) {
+                output.status.code = 200
+                output.status.success = true
+                output.status.message = defaultSuccessMessage
+                output.data = setData(vods, 'feature-vod-paid')
+              }
+              return res.json(output)
+            })
+          } else {
+            Vod.findOne({ feature: 'active' }, function(err, vods) {
+              if (err) {
+                output.status.message = err.message
+              } else if (vods) {
+                output.status.code = 200
+                output.status.success = true
+                output.status.message = defaultSuccessMessage
+                output.data = setData(vods, 'feature-vod')
+              }
+              return res.json(output)
+            })
+          }
+        })
+      }
+    })
+  }
 }
 
 exports.insertValue = function(req, res) {
