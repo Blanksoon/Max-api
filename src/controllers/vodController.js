@@ -206,21 +206,81 @@ exports.vods = function(req, res) {
   }
   if (progName != 'undefined' && progName != '') {
     console.log('hi1', progName)
-    Vod.find({ programName_en: progName }, function(err, vods) {
-      if (err) {
-        output.status.message = err.message
-      } else if (vods) {
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = defaultSuccessMessage
-        if (token == 'undefined') {
-          output.data = setData(vods, 'not-paid')
-        } else {
-          output.data = setData(vods, 'not-paid')
+    if (token == undefined || token == '' || token == 'undefined') {
+      Vod.find({ programName_en: progName }, function(err, vods) {
+        if (err) {
+          output.status.message = err.message
+        } else if (vods) {
+          output.status.code = 200
+          output.status.success = true
+          output.status.message = defaultSuccessMessage
+          if (token == 'undefined') {
+            output.data = setData(vods, 'not-paid')
+          } else {
+            output.data = setData(vods, 'not-paid')
+          }
         }
-      }
-      return res.json(output)
-    }).sort({ onAirDate: 1 })
+        return res.json(output)
+      }).sort({ onAirDate: 1 })
+    } else {
+      jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+        if (err) {
+          return res.json({
+            status: {
+              code: 403,
+              success: false,
+              message: 'Failed to authenticate token.',
+            },
+            data: [],
+          })
+        } else {
+          decoded = decoded
+          var queryParams = {
+            userId: decoded.data.email,
+            //productId: '1002',
+          }
+          Order.findOne(queryParams, function(err, order) {
+            if (err) {
+              Vod.find({ programName_en: progName }, function(err, vods) {
+                if (err) {
+                  output.status.message = err.message
+                } else if (vods) {
+                  output.status.code = 200
+                  output.status.success = true
+                  output.status.message = defaultSuccessMessage
+                  output.data = setData(vods, 'not-paid')
+                }
+                return res.json(output)
+              }).sort({ onAirDate: 1 })
+            } else if (order) {
+              Vod.find({ programName_en: progName }, function(err, vods) {
+                if (err) {
+                  output.status.message = err.message
+                } else if (vods) {
+                  output.status.code = 200
+                  output.status.success = true
+                  output.status.message = defaultSuccessMessage
+                  output.data = setData(vods, 'paid')
+                }
+                return res.json(output)
+              }).sort({ onAirDate: 1 })
+            } else {
+              Vod.find({ programName_en: progName }, function(err, vods) {
+                if (err) {
+                  output.status.message = err.message
+                } else if (vods) {
+                  output.status.code = 200
+                  output.status.success = true
+                  output.status.message = defaultSuccessMessage
+                  output.data = setData(vods, 'not-paid')
+                }
+                return res.json(output)
+              }).sort({ onAirDate: 1 })
+            }
+          })
+        }
+      })
+    }
   } else if (token == undefined || token == '' || token == 'undefined') {
     console.log('hi2')
     Vod.find({}, function(err, vods) {
