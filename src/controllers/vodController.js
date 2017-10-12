@@ -194,7 +194,7 @@ exports.vods = function(req, res) {
   var decoded = {}
   var token = req.query.token
   var progName = req.query.progname
-  console.log('progName', progName)
+  //console.log('progName', progName)
   //console.log('test', req.query.token)
   var output = {
     status: {
@@ -204,8 +204,8 @@ exports.vods = function(req, res) {
     },
     data: [],
   }
-  if (progName != 'undefined') {
-    console.log('hi1')
+  if (progName != 'undefined' && progName != '') {
+    console.log('hi1', progName)
     Vod.find({ programName_en: progName }, function(err, vods) {
       if (err) {
         output.status.message = err.message
@@ -494,16 +494,16 @@ exports.getProgramName = function(req, res) {
         title_th: 'แม็กซ์มวยไทย',
       },
       {
-        title_en: 'Muay Thai Battle',
-        title_th: 'มวยไทย แบทเทิล',
+        title_en: 'The Champion Muay Thai',
+        title_th: 'เดอะแชมป์เปี้ยน มวยไทย ตัดเชือก',
       },
       {
-        title_en: 'Muaythai Fighter',
+        title_en: 'Muay Thai Fighter',
         title_th: 'มวยไทย ไฟต์เตอร์',
       },
       {
-        title_en: 'The Champion Muay Thai',
-        title_th: 'เดอะแชมป์เปี้ยน มวยไทย ตัดเชือก',
+        title_en: 'Battle Muay Thai',
+        title_th: 'มวยไทย แบทเทิล',
       },
     ],
   }
