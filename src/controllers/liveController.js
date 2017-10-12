@@ -129,7 +129,7 @@ exports.lives = function(req, res) {
     },
     data: [],
   }
-  if (token == undefined) {
+  if (token == undefined || token == 'undefined') {
     Live.find({}, function(err, lives) {
       if (err) {
         output.status.message = err.message

@@ -77,7 +77,10 @@ module.exports = function(app) {
     next()
   })
 
-  // vod Routes
+  // Vod Routes
+  app.get('/program-name', vod.getProgramName)
+  app.post('/insert-vod', vod.insertValue)
+  app.get('/vods-feature', vod.featureVods)
   app.route('/vods').get(vod.vods)
   // .get(vod.search)
   //.post(middleware, vod.create)
@@ -93,29 +96,26 @@ module.exports = function(app) {
     .route('/users')
     .get(middleware, user.search)
     .post(user.create)
-
   app
     .route('/users/:userId')
     .get(middleware, user.get)
     .put(middleware, user.update)
     .delete(middleware, user.delete)
 
+  // Live Routes
+  app.route('/lives').get(live.lives)
+  app.route('/lives/:liveId').get(live.livesById)
+  app.post('/insert-live', live.insertValue)
+
+  // Order and Transection Routes
   app.route('/order').post(middleware, order.search)
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   app.route('/subscribe').post(middleware, order.subscribe)
 
-  app.route('/lives').get(live.lives)
-
-  app.route('/lives/:liveId').get(live.livesById)
-
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
-
   app.route('/fb-login').post(user.fbLogin)
   app.route('/local-register').post(user.localRegister)
+  app.route('/local-login').post(user.localLogin)
   app.post('/email', user.sendEmail)
-  app.get('/program-name', vod.getProgramName)
-  app.post('/insert-live', live.insertValue)
-  app.post('/insert-vod', vod.insertValue)
-  app.get('/vods-feature', vod.featureVods)
 }

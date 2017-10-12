@@ -1,29 +1,26 @@
-'use strict';
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+'use strict'
+var mongoose = require('mongoose')
+var Schema = mongoose.Schema
 
 var UserSchema = new Schema({
   email: {
     type: String,
     required: 'email is required',
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: 'password is required'
+    required: 'password is required',
   },
   fb_info: {
     type: Object,
-    default: null
+    default: null,
   },
   status: {
-    type: [{
-      type: String,
-      enum: ['active', 'inactive']
-    }],
-    default: 'active'
+    type: String,
+    default: 'active',
   },
-  versionKey: false
-});
+  versionKey: false,
+})
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema)

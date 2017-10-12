@@ -194,7 +194,7 @@ exports.vods = function(req, res) {
   var decoded = {}
   var token = req.query.token
   var progName = req.query.progname
-  console.log('test', req.query.token)
+  //console.log('test', req.query.token)
   var output = {
     status: {
       code: 400,

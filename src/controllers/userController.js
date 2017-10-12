@@ -254,6 +254,7 @@ socialAuthen['local'] = async function(providerData) {
       var createObject = {
         email: localData.email,
         password: localData.password,
+        status: 'inactive',
       }
       var new_user = new User(createObject)
       try {
@@ -401,13 +402,11 @@ socialAuthen['facebook'] = async function(providerData) {
 }
 
 exports.sendEmail = function(req, res) {
-  //console.log('req', req.body)
-  // Not the movie transporter!
   var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'topscores@gmail.com', // Your email id
-      pass: 'pr0visi0n', // Your password
+      // user: 'topscores@gmail.com', // Your email id
+      // pass: 'pr0visi0n', // Your password
     },
   })
 
@@ -434,11 +433,11 @@ exports.sendEmail = function(req, res) {
     }
   })
 }
+
 exports.localRegister = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
   var j = JSON.stringify(req.body)
-  console.log('jjjjjjjj', j)
   if (!socialAuthen[providerName])
     res.json({
       status: {
@@ -450,9 +449,81 @@ exports.localRegister = async function(req, res) {
     })
   else {
     var response = await socialAuthen[providerName](providerData)
-    return res.json(response)
+    // console.log(response.status.code)
+    if (response.status.code != 400) {
+      console.log('aaaaaa', response.data.token)
+      var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: '', // Your email id
+          pass: '', // Your password
+        },
+      })
+
+      var text = 'Hello world from'
+      var mailOptions = {
+        from: '<farm1771@gmail.com>', // sender address
+        to: 'farm1771@gmail.com', // list of receivers
+        subject: 'Email Example', // Subject line
+        text:
+          'Activate Account please enter link ' +
+          'http://localhost:3002/activateUser?token=' +
+          response.data.token,
+        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+      }
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          //console.log(error)
+          res.json({ yo: 'error' })
+        } else {
+          //console.log('Message sent: ' + info.response)
+          //res.json({ yo: 'success' })
+          return res.json(response)
+        }
+      })
+    } else {
+      return res.json(response)
+    }
   }
 }
+
+exports.localLogin = async function(req, res) {
+  var queryParams = {
+    email: req.body.email,
+    password: req.body.password,
+  }
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  User.findOne(queryParams, function(err, user) {
+    if (err) {
+      output.status.message = err.message
+    } else if (user) {
+      if (user.status) {
+        output.status.message = 'You are not activate'
+      } else {
+        var token = jwt.sign({ data: user }, req.app.get('secret'), {
+          expiresIn: req.app.get('tokenLifetime'),
+        })
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = {
+          token: token,
+        }
+      }
+    }
+    return res.json(output)
+  })
+}
+
+exports.activateLocalUser = async function(req, res) {}
+
 exports.fbLogin = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
