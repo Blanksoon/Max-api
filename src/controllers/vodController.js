@@ -78,7 +78,7 @@ function setData(data, message) {
   var output = []
   var vodUrl = ''
   if (message == 'not-paid') {
-    console.log('not-paid')
+    //console.log('not-paid')
     data.forEach(function(record) {
       var newData = {
         id: record._id,
@@ -104,7 +104,7 @@ function setData(data, message) {
       output.push(newData)
     })
   } else if (message == 'feature-vod') {
-    console.log('feature-vod')
+    //console.log('feature-vod')
     var newData = {
       id: data._id,
       programName_en: data.programName_en,
@@ -128,7 +128,7 @@ function setData(data, message) {
     }
     output.push(newData)
   } else if (message == 'feature-vod-paid') {
-    console.log('feature-vod-paid')
+    //console.log('feature-vod-paid')
     var newData = {
       id: data._id,
       programName_en: data.programName_en,
@@ -152,7 +152,7 @@ function setData(data, message) {
     }
     output.push(newData)
   } else {
-    console.log('paid')
+    //console.log('paid')
     data.forEach(function(record) {
       var newData = {
         id: record._id,
@@ -232,7 +232,7 @@ exports.vods = function(req, res) {
     data: [],
   }
   if (progName != 'undefined' && progName != '') {
-    console.log('hi1', progName)
+    //console.log('hi1', progName)
     if (token == undefined || token == '' || token == 'undefined') {
       Vod.find({ programName_en: progName }, function(err, vods) {
         if (err) {
@@ -309,7 +309,7 @@ exports.vods = function(req, res) {
       })
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
-    console.log('hi2')
+    // console.log('hi2')
     Vod.find({}, function(err, vods) {
       if (err) {
         output.status.message = err.message
@@ -322,7 +322,7 @@ exports.vods = function(req, res) {
       return res.json(output)
     }).sort({ onAirDate: -1 })
   } else {
-    console.log('hi3')
+    //console.log('hi3')
     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
       if (err) {
         return res.json({
@@ -340,7 +340,7 @@ exports.vods = function(req, res) {
         }
         Order.findOne(queryParams, function(err, order) {
           if (err) {
-            console.log(err)
+            //console.log(err)
             Vod.find({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message
@@ -357,7 +357,7 @@ exports.vods = function(req, res) {
               if (err) {
                 output.status.message = err.message
               } else if (vods) {
-                console.log('vods', setData(vods, 'paid'))
+                // console.log('vods', setData(vods, 'paid'))
                 output.status.code = 200
                 output.status.success = true
                 output.status.message = defaultSuccessMessage
