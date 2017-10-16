@@ -521,7 +521,8 @@ exports.localLogin = async function(req, res) {
   }
   User.findOne(queryParams, function(err, user) {
     if (err) {
-      output.status.message = err.message
+      console.log(err)
+      output.status.message = err
     } else if (user) {
       if (bcrypt.compareSync(req.body.provider_data.password, user.password)) {
         if (user.status == 'inactive') {
@@ -541,8 +542,12 @@ exports.localLogin = async function(req, res) {
       } else {
         output.status.code = 400
         output.status.success = false
-        output.status.message = 'password is invalid'
+        output.status.message = 'Password is invalid'
       }
+    } else {
+      output.status.code = 400
+      output.status.success = false
+      output.status.message = 'Email is invalid'
     }
     return res.json(output)
   })
