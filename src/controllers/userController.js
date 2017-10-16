@@ -480,7 +480,7 @@ exports.localRegister = async function(req, res) {
         subject: 'Email Example', // Subject line
         text:
           'Activate Account please enter link ' +
-          'http://localhost:3002/activate-user?token=' +
+          'http://beta.maxmuaythai.com:3002/activate-user?token=' +
           response.data.token,
         // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
       }
