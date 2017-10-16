@@ -214,7 +214,7 @@ exports.livesById = function(req, res) {
     _id: req.params.liveId,
   }
   if (token == undefined || token == 'undefined' || token == '') {
-    console.log('h1')
+    //console.log('h1')
     Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
       if (err) {
         output.status.message = err.message

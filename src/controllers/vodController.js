@@ -322,7 +322,7 @@ exports.vods = function(req, res) {
       return res.json(output)
     }).sort({ onAirDate: -1 })
   } else {
-    console.log('hi3')
+    //console.log('hi3')
     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
       if (err) {
         return res.json({
@@ -335,7 +335,7 @@ exports.vods = function(req, res) {
         })
       } else {
         decoded = decoded
-        console.log(decoded)
+        //console.log(decoded)
         var queryParams = {
           userId: decoded.data.email,
         }
@@ -354,7 +354,7 @@ exports.vods = function(req, res) {
               return res.json(output)
             }).sort({ onAirDate: -1 })
           } else if (order) {
-            console.log('err', order)
+            //console.log('err', order)
             Vod.find({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message

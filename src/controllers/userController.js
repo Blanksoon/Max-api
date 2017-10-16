@@ -486,7 +486,7 @@ exports.localRegister = async function(req, res) {
       }
       transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
-          console.log(error)
+          //console.log(error)
           response.status.code = 400
           response.status.success = false
           response.status.message = 'Cannot send email'
@@ -510,7 +510,7 @@ exports.localLogin = async function(req, res) {
   var queryParams = {
     email: req.body.provider_data.email,
   }
-  console.log('queryParams', queryParams)
+  //console.log('queryParams', queryParams)
   var output = {
     status: {
       code: 400,
@@ -572,7 +572,7 @@ exports.activateLocalUser = async function(req, res) {
           if (err) {
             return res.send(err)
           } else {
-            console.log(user)
+            //console.log(user)
             return res.sendStatus(200)
           }
         }
