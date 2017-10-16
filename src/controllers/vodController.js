@@ -322,7 +322,7 @@ exports.vods = function(req, res) {
       return res.json(output)
     }).sort({ onAirDate: -1 })
   } else {
-    //console.log('hi3')
+    console.log('hi3')
     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
       if (err) {
         return res.json({
@@ -335,13 +335,14 @@ exports.vods = function(req, res) {
         })
       } else {
         decoded = decoded
+        console.log(decoded)
         var queryParams = {
           userId: decoded.data.email,
         }
-        Order.findOne(queryParams, function(err, order) {
+        Order.find(queryParams, function(err, order) {
           if (err) {
             //console.log(err)
-            Vod.find({}, function(err, vods) {
+            Vod.findOne({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message
               } else if (vods) {
@@ -353,6 +354,20 @@ exports.vods = function(req, res) {
               return res.json(output)
             }).sort({ onAirDate: -1 })
           } else if (order) {
+            console.log('err', order)
+            Vod.find({}, function(err, vods) {
+              if (err) {
+                output.status.message = err.message
+              } else if (vods) {
+                // console.log('vods', setData(vods, 'paid'))
+                output.status.code = 200
+                output.status.success = true
+                output.status.message = defaultSuccessMessage
+                output.data = setData(vods, 'paid')
+              }
+              return res.json(output)
+            }).sort({ onAirDate: -1 })
+          } else {
             Vod.find({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message

@@ -534,6 +534,7 @@ exports.localLogin = async function(req, res) {
           output.status.success = true
           output.status.message = defaultSuccessMessage
           output.data = {
+            email: user.email,
             token: token,
           }
         }
