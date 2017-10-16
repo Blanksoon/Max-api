@@ -9,9 +9,12 @@ Live = require('./src/models/live')
 bodyParser = require('body-parser')
 express = require('express')
 //'mongodb://mmt:maxworldchampion2016@localhost/max_api_phase2',
-mongoose.connect('mongodb://localhost/max_api_phase2', {
-  useMongoClient: true,
-})
+mongoose.connect(
+  'mongodb://mmt:maxworldchampion2016@localhost/max_api_phase2',
+  {
+    useMongoClient: true,
+  }
+)
 //console.log('secret', config.secret)
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
