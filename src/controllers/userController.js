@@ -475,7 +475,7 @@ exports.localRegister = async function(req, res) {
         },
       })
       var mailOptions = {
-        from: '<farm1771@maxmuaythai.com>', // sender address
+        from: '<no-reply@maxmuaythai.com>', // sender address
         to: `${response.data.email}`, // list of receivers
         subject: 'Email Example', // Subject line
         text:
