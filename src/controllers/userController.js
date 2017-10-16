@@ -557,6 +557,7 @@ exports.localLogin = async function(req, res) {
 
 exports.activateLocalUser = async function(req, res) {
   var token = req.query.token
+  //console.log('token', token)
   jwt.verify(token, req.app.get('secret'), function(err, decoded) {
     if (err) {
       return res.json({
@@ -579,8 +580,14 @@ exports.activateLocalUser = async function(req, res) {
           if (err) {
             return res.send(err)
           } else {
-            //console.log(user)
-            return res.sendStatus(200)
+            return res.send({
+              status: {
+                code: 200,
+                success: true,
+                message: 'active email is success',
+              },
+              data: [],
+            })
           }
         }
       )
