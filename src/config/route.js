@@ -118,4 +118,5 @@ module.exports = function(app) {
   app.route('/local-register').post(user.localRegister)
   app.route('/local-login').post(user.localLogin)
   app.post('/email', user.sendEmail)
+  app.get('/activate-user', user.activateLocalUser)
 }

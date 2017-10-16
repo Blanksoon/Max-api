@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
 var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var nodemailer = require('nodemailer')
+var bcrypt = require('bcrypt-nodejs')
 function genNextQueryParams(params) {
   var nextQueryParams = ''
 
@@ -250,10 +251,22 @@ socialAuthen['local'] = async function(providerData) {
   try {
     var token = ''
     var user = await User.findOne({ email: localData.email }).exec()
-    if (!user) {
+    var password = bcrypt.hashSync(localData.password)
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    re.test(localData.email)
+    if (!re) {
+      return {
+        status: {
+          code: 400,
+          success: false,
+          message: 'email is invalid',
+        },
+        data: [],
+      }
+    } else if (!user) {
       var createObject = {
         email: localData.email,
-        password: localData.password,
+        password: password,
         status: 'inactive',
       }
       var new_user = new User(createObject)
@@ -280,6 +293,7 @@ socialAuthen['local'] = async function(providerData) {
         },
         data: {
           token: token,
+          email: localData.email,
         },
       }
     } else {
@@ -306,8 +320,6 @@ socialAuthen['local'] = async function(providerData) {
 
 socialAuthen['facebook'] = async function(providerData) {
   let facebookData = providerData
-  //console.log('hi',facebookData)
-  //console.log('app', app)
   var response = {}
   try {
     response = await fetch(
@@ -352,9 +364,10 @@ socialAuthen['facebook'] = async function(providerData) {
       { new: true }
     ).exec()
     if (!user) {
+      var password = Date.now()
       var createObject = {
         email: facebookData.email,
-        password: Date.now(),
+        password: bcrypt.hashSync(password), //if error is meaning this
         fb_info: facebookData,
       }
       var new_user = new User(createObject)
@@ -449,32 +462,36 @@ exports.localRegister = async function(req, res) {
     })
   else {
     var response = await socialAuthen[providerName](providerData)
-    // console.log(response.status.code)
+    //console.log(response)
     if (response.status.code != 400) {
-      console.log('aaaaaa', response.data.token)
+      //console.log('aaaaaa', response.data.token)
       var transporter = nodemailer.createTransport({
-        service: 'Gmail',
+        host: 'smtp.sparkpostmail.com',
+        port: 587,
+        //service: 'Gmail',
         auth: {
-          user: '', // Your email id
-          pass: '', // Your password
+          user: 'SMTP_Injection', // Your email id
+          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
         },
       })
-
-      var text = 'Hello world from'
       var mailOptions = {
-        from: '<farm1771@gmail.com>', // sender address
-        to: 'farm1771@gmail.com', // list of receivers
+        from: '<farm1771@maxmuaythai.com>', // sender address
+        to: `${response.data.email}`, // list of receivers
         subject: 'Email Example', // Subject line
         text:
           'Activate Account please enter link ' +
-          'http://localhost:3002/activateUser?token=' +
+          'http://localhost:3002/activate-user?token=' +
           response.data.token,
         // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
       }
       transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
-          //console.log(error)
-          res.json({ yo: 'error' })
+          console.log(error)
+          response.status.code = 400
+          response.status.success = false
+          response.status.message = 'Cannot send email'
+          response.data = {}
+          return res.json(response)
         } else {
           //console.log('Message sent: ' + info.response)
           //res.json({ yo: 'success' })
@@ -488,10 +505,12 @@ exports.localRegister = async function(req, res) {
 }
 
 exports.localLogin = async function(req, res) {
+  var password = bcrypt.hashSync(req.body.provider_data.password)
+
   var queryParams = {
-    email: req.body.email,
-    password: req.body.password,
+    email: req.body.provider_data.email,
   }
+  console.log('queryParams', queryParams)
   var output = {
     status: {
       code: 400,
@@ -504,25 +523,62 @@ exports.localLogin = async function(req, res) {
     if (err) {
       output.status.message = err.message
     } else if (user) {
-      if (user.status) {
-        output.status.message = 'You are not activate'
-      } else {
-        var token = jwt.sign({ data: user }, req.app.get('secret'), {
-          expiresIn: req.app.get('tokenLifetime'),
-        })
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = defaultSuccessMessage
-        output.data = {
-          token: token,
+      if (bcrypt.compareSync(req.body.provider_data.password, user.password)) {
+        if (user.status == 'inactive') {
+          output.status.message = 'You are not activate'
+        } else {
+          var token = jwt.sign({ data: user }, req.app.get('secret'), {
+            expiresIn: req.app.get('tokenLifetime'),
+          })
+          output.status.code = 200
+          output.status.success = true
+          output.status.message = defaultSuccessMessage
+          output.data = {
+            token: token,
+          }
         }
+      } else {
+        output.status.code = 400
+        output.status.success = false
+        output.status.message = 'password is invalid'
       }
     }
     return res.json(output)
   })
 }
 
-exports.activateLocalUser = async function(req, res) {}
+exports.activateLocalUser = async function(req, res) {
+  var token = req.query.token
+  jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+    if (err) {
+      return res.json({
+        status: {
+          code: 403,
+          success: false,
+          message: 'Failed to authenticate token.',
+        },
+        data: [],
+      })
+    } else {
+      decoded = decoded
+      var queryParams = {
+        email: decoded.data.email,
+      }
+      User.findOneAndUpdate(
+        queryParams,
+        { $set: { status: 'active' } },
+        function(err, user) {
+          if (err) {
+            return res.send(err)
+          } else {
+            console.log(user)
+            return res.sendStatus(200)
+          }
+        }
+      )
+    }
+  })
+}
 
 exports.fbLogin = async function(req, res) {
   var providerName = req.body.provider_name
