@@ -480,9 +480,8 @@ exports.localRegister = async function(req, res) {
         subject: 'Please verify your email', // Subject line
         text:
           `Hello ${response.data.email},` +
-          ' ' +
-          'Thank you for signup. Welcome to Max Muay Thai. Please verify your email by click on the following link' +
-          'http://beta.maxmuaythai.com:3002/activate-user?token=' +
+          'Thank you for signup. Welcome to Max Muay Thai. Please verify your email by click on the following link ' +
+          'http://beta.maxmuaythai.com/verify?token=' +
           response.data.token,
         // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
       }
