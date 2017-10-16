@@ -309,7 +309,7 @@ exports.vods = function(req, res) {
       })
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
-    // console.log('hi2')
+    //console.log('hi2')
     Vod.find({}, function(err, vods) {
       if (err) {
         output.status.message = err.message
@@ -339,9 +339,10 @@ exports.vods = function(req, res) {
         var queryParams = {
           userId: decoded.data.email,
         }
-        Order.find(queryParams, function(err, order) {
+        Order.findOne(queryParams, function(err, order) {
           if (err) {
             //console.log(err)
+            //console.log('1')
             Vod.findOne({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message
@@ -355,6 +356,7 @@ exports.vods = function(req, res) {
             }).sort({ onAirDate: -1 })
           } else if (order) {
             //console.log('err', order)
+            //console.log('2')
             Vod.find({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message
@@ -368,6 +370,7 @@ exports.vods = function(req, res) {
               return res.json(output)
             }).sort({ onAirDate: -1 })
           } else {
+            //console.log('3')
             Vod.find({}, function(err, vods) {
               if (err) {
                 output.status.message = err.message
@@ -376,7 +379,7 @@ exports.vods = function(req, res) {
                 output.status.code = 200
                 output.status.success = true
                 output.status.message = defaultSuccessMessage
-                output.data = setData(vods, 'paid')
+                output.data = setData(vods, 'not-paid')
               }
               return res.json(output)
             }).sort({ onAirDate: -1 })
