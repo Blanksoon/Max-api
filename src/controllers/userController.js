@@ -477,9 +477,11 @@ exports.localRegister = async function(req, res) {
       var mailOptions = {
         from: '<no-reply@maxmuaythai.com>', // sender address
         to: `${response.data.email}`, // list of receivers
-        subject: 'Email Example', // Subject line
+        subject: 'Please verify your email', // Subject line
         text:
-          'Activate Account please enter link ' +
+          `Hello ${response.data.email},` +
+          ' ' +
+          'Thank you for signup. Welcome to Max Muay Thai. Please verify your email by click on the following link' +
           'http://beta.maxmuaythai.com:3002/activate-user?token=' +
           response.data.token,
         // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
