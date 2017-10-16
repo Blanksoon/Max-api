@@ -113,7 +113,7 @@ exports.checkSubScribe = function(req, res) {
   Order.findOne(queryParams, function(err, order) {
     if (order) {
       //console.log('hiiii', order)
-      output.status.code = 400
+      output.status.code = 403
       output.status.success = false
       output.status.message = 'you have purchase'
       //console.log('hiiii', output)
@@ -145,7 +145,7 @@ exports.subscribe = function(req, res) {
     Order.findOne(queryParams, function(err, order) {
       if (order) {
         //console.log('hiiii', order)
-        output.status.code = 400
+        output.status.code = 403
         output.status.success = false
         output.status.message = 'you have purchase'
         return res.json(output)
@@ -174,7 +174,7 @@ exports.subscribe = function(req, res) {
   } else if (req.body.promocode == '1002') {
     Order.findOne(queryParams, function(err, order) {
       if (order) {
-        output.status.code = 400
+        output.status.code = 403
         output.status.success = false
         output.status.message = 'you have purchase'
         return res.json(output)
