@@ -480,7 +480,7 @@ exports.localRegister = async function(req, res) {
         subject: 'Email Example', // Subject line
         text:
           'Activate Account please enter link ' +
-          'http://localhost:8080/verify?token=' +
+          'https://www.maxmuaythai.com/verify?token=' +
           response.data.token,
         // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
       }
