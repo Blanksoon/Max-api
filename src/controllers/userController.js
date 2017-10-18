@@ -477,7 +477,7 @@ exports.localRegister = async function(req, res) {
       var mailOptions = {
         from: '<no-reply@maxmuaythai.com>', // sender address
         to: `${response.data.email}`, // list of receivers
-        subject: 'Email Example', // Subject line
+        subject: 'Please verify your email', // Subject line
         text:
           'Activate Account please enter link ' +
           'https://www.maxmuaythai.com/verify?token=' +
