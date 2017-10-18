@@ -15,7 +15,6 @@ mongoose.connect(
     useMongoClient: true,
   }
 )
-//console.log('secret', config.secret)
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
