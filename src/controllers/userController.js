@@ -321,6 +321,8 @@ socialAuthen['local'] = async function(providerData) {
 socialAuthen['facebook'] = async function(providerData) {
   let facebookData = providerData
   var response = {}
+  var checkNewUser = {}
+  var data = {}
   try {
     response = await fetch(
       'https://graph.facebook.com/me?access_token=' + facebookData.accessToken
@@ -371,6 +373,7 @@ socialAuthen['facebook'] = async function(providerData) {
         fb_info: facebookData,
       }
       var new_user = new User(createObject)
+      checkNewUser = new User(createObject)
       try {
         user = await new_user.save()
       } catch (err) {
@@ -391,16 +394,90 @@ socialAuthen['facebook'] = async function(providerData) {
       expiresIn: app.get('tokenLifetime'),
     })
 
-    return {
-      status: {
-        code: 200,
-        success: true,
-        message: defaultSuccessMessage,
-      },
-      data: {
-        token: token,
-        email: facebookData.email,
-      },
+    if (Object.keys(checkNewUser).length != 0) {
+      var transporter = nodemailer.createTransport({
+        host: 'smtp.sparkpostmail.com',
+        port: 587,
+        //service: 'Gmail',
+        auth: {
+          user: 'SMTP_Injection', // Your email id
+          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+        },
+      })
+      var mailOptions = {
+        from: '<no-reply@maxmuaythai.com>', // sender address
+        to: `${checkNewUser.email}`, // list of receivers
+        subject: 'Promotion code for Max Muay Thai', // Subject line
+        text:
+          'Your promotion code for watch live and video in Max Muay Thai: ' +
+          'MWC2016',
+        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+      }
+      var statuEmail = await transporter
+        .sendMail(mailOptions)
+        .then(function(info) {
+          data = {
+            status: {
+              code: 200,
+              success: true,
+              message: defaultSuccessMessage,
+            },
+            data: {
+              token: token,
+              email: facebookData.email,
+            },
+          }
+          return data
+        })
+        .catch(function(err) {
+          return {
+            status: {
+              code: 400,
+              success: false,
+              message: `can't send email`,
+            },
+            data: {},
+          }
+        })
+      return statuEmail
+      // transporter.sendMail(mailOptions, function(error, info) {
+      //   if (error) {
+      //     console.log(error)
+      //     return {
+      //       status: {
+      //         code: 400,
+      //         success: false,
+      //         message: `can't send email`,
+      //       },
+      //       data: {},
+      //     }
+      //   } else {
+      //     console.log('token')
+      //   }
+      // })
+      // return {
+      //   status: {
+      //     code: 200,
+      //     success: true,
+      //     message: defaultSuccessMessage,
+      //   },
+      //   data: {
+      //     token: token,
+      //     email: facebookData.email,
+      //   },
+      // }
+    } else {
+      return {
+        status: {
+          code: 200,
+          success: true,
+          message: defaultSuccessMessage,
+        },
+        data: {
+          token: token,
+          email: facebookData.email,
+        },
+      }
     }
   } catch (err) {
     return {
@@ -578,13 +655,42 @@ exports.activateLocalUser = async function(req, res) {
           if (err) {
             return res.send(err)
           } else {
-            return res.send({
-              status: {
-                code: 200,
-                success: true,
-                message: 'active email is success',
+            var transporter = nodemailer.createTransport({
+              host: 'smtp.sparkpostmail.com',
+              port: 587,
+              //service: 'Gmail',
+              auth: {
+                user: 'SMTP_Injection', // Your email id
+                pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
               },
-              data: [],
+            })
+            var mailOptions = {
+              from: '<no-reply@maxmuaythai.com>', // sender address
+              to: `${user.email}`, // list of receivers
+              subject: 'Promotion code for Max Muay Thai', // Subject line
+              text:
+                'Your promotion code for watch live and video in Max Muay Thai: ' +
+                'MWC2016',
+              // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+            }
+            transporter.sendMail(mailOptions, function(error, info) {
+              if (error) {
+                //console.log(error)
+                response.status.code = 400
+                response.status.success = false
+                response.status.message = 'Cannot send email'
+                response.data = {}
+                return res.json(response)
+              } else {
+                return res.send({
+                  status: {
+                    code: 200,
+                    success: true,
+                    message: 'active email is success',
+                  },
+                  data: [],
+                })
+              }
             })
           }
         }
@@ -609,6 +715,8 @@ exports.fbLogin = async function(req, res) {
     })
   else {
     var response = await socialAuthen[providerName](providerData)
+
+    console.log('response', response)
     return res.json(response)
   }
 }
