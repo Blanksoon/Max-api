@@ -141,37 +141,68 @@ exports.subscribe = function(req, res) {
     },
     data: [],
   }
-  if (req.body.promocode == '1001') {
-    Order.findOne(queryParams, function(err, order) {
-      if (order) {
-        //console.log('hiiii', order)
-        output.status.code = 403
-        output.status.success = false
-        output.status.message = 'you have purchase'
-        return res.json(output)
-      }
-      var dateNow = new Date()
-      var endDate = moment(dateNow).add(3, 'days')
-      var order = {
-        userId: req.decoded.data.email,
-        productId: req.body.promocode,
-        endDate: endDate,
-      }
-      var newOrder = new Order(order)
-      newOrder.save(function(err, order) {
-        if (err) {
-          output.status.message = err.message
-          return res.json(output)
-        } else {
-          output.status.code = 200
-          output.status.success = true
-          output.status.message = defaultSuccessMessage
-          output.data = order
-        }
-        return res.json(output)
-      })
-    })
-  } else if (req.body.promocode == 'MWC2016') {
+  // if (req.body.promocode == '1001') {
+  //   Order.findOne(queryParams, function(err, order) {
+  //     if (order) {
+  //       //console.log('hiiii', order)
+  //       output.status.code = 403
+  //       output.status.success = false
+  //       output.status.message = 'you have purchase'
+  //       return res.json(output)
+  //     }
+  //     var dateNow = new Date()
+  //     var endDate = moment(dateNow).add(3, 'days')
+  //     var order = {
+  //       userId: req.decoded.data.email,
+  //       productId: req.body.promocode,
+  //       endDate: endDate,
+  //     }
+  //     var newOrder = new Order(order)
+  //     newOrder.save(function(err, order) {
+  //       if (err) {
+  //         output.status.message = err.message
+  //         return res.json(output)
+  //       } else {
+  //         output.status.code = 200
+  //         output.status.success = true
+  //         output.status.message = defaultSuccessMessage
+  //         output.data = order
+  //       }
+  //       return res.json(output)
+  //     })
+  //   })
+  // } else if (req.body.promocode == 'MWC2016') {  // if (req.body.promocode == '1001') {
+  //   Order.findOne(queryParams, function(err, order) {
+  //     if (order) {
+  //       //console.log('hiiii', order)
+  //       output.status.code = 403
+  //       output.status.success = false
+  //       output.status.message = 'you have purchase'
+  //       return res.json(output)
+  //     }
+  //     var dateNow = new Date()
+  //     var endDate = moment(dateNow).add(3, 'days')
+  //     var order = {
+  //       userId: req.decoded.data.email,
+  //       productId: req.body.promocode,
+  //       endDate: endDate,
+  //     }
+  //     var newOrder = new Order(order)
+  //     newOrder.save(function(err, order) {
+  //       if (err) {
+  //         output.status.message = err.message
+  //         return res.json(output)
+  //       } else {
+  //         output.status.code = 200
+  //         output.status.success = true
+  //         output.status.message = defaultSuccessMessage
+  //         output.data = order
+  //       }
+  //       return res.json(output)
+  //     })
+  //   })
+  // } else if (req.body.promocode == 'MWC2016') {
+  if (req.body.promocode == 'MWC2016') {
     Order.findOne(queryParams, function(err, order) {
       if (order) {
         output.status.code = 403
