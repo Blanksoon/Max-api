@@ -100,7 +100,7 @@ exports.checkSubScribe = function(req, res) {
   //console.log('1')
   var queryParams = {
     userId: req.decoded.data.email,
-    productId: 1002,
+    //productId: 1002,
   }
   var output = {
     status: {
@@ -171,7 +171,7 @@ exports.subscribe = function(req, res) {
         return res.json(output)
       })
     })
-  } else if (req.body.promocode == '1002') {
+  } else if (req.body.promocode == 'MWC2016') {
     Order.findOne(queryParams, function(err, order) {
       if (order) {
         output.status.code = 403
