@@ -5,65 +5,6 @@ var mongoose = require('mongoose'),
   Order = mongoose.model('Order')
 Live = mongoose.model('Live')
 
-// function setData(data, message) {
-//   var output = []
-//   var vodUrl = ''
-//   if (message == 'not-paid') {
-//     data.forEach(function(record) {
-//       //console.log('record.liveFromDate', record.liveFromDate)
-//       var newData = {
-//         id: record._id,
-//         programName: record.programName,
-//         title_en: record.title_en,
-//         title_th: record.title_th,
-//         showOrder: record.showOrder,
-//         liveDateStr_en: record.liveDateStr_en,
-//         liveDateStr_th: record.liveDateStr_th,
-//         liveFromDate: record.liveFromDate,
-//         liveToDate: record.liveToDate,
-//         shortDesc1_en: record.shortDesc1_en,
-//         shortDesc1_th: record.shortDesc1_th,
-//         shortDesc2_en: record.shortDesc2_en,
-//         shortDesc2_th: record.shortDesc2_th,
-//         desc_en: record.desc_en,
-//         desc_th: record.desc_th,
-//         fightcardUrl: record.fightcardUrl,
-//         videoUrl: '',
-//         promoUrl: record.promoUrl,
-//         bannerUrl: record.bannerUrl,
-//         logoUrl: record.logoUrl,
-//       }
-//       output.push(newData)
-//     })
-//   } else {
-//     data.forEach(function(record) {
-//       var newData = {
-//         id: record._id,
-//         programName: record.programName,
-//         title_en: record.title_en,
-//         title_th: record.title_th,
-//         showOrder: record.showOrder,
-//         liveDateStr_en: record.liveDateStr_en,
-//         liveDateStr_th: record.liveDateStr_th,
-//         liveFromDate: record.liveFromDate,
-//         liveToDate: record.liveToDate,
-//         shortDesc1_en: record.shortDesc1_en,
-//         shortDesc1_th: record.shortDesc1_th,
-//         shortDesc2_en: record.shortDesc2_en,
-//         shortDesc2_th: record.shortDesc2_th,
-//         desc_en: record.desc_en,
-//         desc_th: record.desc_th,
-//         fightcardUrl: record.fightcardUrl,
-//         videoUrl: '',
-//         promoUrl: record.promoUrl,
-//         bannerUrl: record.bannerUrl,
-//         logoUrl: record.logoUrl,
-//       }
-//       output.push(newData)
-//     })
-//   }
-//   return output
-// }
 //global variable
 var output = {
   status: {
@@ -79,7 +20,6 @@ var outputvods = {} // data vod and error
 var token = '' //token
 
 function prepareData(data, vodUrl) {
-  console.log('vodUrl', vodUrl)
   var outputPrepareData = []
   var newData = {}
   if (vodUrl == 'null') {
@@ -151,8 +91,6 @@ function setData(data, message) {
 }
 
 async function findLives(status, query) {
-  console.log('status', status)
-  console.log('query', typeof query)
   var statusOrder = ''
   var dataLives = {
     error: 'none',
@@ -189,6 +127,7 @@ const readJwt = (token, req) =>
       err: '',
     }
     jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
+      console.log('decoded', decoded.data.email)
       if (err) {
         error.statusJwt = 'Failed to authenticate token.'
         error.err = err
@@ -221,13 +160,10 @@ async function decodeJwt(token, req) {
   try {
     const decode = await readJwt(token, req)
     if (decode.statusJwt == 'Failed to authenticate token.') {
-      //console.log('decode', decode)
       status = decode.statusJwt
     } else {
-      //console.log('decode', decode)
       const query = { userId: decode.data.email }
       const order = await queryOrder(query)
-      //console.log('ordersss', ordersss)
       status = order
     }
   } catch (err) {
@@ -322,141 +258,25 @@ exports.lives = async function(req, res) {
     return res.json(json)
   }
 }
-// else {
-//   if (token) {
-//     jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-//       if (err) {
-//         return res.json({
-//           status: {
-//             code: 403,
-//             success: false,
-//             message: 'Failed to authenticate token.',
-//           },
-//           data: [],
-//         })
-//       } else {
-//         decoded = decoded
-//         var queryParams = {
-//           userId: decoded.data.email,
-//         }
-//         Order.findOne(queryParams, function(err, order) {
-//           if (err) {
-//             output.status.message = err.message
-//             return res.json(output)
-//           } else if (order) {
-//             Live.find({}, function(err, lives) {
-//               if (err) {
-//                 output.status.message = err.message
-//                 return res.json(output)
-//               } else if (lives) {
-//                 responseLive = lives
-//                 output.status.code = 200
-//                 output.status.success = true
-//                 output.status.message = defaultSuccessMessage
-//                 output.data = setData(lives, 'paid')
-//               }
-//               return res.json(output)
-//             })
-//           } else {
-//             Live.find({}, function(err, lives) {
-//               if (err) {
-//                 output.status.message = err.message
-//               } else if (lives) {
-//                 responseLive = lives
-//                 output.status.code = 200
-//                 output.status.success = true
-//                 output.status.message = defaultSuccessMessage
-//                 output.data = setData(lives, 'not-paid')
-//               }
-//               return res.json(output)
-//             }).sort({ showOrder: 1 })
-//           }
-//         })
-//       }
-//     })
-//   }
-// }
 
-exports.livesById = function(req, res) {
-  var decoded = {}
-  var token = req.query.token
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  var queryParams = {
-    _id: req.params.liveId,
-  }
+exports.livesById = async function(req, res) {
+  token = req.query.token
   if (token == undefined || token == 'undefined' || token == '') {
-    //console.log('h1')
-    Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
-      if (err) {
-        output.status.message = err.message
-      } else if (lives) {
-        responseLive = lives
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = defaultSuccessMessage
-        output.data = setData(lives, 'not-paid')
-      }
-      return res.json(output)
-    })
+    outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+    json = setDataOutput(outputvods)
+    return res.json(json)
   } else {
-    if (token) {
-      jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-        if (err) {
-          return res.json({
-            status: {
-              code: 403,
-              success: false,
-              message: 'Failed to authenticate token.',
-            },
-            data: [],
-          })
-        } else {
-          decoded = decoded
-          var queryParams = {
-            userId: decoded.data.email,
-          }
-          Order.findOne(queryParams, function(err, order) {
-            if (err) {
-              output.status.message = err.message
-              return res.json(output)
-            } else if (order) {
-              Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
-                if (err) {
-                  output.status.message = err.message
-                  return res.json(output)
-                } else if (lives) {
-                  responseLive = lives
-                  output.status.code = 200
-                  output.status.success = true
-                  output.status.message = defaultSuccessMessage
-                  output.data = setData(lives, 'paid')
-                }
-                return res.json(output)
-              })
-            } else {
-              Live.find({ _id: `${req.params.liveId}` }, function(err, lives) {
-                if (err) {
-                  output.status.message = err.message
-                } else if (lives) {
-                  responseLive = lives
-                  output.status.code = 200
-                  output.status.success = true
-                  output.status.message = defaultSuccessMessage
-                  output.data = setData(lives, 'not-paid')
-                }
-                return res.json(output)
-              })
-            }
-          })
-        }
-      })
+    order = await decodeJwt(token, req)
+    if (order == 'you have purchase') {
+      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
+      json = setDataOutput(outputvods)
+    } else if (order == `you have't purchase`) {
+      outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+      json = setDataOutput(outputvods)
+    } else {
+      outputvods = { err: order }
+      json = setDataOutput(outputvods)
     }
+    return res.json(json)
   }
 }

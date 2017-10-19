@@ -9,6 +9,16 @@ var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var moment = require('moment')
 
+//global variable
+var output = {
+  status: {
+    code: 400,
+    success: false,
+    message: defaultErrorMessage,
+  },
+  data: [],
+}
+
 function genNextQueryParams(params) {
   var nextQueryParams = ''
 
@@ -94,91 +104,59 @@ exports.search = function(req, res) {
     res.json(output)
   }
 }
-
-exports.checkSubScribe = function(req, res) {
-  //console.log('userId', req.decoded.data)
-  //console.log('1')
-  var queryParams = {
-    userId: req.decoded.data.email,
-    productId: 1002,
-  }
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  Order.findOne(queryParams, function(err, order) {
-    if (order) {
-      //console.log('hiiii', order)
-      output.status.code = 403
-      output.status.success = false
-      output.status.message = 'you have purchase'
-      //console.log('hiiii', output)
-      return res.json(output)
-    } else {
-      output.status.code = 200
-      output.status.success = true
-      output.status.message = 'you do not have ticket'
-      return res.json(output)
-    }
-  })
-}
-
-exports.subscribe = function(req, res) {
-  //console.log('22')
-  var queryParams = {
-    userId: req.decoded.data.email,
-    productId: req.body.promocode,
-  }
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  if (req.body.promocode == '1001') {
-    Order.findOne(queryParams, function(err, order) {
-      if (order) {
-        //console.log('hiiii', order)
-        output.status.code = 403
-        output.status.success = false
-        output.status.message = 'you have purchase'
-        return res.json(output)
-      }
-      var dateNow = new Date()
-      var endDate = moment(dateNow).add(3, 'days')
-      var order = {
-        userId: req.decoded.data.email,
-        productId: req.body.promocode,
-        endDate: endDate,
-      }
-      var newOrder = new Order(order)
-      newOrder.save(function(err, order) {
-        if (err) {
-          output.status.message = err.message
-          return res.json(output)
+//function
+const findOrders = query =>
+  new Promise((resolve, reject) => {
+    Order.find(query)
+      .then(function(order) {
+        if (Object.keys(order).length != 0) {
+          output.status.code = 403
+          output.status.success = false
+          output.status.message = 'you have purchase'
+          resolve('you have purchase')
         } else {
           output.status.code = 200
           output.status.success = true
-          output.status.message = defaultSuccessMessage
-          output.data = order
+          output.status.message = `you don't have ticket`
+          resolve(`you don't have ticket`)
         }
-        return res.json(output)
       })
+      .catch(function(err) {
+        resolve(err.message)
+      })
+  })
+
+const creatOrders = newOrder =>
+  new Promise((resolve, reject) => {
+    newOrder
+      .save(function(order) {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = order
+        resolve('success')
+      })
+      .catch(function(err) {
+        output.status.message = err.message
+        resolve(err.message)
+      })
+  })
+
+//controllers
+exports.checkSubScribe = async function(req, res) {
+  await findOrders({ userId: req.decoded.data.email })
+  return res.json(output)
+}
+
+exports.subscribe = async function(req, res) {
+  var statusOrders = ''
+  console.log('req.decoded.data.email', req.decoded.data.email)
+  if (req.body.promocode == 'MWC2016') {
+    statusOrders = await findOrders({
+      userId: req.decoded.data.email,
+      productId: req.body.promocode,
     })
-  } else if (req.body.promocode == '1002') {
-    Order.findOne(queryParams, function(err, order) {
-      if (order) {
-        output.status.code = 403
-        output.status.success = false
-        output.status.message = 'you have purchase'
-        return res.json(output)
-      }
+    if (statusOrders == `you don't have ticket`) {
       var dateNow = new Date()
       var endDate = moment(dateNow).add(1, 'months')
       var order = {
@@ -187,22 +165,11 @@ exports.subscribe = function(req, res) {
         endDate: endDate,
       }
       var newOrder = new Order(order)
-      newOrder.save(function(err, order) {
-        if (err) {
-          output.status.message = err.message
-          return res.json(output)
-        } else {
-          output.status.code = 200
-          output.status.success = true
-          output.status.message = defaultSuccessMessage
-          output.data = order
-        }
-        return res.json(output)
-      })
-    })
+      await creatOrders(newOrder)
+    }
+    return res.json(output)
   } else {
-    //console.log('output', output)
     output.status.message = 'invalid promocode'
-    res.json(output)
+    return res.json(output)
   }
 }
