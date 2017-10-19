@@ -7,6 +7,22 @@ Order = mongoose.model('Order')
 var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var jwt = require('jsonwebtoken')
+
+//global variable
+var output = {
+  status: {
+    code: 400,
+    success: false,
+    message: defaultErrorMessage,
+  },
+  data: [],
+}
+var order = '' // status order
+var json = {} // output
+var outputvods = {} // data vod and error
+var token = '' //token
+
+//functions
 function genNextQueryParams(params) {
   var nextQueryParams = ''
 
@@ -54,28 +70,11 @@ function setQueryParams(params) {
   return queryParams
 }
 
-// function setData(data) {
-//   var output = []
-
-//   data.forEach(function(record) {
-//     var newData = {
-//       id: record._id,
-//       title: record.title,
-//       duration: record.duration,
-//       on_air_date: record.on_air_date.date,
-//       video_url: record.video_url,
-//       long_url: record.long_url,
-//     }
-
-//     output.push(newData)
-//   })
-
-//   return output
-// }
-function prepareData(data, vodUrl, message) {
-  var output = []
+function prepareData(data, vodUrl) {
+  console.log('vodUrl', vodUrl)
+  var outputPrepareData = []
   var newData = {}
-  if (message == 'array') {
+  if (vodUrl == 'null') {
     data.forEach(function(record) {
       newData = {
         id: record._id,
@@ -98,66 +97,174 @@ function prepareData(data, vodUrl, message) {
         duration: record.duration,
         feature: record.feature,
       }
-      output.push(newData)
+      outputPrepareData.push(newData)
     })
-    return output
+    return outputPrepareData
   } else {
-    newData = {
-      id: data._id,
-      programName_en: data[0].programName_en,
-      programName_th: data[0].programName_th,
-      promoFromTime: data[0].promoFromTime,
-      promoToTime: data[0].promoToTime,
-      free: data[0].free,
-      logoUrl: data[0].logoUrl,
-      videoUrl: vodUrl,
-      promoUrl: data[0].promoUrl,
-      thumbnailUrl: data[0].thumbnailUrl,
-      title_en: data[0].title_en,
-      title_th: data[0].title_th,
-      onAirDateStr_en: data[0].onAirDateStr_en,
-      onAirDateStr_th: data[0].onAirDateStr_th,
-      onAirDate: data[0].onAirDate,
-      desc_en: data[0].desc_en,
-      desc_th: data[0].desc_th,
-      duration: data[0].duration,
-      feature: data[0].feature,
-    }
-    output.push(newData)
-    //console.log('output', data)
-    return output
+    data.forEach(function(record) {
+      newData = {
+        id: record._id,
+        programName_en: record.programName_en,
+        programName_th: record.programName_th,
+        promoFromTime: record.promoFromTime,
+        promoToTime: record.promoToTime,
+        free: record.free,
+        logoUrl: record.logoUrl,
+        videoUrl: record.videoUrl,
+        promoUrl: record.promoUrl,
+        thumbnailUrl: record.thumbnailUrl,
+        title_en: record.title_en,
+        title_th: record.title_th,
+        onAirDateStr_en: record.onAirDateStr_en,
+        onAirDateStr_th: record.onAirDateStr_th,
+        onAirDate: record.onAirDate,
+        desc_en: record.desc_en,
+        desc_th: record.desc_th,
+        duration: record.duration,
+        feature: record.feature,
+      }
+      outputPrepareData.push(newData)
+    })
+    return outputPrepareData
   }
 }
 
 function setData(data, message) {
-  //console.log('data', data)
   var outputJson = []
-  // switch (message) {
-  //   case 'not-paid':
-  //     outputJson = prepareData(data, 'null', 'array')
-  //   case 'feature-vod':
-  //     outputJson = prepareData(data, 'null', 'object')
-  //   case 'feature-vod-paid':
-  //     outputJson = prepareData(data, data.videoUrl, 'object')
-  //   default:
-  //     outputJson = prepareData(data, data.videoUrl, 'array')
-  // }
   if (message == 'not-paid') {
-    outputJson = prepareData(data, 'null', 'array')
+    outputJson = prepareData(data, 'null')
     return outputJson
   } else if (message == 'feature-vod') {
-    outputJson = prepareData(data, 'null', 'object')
-    //console.log(outputJson)
+    outputJson = prepareData(data, 'null')
     return outputJson
   } else if (message == 'feature-vod-paid') {
-    outputJson = prepareData(data, data.videoUrl, 'object')
+    outputJson = prepareData(data, data[0].videoUrl)
     return outputJson
   } else {
-    outputJson = prepareData(data, data.videoUrl, 'array')
+    outputJson = prepareData(data, data)
     return outputJson
   }
 }
 
+async function findVods(status, query) {
+  console.log('status', status)
+  console.log('query', typeof query)
+  var statusOrder = ''
+  var dataVods = {
+    error: 'none',
+    data: [],
+  }
+  var returnVods = {}
+  if (status == 'not-paid') {
+    statusOrder = 'not-paid'
+  } else if (status == 'feature-vod') {
+    statusOrder = 'feature-vod'
+  } else if (status == 'feature-vod-paid') {
+    statusOrder = 'feature-vod-paid'
+  } else {
+    statusOrder = 'paid'
+  }
+  returnVods = await Vod.find(query)
+    .sort({ onAirDate: -1 })
+    .then(function(vods) {
+      if (Object.keys(vods).length != 0) {
+        dataVods.data = setData(vods, statusOrder)
+        return dataVods
+      } else {
+        dataVods.error = 'data not found'
+        //dataVods.data = setData(vods, statusOrder)
+        return dataVods
+      }
+    })
+    .catch(function(err) {
+      dataVods.error = err
+      return dataVods
+    })
+  // returnVods = await Vod.find(query),function(err,vods){
+  //   if(err){
+  //     dataVods.error = err
+  //     return dataVods
+  //   }
+  //   else if (Object.keys(vods).length != 0) {
+  //           dataVods.data = setData(vods, statusOrder)
+  //           return dataVods
+  //         } else {
+  //           dataVods.error = 'data not found'
+  //           dataVods.data = setData(vods, statusOrder)
+  //           return dataVods
+  //         }
+  // }
+  //console.log('returnVods', returnVods)
+  return returnVods
+}
+
+const readJwt = (token, req) =>
+  new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        resolve(error)
+      }
+      resolve(decoded)
+    })
+  })
+
+const queryOrder = query =>
+  new Promise((resolve, reject) => {
+    let statusOders = ''
+    Order.find(query)
+      .then(function(order) {
+        if (Object.keys(order).length != 0) {
+          statusOders = 'you have purchase'
+          resolve(statusOders)
+        } else {
+          statusOders = `you have't purchase`
+          resolve(statusOders)
+        }
+      })
+      .catch(function(err) {
+        resolve(err.message)
+      })
+  })
+
+async function decodeJwt(token, req) {
+  var status = ''
+  try {
+    const decode = await readJwt(token, req)
+    if (decode.statusJwt == 'Failed to authenticate token.') {
+      //console.log('decode', decode)
+      status = decode.statusJwt
+    } else {
+      //console.log('decode', decode)
+      const query = { userId: decode.data.email }
+      const order = await queryOrder(query)
+      //console.log('ordersss', ordersss)
+      status = order
+    }
+  } catch (err) {
+    console.log(err)
+  }
+  return status
+}
+
+function setDataOutput(outputvods) {
+  if (outputvods.error == 'none') {
+    output.status.code = 200
+    output.status.success = true
+    output.status.message = defaultSuccessMessage
+    output.data = outputvods.data
+  } else {
+    output.status.message = outputvods.error
+  }
+  return output
+}
+
+//controllers
 exports.search = function(req, res) {
   var queryParams = setQueryParams(req.query)
   var paginationParams = setPaginationParams(req.query)
@@ -194,350 +301,73 @@ exports.search = function(req, res) {
     .skip(paginationParams.offset)
 }
 
-exports.vods = function(req, res) {
-  var decoded = {}
-  var token = req.query.token
+exports.vods = async function(req, res) {
+  token = req.query.token
   var progName = req.query.progname
-  //console.log('progName', progName)
-  //console.log('test', req.query.token)
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  if (progName != 'undefined' && progName != '') {
-    //console.log('hi1', progName)
+  if (progName != 'undefined' && progName != '' && progName != undefined) {
     if (token == undefined || token == '' || token == 'undefined') {
-      Vod.find({ programName_en: progName }, function(err, vods) {
-        if (err) {
-          output.status.message = err.message
-        } else if (vods) {
-          output.status.code = 200
-          output.status.success = true
-          output.status.message = defaultSuccessMessage
-          if (token == 'undefined') {
-            output.data = setData(vods, 'not-paid')
-          } else {
-            output.data = setData(vods, 'not-paid')
-          }
-        }
-        return res.json(output)
-      }).sort({ onAirDate: -1 })
-    } else {
-      jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-        if (err) {
-          return res.json({
-            status: {
-              code: 403,
-              success: false,
-              message: 'Failed to authenticate token.',
-            },
-            data: [],
-          })
-        } else {
-          decoded = decoded
-          var queryParams = {
-            userId: decoded.data.email,
-            //productId: '1002',
-          }
-          Order.findOne(queryParams, function(err, order) {
-            if (err) {
-              Vod.find({ programName_en: progName }, function(err, vods) {
-                if (err) {
-                  output.status.message = err.message
-                } else if (vods) {
-                  output.status.code = 200
-                  output.status.success = true
-                  output.status.message = defaultSuccessMessage
-                  output.data = setData(vods, 'not-paid')
-                }
-                return res.json(output)
-              }).sort({ onAirDate: -1 })
-            } else if (order) {
-              Vod.find({ programName_en: progName }, function(err, vods) {
-                if (err) {
-                  output.status.message = err.message
-                } else if (vods) {
-                  output.status.code = 200
-                  output.status.success = true
-                  output.status.message = defaultSuccessMessage
-                  output.data = setData(vods, 'paid')
-                }
-                return res.json(output)
-              }).sort({ onAirDate: -1 })
-            } else {
-              Vod.find({ programName_en: progName }, function(err, vods) {
-                if (err) {
-                  output.status.message = err.message
-                } else if (vods) {
-                  output.status.code = 200
-                  output.status.success = true
-                  output.status.message = defaultSuccessMessage
-                  output.data = setData(vods, 'not-paid')
-                }
-                return res.json(output)
-              }).sort({ onAirDate: -1 })
-            }
-          })
-        }
+      outputvods = await findVods('not-paid', {
+        programName_en: progName,
       })
+      json = setDataOutput(outputvods)
+      return res.json(json)
+    } else {
+      order = await decodeJwt(token, req)
+      if (order == 'you have purchase') {
+        outputvods = await findVods('paid', {
+          programName_en: progName,
+        })
+        json = setDataOutput(outputvods)
+      } else if (order == `you have't purchase`) {
+        outputvods = await findVods('not-paid', {
+          programName_en: progName,
+        })
+        json = setDataOutput(outputvods)
+      } else {
+        outputvods = { err: order }
+        json = setDataOutput(outputvods)
+      }
+      return res.json(json)
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
-    //console.log('hi2')
-    Vod.find({}, function(err, vods) {
-      if (err) {
-        output.status.message = err.message
-      } else if (vods) {
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = defaultSuccessMessage
-        output.data = setData(vods, 'not-paid')
-      }
-      return res.json(output)
-    }).sort({ onAirDate: -1 })
+    outputvods = await findVods('not-paid', {})
+    json = setDataOutput(outputvods)
+    return res.json(json)
   } else {
-    //console.log('hi3')
-    jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-      if (err) {
-        return res.json({
-          status: {
-            code: 403,
-            success: false,
-            message: 'Failed to authenticate token.',
-          },
-          data: [],
-        })
-      } else {
-        decoded = decoded
-        //console.log(decoded)
-        var queryParams = {
-          userId: decoded.data.email,
-        }
-        Order.findOne(queryParams, function(err, order) {
-          if (err) {
-            //console.log(err)
-            //console.log('1')
-            Vod.findOne({}, function(err, vods) {
-              if (err) {
-                output.status.message = err.message
-              } else if (vods) {
-                output.status.code = 200
-                output.status.success = true
-                output.status.message = defaultSuccessMessage
-                output.data = setData(vods, 'not-paid')
-              }
-              return res.json(output)
-            }).sort({ onAirDate: -1 })
-          } else if (order) {
-            //console.log('err', order)
-            //console.log('2')
-            Vod.find({}, function(err, vods) {
-              if (err) {
-                output.status.message = err.message
-              } else if (vods) {
-                // console.log('vods', setData(vods, 'paid'))
-                output.status.code = 200
-                output.status.success = true
-                output.status.message = defaultSuccessMessage
-                output.data = setData(vods, 'paid')
-              }
-              return res.json(output)
-            }).sort({ onAirDate: -1 })
-          } else {
-            //console.log('3')
-            Vod.find({}, function(err, vods) {
-              if (err) {
-                output.status.message = err.message
-              } else if (vods) {
-                // console.log('vods', setData(vods, 'paid'))
-                output.status.code = 200
-                output.status.success = true
-                output.status.message = defaultSuccessMessage
-                output.data = setData(vods, 'not-paid')
-              }
-              return res.json(output)
-            }).sort({ onAirDate: -1 })
-          }
-        })
-      }
-    })
-  }
-}
-
-async function findVods(status, query) {
-  console.log('status', status)
-  console.log('query', typeof query)
-  var statusOrder = ''
-  var dataVods = {
-    error: 'none',
-    data: [],
-  }
-  var returnVods = {}
-  if (status == 'not-paid') {
-    statusOrder = 'not-paid'
-  } else if (status == 'feature-vod') {
-    statusOrder = 'feature-vod'
-  } else if (status == 'feature-vod-paid') {
-    statusOrder = 'feature-vod-paid'
-  } else {
-    statusOrder = 'paid'
-  }
-  returnVods = await Vod.find(query)
-    .then(function(vods) {
-      console.log('1')
-      if (vods) {
-        dataVods.data = setData(vods, statusOrder)
-        //console.log('dataVods', dataVods)
-        return dataVods
-      } else {
-        console.log('2')
-        dataVods.data = setData(vods, statusOrder)
-        return dataVods
-      }
-    })
-    .catch(function(err) {
-      console.log(err)
-      dataVods.error = err
-      return dataVods
-    })
-  return returnVods
-}
-
-function decodeJwt(token) {
-  console.log('token', token)
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-    if (err) {
-      output.status.code = 403
-      output.status.success = false
-      output.status.message = 'Failed to authenticate token.'
+    order = await decodeJwt(token, req)
+    if (order == 'you have purchase') {
+      outputvods = await findVods('paid', {})
+      json = setDataOutput(outputvods)
+    } else if (order == `you have't purchase`) {
+      outputvods = await findVods('not-paid', {})
+      json = setDataOutput(outputvods)
     } else {
-      var queryParams = {
-        userId: decoded.data.email,
-      }
-      Order.find(queryParams, function(err, order) {
-        if (err) {
-          output.status.message = err.message
-        } else if (order) {
-          output.status.code = 200
-          output.status.success = true
-          output.status.message = 'you have purchase'
-        } else {
-          output.status.code = 400
-          output.status.success = false
-          output.status.message = `you have't purchase`
-        }
-      })
-      return output
+      outputvods = { err: order }
+      json = setDataOutput(outputvods)
     }
-  })
+    return res.json(json)
+  }
 }
 
 exports.featureVods = async function(req, res) {
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  var token = req.query.token
-  var order = {}
+  token = req.query.token
   if (token == 'undefined' || token == '' || token == undefined) {
-    var outputvods = await findVods('feature-vod', { feature: 'active' })
-    console.log('outputvods', outputvods)
-    if (outputvods.error == 'none') {
-      output.status.code = 200
-      output.status.success = true
-      output.status.message = defaultSuccessMessage
-      output.data = outputvods.data
-    } else {
-      output.status.message = outputvods.err
-    }
-    return res.json(output)
-    // Vod.findOne({ feature: 'active' }, function(err, vods) {
-    //   if (err) {
-    //     output.status.message = err.message
-    //   } else if (vods) {
-    //     output.status.code = 200
-    //     output.status.success = true
-    //     output.status.message = defaultSuccessMessage
-    //     output.data = setData(vods, 'feature-vod')
-    //   }
-    //   return res.json(output)
-    // })
+    outputvods = await findVods('feature-vod', { feature: 'active' })
+    json = setDataOutput(outputvods)
+    return res.json(json)
   } else {
-    //order = decodeJwt(token)
-    //console.log(order)
-    return res.sendStatus(200)
-    // jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-    //   if (err) {
-    //     return res.json({
-    //       status: {
-    //         code: 403,
-    //         success: false,
-    //         message: 'Failed to authenticate token.',
-    //       },
-    //       data: [],
-    //     })
-    //   } else {
-    //     decoded = decoded
-    //     var queryParams = {
-    //       userId: decoded.data.email,
-    //       //productId: '1002',
-    //     }
-    //     Order.findOne(queryParams, function(err, order) {
-    //       if (err) {
-    //         Vod.find({ programName_en: progName }, function(err, vods) {
-    //           if (err) {
-    //             output.status.message = err.message
-    //           } else if (vods) {
-    //             output.status.code = 200
-    //             output.status.success = true
-    //             output.status.message = defaultSuccessMessage
-    //             output.data = setData(vods, 'feature-vod')
-    //           }
-    //           return res.json(output)
-    //         })
-    //       } else if (order) {
-    //         Vod.findOne({ feature: 'active' }, function(err, vods) {
-    //           if (err) {
-    //             output.status.message = err.message
-    //           } else if (vods) {
-    //             output.status.code = 200
-    //             output.status.success = true
-    //             output.status.message = defaultSuccessMessage
-    //             output.data = setData(vods, 'feature-vod-paid')
-    //           }
-    //           return res.json(output)
-    //         })
-    //       } else {
-    //         Vod.findOne({ feature: 'active' }, function(err, vods) {
-    //           if (err) {
-    //             output.status.message = err.message
-    //           } else if (vods) {
-    //             output.status.code = 200
-    //             output.status.success = true
-    //             output.status.message = defaultSuccessMessage
-    //             output.data = setData(vods, 'feature-vod')
-    //           }
-    //           return res.json(output)
-    //         })
-    //       }
-    //     })
-    //   }
-    // })
+    order = await decodeJwt(token, req)
+    if (order == 'you have purchase') {
+      outputvods = await findVods('feature-vod-paid', { feature: 'active' })
+      json = setDataOutput(outputvods)
+    } else if (order == `you have't purchase`) {
+      outputvods = await findVods('feature-vod', { feature: 'active' })
+      json = setDataOutput(outputvods)
+    } else {
+      outputvods = { err: order }
+      json = setDataOutput(outputvods)
+    }
+    return res.json(json)
   }
 }
 
