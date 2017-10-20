@@ -117,6 +117,37 @@ exports.insertValue = function(req, res) {
     return res.json(output)
   })
 }
+const checktime = lives =>
+  new Promise(async (resolve, reject) => {
+    var i = 0
+    var today = new Date()
+    today = Date.now()
+    var newLiveFromDate = new Date()
+    var newLiveToDate = new Date()
+    while (i < Object.keys(lives).length) {
+      //console.log(i)
+      if (lives[i].liveFromDate <= today) {
+        newLiveFromDate = lives[i].liveFromDate
+        newLiveToDate = lives[i].liveToDate
+        newLiveFromDate.setDate(newLiveFromDate.getDate() + 1)
+        newLiveToDate.setDate(newLiveToDate.getDate() + 1)
+        //console.log('newLiveToDate', newLiveFromDate)
+        await Live.findOneAndUpdate(
+          { _id: lives[i]._id },
+          { $set: { liveFromDate: newLiveFromDate, liveToDate: newLiveToDate } }
+        )
+          .then(function(live) {
+            //console.log('live', live)
+          })
+          .catch(function(err) {
+            //console.log('error', err.message)
+          })
+      }
+      i++
+    }
+    //console.log('success')
+    resolve('success')
+  })
 
 exports.lives = function(req, res) {
   var decoded = {}
@@ -131,10 +162,12 @@ exports.lives = function(req, res) {
     data: [],
   }
   if (token == undefined || token == 'undefined' || token == '') {
-    Live.find({}, function(err, lives) {
+    Live.find({}, async function(err, lives) {
       if (err) {
         output.status.message = err.message
       } else if (lives) {
+        await checktime(lives)
+        //console.log('a', a)
         responseLive = lives
         output.status.code = 200
         output.status.success = true
@@ -165,11 +198,12 @@ exports.lives = function(req, res) {
               output.status.message = err.message
               return res.json(output)
             } else if (order) {
-              Live.find({}, function(err, lives) {
+              Live.find({}, async function(err, lives) {
                 if (err) {
                   output.status.message = err.message
                   return res.json(output)
                 } else if (lives) {
+                  await checktime(lives)
                   responseLive = lives
                   output.status.code = 200
                   output.status.success = true
@@ -179,10 +213,11 @@ exports.lives = function(req, res) {
                 return res.json(output)
               })
             } else {
-              Live.find({}, function(err, lives) {
+              Live.find({}, async function(err, lives) {
                 if (err) {
                   output.status.message = err.message
                 } else if (lives) {
+                  await checktime(lives)
                   responseLive = lives
                   output.status.code = 200
                   output.status.success = true
