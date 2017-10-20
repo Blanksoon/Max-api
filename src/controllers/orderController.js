@@ -105,7 +105,7 @@ exports.search = function(req, res) {
   }
 }
 //function
-const findOrders = query =>
+const findOrders = (query, output) =>
   new Promise((resolve, reject) => {
     Order.find(query)
       .then(function(order) {
@@ -122,11 +122,12 @@ const findOrders = query =>
         }
       })
       .catch(function(err) {
+        console.log('err', err)
         resolve(err.message)
       })
   })
 
-const creatOrders = newOrder =>
+const creatOrders = (newOrder, output) =>
   new Promise((resolve, reject) => {
     newOrder
       .save(function(order) {
@@ -144,18 +145,39 @@ const creatOrders = newOrder =>
 
 //controllers
 exports.checkSubScribe = async function(req, res) {
-  await findOrders({ userId: req.decoded.data.email })
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  await findOrders({ userId: req.decoded.data.email }, output)
   return res.json(output)
 }
 
 exports.subscribe = async function(req, res) {
   var statusOrders = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
   console.log('req.decoded.data.email', req.decoded.data.email)
+  //console.log(req.body.promocode)
   if (req.body.promocode == 'MWC2016') {
-    statusOrders = await findOrders({
-      userId: req.decoded.data.email,
-      productId: req.body.promocode,
-    })
+    statusOrders = await findOrders(
+      {
+        userId: req.decoded.data.email,
+        productId: req.body.promocode,
+      },
+      output
+    )
+    console.log('hi', statusOrders)
     if (statusOrders == `you don't have ticket`) {
       var dateNow = new Date()
       var endDate = moment(dateNow).add(1, 'months')
@@ -165,7 +187,7 @@ exports.subscribe = async function(req, res) {
         endDate: endDate,
       }
       var newOrder = new Order(order)
-      await creatOrders(newOrder)
+      await creatOrders(newOrder, output)
     }
     return res.json(output)
   } else {

@@ -9,6 +9,22 @@ var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var nodemailer = require('nodemailer')
 var bcrypt = require('bcrypt-nodejs')
+
+const log = console.log
+
+var output = {
+  status: {
+    code: 400,
+    success: false,
+    message: defaultErrorMessage,
+  },
+  data: [],
+}
+var order = '' // status order
+var json = {} // output
+var outputvods = {} // data vod and error
+var token = '' //token
+
 function genNextQueryParams(params) {
   var nextQueryParams = ''
 
@@ -243,77 +259,60 @@ exports.delete = function(req, res) {
   )
 }
 
-var socialAuthen = []
-
-socialAuthen['local'] = async function(providerData) {
-  let localData = providerData
-  var response = {}
-  try {
-    var token = ''
-    var user = await User.findOne({ email: localData.email }).exec()
-    var password = bcrypt.hashSync(localData.password)
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    re.test(localData.email)
-    if (!re) {
-      return {
-        status: {
-          code: 400,
-          success: false,
-          message: 'email is invalid',
-        },
-        data: [],
+const createUser = (newUser, type) => {
+  new Promise(async (resolve, reject) => {
+    console.log('create User')
+    try {
+      const user = await newUser.save()
+      const token = await jwt.sign({ data: user }, app.get('secret'), {
+        expiresIn: app.get('tokenLifetime'),
+      })
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data = {
+        token: token,
+        email: user.email,
       }
-    } else if (!user) {
+      resolve(output.status.code)
+    } catch (err) {
+      log('err', err)
+      if (type == 'local') {
+        output.status.message = 'You already register'
+      } else {
+        output.status.message = err.message
+      }
+      resolve(output.status.code)
+    }
+  })
+}
+
+var socialAuthen = []
+socialAuthen['local'] = async function(providerData) {
+  //console.log('provideData', providerData)
+  var code = ''
+  var user = await User.find({ email: providerData.email }).exec()
+  //console.log('user', user)
+  var password = bcrypt.hashSync(providerData.password)
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  re.test(providerData.email)
+  if (!re) {
+    output.status.message = 'email is invalid'
+    return 400
+  } else {
+    if (Object.keys(user).length == 0) {
       var createObject = {
-        email: localData.email,
+        email: providerData.email,
         password: password,
         status: 'inactive',
       }
       var new_user = new User(createObject)
-      try {
-        user = await new_user.save()
-      } catch (err) {
-        return {
-          status: {
-            code: 400,
-            success: false,
-            message: err.message,
-          },
-          data: [],
-        }
-      }
-      token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
-      })
-      return {
-        status: {
-          code: 200,
-          success: true,
-          message: defaultSuccessMessage,
-        },
-        data: {
-          token: token,
-          email: localData.email,
-        },
-      }
+      const user = await createUser(new_user, 'local')
+      console.log('coddddeeeeeeee')
+      return user
     } else {
-      return {
-        status: {
-          code: 400,
-          success: false,
-          message: 'You already register',
-        },
-        data: [],
-      }
-    }
-  } catch (err) {
-    return {
-      status: {
-        code: 400,
-        success: false,
-        message: err.message,
-      },
-      data: [],
+      output.status.message = 'You already register'
+      return 400
     }
   }
 }
@@ -390,9 +389,6 @@ socialAuthen['facebook'] = async function(providerData) {
         expiresIn: app.get('tokenLifetime'),
       })
     }
-    token = await jwt.sign({ data: user }, app.get('secret'), {
-      expiresIn: app.get('tokenLifetime'),
-    })
 
     if (Object.keys(checkNewUser).length != 0) {
       var transporter = nodemailer.createTransport({
@@ -440,32 +436,6 @@ socialAuthen['facebook'] = async function(providerData) {
           }
         })
       return statuEmail
-      // transporter.sendMail(mailOptions, function(error, info) {
-      //   if (error) {
-      //     console.log(error)
-      //     return {
-      //       status: {
-      //         code: 400,
-      //         success: false,
-      //         message: `can't send email`,
-      //       },
-      //       data: {},
-      //     }
-      //   } else {
-      //     console.log('token')
-      //   }
-      // })
-      // return {
-      //   status: {
-      //     code: 200,
-      //     success: true,
-      //     message: defaultSuccessMessage,
-      //   },
-      //   data: {
-      //     token: token,
-      //     email: facebookData.email,
-      //   },
-      // }
     } else {
       return {
         status: {
@@ -524,62 +494,105 @@ exports.sendEmail = function(req, res) {
   })
 }
 
+const email = response => {
+  //console.log('response', response)
+  new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      host: 'smtp.sparkpostmail.com',
+      port: 587,
+      auth: {
+        user: 'SMTP_Injection', // Your email id
+        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+      },
+    })
+    var mailOptions = {
+      from: '<no-reply@maxmuaythai.com>', // sender address
+      to: `${response.data.email}`, // list of receivers
+      subject: 'Please verify your email', // Subject line
+      text:
+        'Activate Account please enter link ' +
+        'https://www.maxmuaythai.com/verify?token=' +
+        response.data.token,
+      // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        output.status.message = 'Cannot send email'
+        resolve('false')
+      } else {
+        console.log('hhiiiiiii')
+        resolve('success')
+      }
+    })
+  })
+}
+
+const checkAuthen = providerName => {
+  if (socialAuthen[providerName] == undefined) {
+    //console.log('hi')
+    output.status.message = providerName + ' is not support'
+    return false
+  } else {
+    return true
+  }
+}
+
 exports.localRegister = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
+  var response = ''
   var j = JSON.stringify(req.body)
-  if (!socialAuthen[providerName])
-    res.json({
-      status: {
-        code: 400,
-        success: false,
-        message: providerName + ' is not support',
-      },
-      data: [],
-    })
-  else {
-    var response = await socialAuthen[providerName](providerData)
+  var auth = checkAuthen(providerName)
+  if (auth == false) {
+    return res.json(output)
+  } else {
+    response = await socialAuthen[providerName](providerData)
     //console.log(response)
-    if (response.status.code != 400) {
-      //console.log('aaaaaa', response.data.token)
-      var transporter = nodemailer.createTransport({
-        host: 'smtp.sparkpostmail.com',
-        port: 587,
-        //service: 'Gmail',
-        auth: {
-          user: 'SMTP_Injection', // Your email id
-          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-        },
-      })
-      var mailOptions = {
-        from: '<no-reply@maxmuaythai.com>', // sender address
-        to: `${response.data.email}`, // list of receivers
-        subject: 'Please verify your email', // Subject line
-        text:
-          'Activate Account please enter link ' +
-          'https://www.maxmuaythai.com/verify?token=' +
-          response.data.token,
-        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-      }
-      transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-          //console.log(error)
-          response.status.code = 400
-          response.status.success = false
-          response.status.message = 'Cannot send email'
-          response.data = {}
-          return res.json(response)
-        } else {
-          //console.log('Message sent: ' + info.response)
-          //res.json({ yo: 'success' })
-          return res.json(response)
-        }
-      })
+    if (response != 400) {
+      //console.log('jg')
+      await email(output)
+      return res.json(output)
     } else {
-      return res.json(response)
+      return res.json(output)
     }
   }
 }
+
+//console.log(response)
+// //console.log('aaaaaa', response.data.token)
+// var transporter = nodemailer.createTransport({
+//   host: 'smtp.sparkpostmail.com',
+//   port: 587,
+//   //service: 'Gmail',
+//   auth: {
+//     user: 'SMTP_Injection', // Your email id
+//     pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+//   },
+// })
+// var mailOptions = {
+//   from: '<no-reply@maxmuaythai.com>', // sender address
+//   to: `${response.data.email}`, // list of receivers
+//   subject: 'Please verify your email', // Subject line
+//   text:
+//     'Activate Account please enter link ' +
+//     'https://www.maxmuaythai.com/verify?token=' +
+//     response.data.token,
+//   // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+// }
+// transporter.sendMail(mailOptions, function(error, info) {
+//   if (error) {
+//     //console.log(error)
+//     response.status.code = 400
+//     response.status.success = false
+//     response.status.message = 'Cannot send email'
+//     response.data = {}
+//     return res.json(response)
+//   } else {
+//     //console.log('Message sent: ' + info.response)
+//     //res.json({ yo: 'success' })
+//     return res.json(response)
+//   }
+// })
 
 exports.localLogin = async function(req, res) {
   var password = bcrypt.hashSync(req.body.provider_data.password)
@@ -702,8 +715,7 @@ exports.activateLocalUser = async function(req, res) {
 exports.fbLogin = async function(req, res) {
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
-  var j = JSON.stringify(req.body)
-  //console.log('req.app', req.app)
+  //var j = JSON.stringify(req.body)
   if (!socialAuthen[providerName])
     res.json({
       status: {

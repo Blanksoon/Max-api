@@ -8,20 +8,6 @@ var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var jwt = require('jsonwebtoken')
 
-//global variable
-var output = {
-  status: {
-    code: 400,
-    success: false,
-    message: defaultErrorMessage,
-  },
-  data: [],
-}
-var order = '' // status order
-var json = {} // output
-var outputvods = {} // data vod and error
-var token = '' //token
-
 //functions
 function genNextQueryParams(params) {
   var nextQueryParams = ''
@@ -252,7 +238,7 @@ async function decodeJwt(token, req) {
   return status
 }
 
-function setDataOutput(outputvods) {
+function setDataOutput(outputvods, output) {
   if (outputvods.error == 'none') {
     output.status.code = 200
     output.status.success = true
@@ -302,14 +288,25 @@ exports.search = function(req, res) {
 }
 
 exports.vods = async function(req, res) {
-  token = req.query.token
+  var token = req.query.token
+  var outputvods = {}
+  var json = {}
+  var order = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
   var progName = req.query.progname
   if (progName != 'undefined' && progName != '' && progName != undefined) {
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVods('not-paid', {
         programName_en: progName,
       })
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
       return res.json(json)
     } else {
       order = await decodeJwt(token, req)
@@ -317,55 +314,66 @@ exports.vods = async function(req, res) {
         outputvods = await findVods('paid', {
           programName_en: progName,
         })
-        json = setDataOutput(outputvods)
+        json = setDataOutput(outputvods, output)
       } else if (order == `you have't purchase`) {
         outputvods = await findVods('not-paid', {
           programName_en: progName,
         })
-        json = setDataOutput(outputvods)
+        json = setDataOutput(outputvods, output)
       } else {
         outputvods = { err: order }
-        json = setDataOutput(outputvods)
+        json = setDataOutput(outputvods, output)
       }
       return res.json(json)
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
     outputvods = await findVods('not-paid', {})
-    json = setDataOutput(outputvods)
+    json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
       outputvods = await findVods('paid', {})
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else if (order == `you have't purchase`) {
       outputvods = await findVods('not-paid', {})
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else {
       outputvods = { err: order }
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     }
     return res.json(json)
   }
 }
 
 exports.featureVods = async function(req, res) {
-  token = req.query.token
+  var token = req.query.token
+  var outputvods = {}
+  var json = {}
+  var order = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
   if (token == 'undefined' || token == '' || token == undefined) {
     outputvods = await findVods('feature-vod', { feature: 'active' })
-    json = setDataOutput(outputvods)
+    json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
       outputvods = await findVods('feature-vod-paid', { feature: 'active' })
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else if (order == `you have't purchase`) {
       outputvods = await findVods('feature-vod', { feature: 'active' })
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else {
       outputvods = { err: order }
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     }
     return res.json(json)
   }

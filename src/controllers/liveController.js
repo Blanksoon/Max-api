@@ -6,18 +6,18 @@ var mongoose = require('mongoose'),
 Live = mongoose.model('Live')
 
 //global variable
-var output = {
-  status: {
-    code: 400,
-    success: false,
-    message: defaultErrorMessage,
-  },
-  data: [],
-}
-var order = '' // status order
-var json = {} // output
-var outputvods = {} // data vod and error
-var token = '' //token
+// var output = {
+//   status: {
+//     code: 400,
+//     success: false,
+//     message: defaultErrorMessage,
+//   },
+//   data: [],
+// }
+// var order = '' // status order
+// var json = {} // output
+// var outputvods = {} // data vod and error
+// var token = '' //token
 
 function prepareData(data, vodUrl) {
   var outputPrepareData = []
@@ -172,7 +172,7 @@ async function decodeJwt(token, req) {
   return status
 }
 
-function setDataOutput(outputvods) {
+function setDataOutput(outputvods, output) {
   if (outputvods.error == 'none') {
     output.status.code = 200
     output.status.success = true
@@ -184,6 +184,7 @@ function setDataOutput(outputvods) {
   return output
 }
 
+//controllers
 exports.insertValue = function(req, res) {
   var output = {
     status: {
@@ -238,44 +239,66 @@ exports.insertValue = function(req, res) {
 }
 
 exports.lives = async function(req, res) {
-  token = req.query.token
+  var token = req.query.token
+  var outputvods = {}
+  var json = {}
+  var order = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', {})
-    json = setDataOutput(outputvods)
+    json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
       outputvods = await findLives('paid', {})
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', {})
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else {
       outputvods = { err: order }
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     }
     return res.json(json)
   }
 }
 
 exports.livesById = async function(req, res) {
-  token = req.query.token
+  var token = req.query.token
+  var outputvods = {}
+  var json = {}
+  var order = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
-    json = setDataOutput(outputvods)
+    json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
       outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     } else {
       outputvods = { err: order }
-      json = setDataOutput(outputvods)
+      json = setDataOutput(outputvods, output)
     }
     return res.json(json)
   }
