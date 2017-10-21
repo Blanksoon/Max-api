@@ -119,7 +119,7 @@ exports.insertValue = function(req, res) {
     return res.json(output)
   })
 }
-const checktime = async lives => {
+const checktime = lives => {
   const today = new Date()
   const newLives = lives.map(live => {
     const newLiveFromDate = new Date(live.liveFromDate)
@@ -159,9 +159,8 @@ exports.lives = function(req, res) {
       if (err) {
         output.status.message = err.message
       } else if (lives) {
-        await checktime(lives)
         //console.log('a', a)
-        responseLive = lives
+        responseLive = checktime(lives)
         output.status.code = 200
         output.status.success = true
         output.status.message = defaultSuccessMessage
@@ -196,8 +195,7 @@ exports.lives = function(req, res) {
                   output.status.message = err.message
                   return res.json(output)
                 } else if (lives) {
-                  await checktime(lives)
-                  responseLive = lives
+                  responseLive = checktime(lives)
                   output.status.code = 200
                   output.status.success = true
                   output.status.message = defaultSuccessMessage
@@ -210,8 +208,7 @@ exports.lives = function(req, res) {
                 if (err) {
                   output.status.message = err.message
                 } else if (lives) {
-                  await checktime(lives)
-                  responseLive = lives
+                  responseLive = checktime(lives)
                   output.status.code = 200
                   output.status.success = true
                   output.status.message = defaultSuccessMessage
@@ -247,7 +244,7 @@ exports.livesById = function(req, res) {
       if (err) {
         output.status.message = err.message
       } else if (lives) {
-        responseLive = lives
+        responseLive = checktime(lives)
         output.status.code = 200
         output.status.success = true
         output.status.message = defaultSuccessMessage
@@ -282,7 +279,7 @@ exports.livesById = function(req, res) {
                   output.status.message = err.message
                   return res.json(output)
                 } else if (lives) {
-                  responseLive = lives
+                  responseLive = checktime(lives)
                   output.status.code = 200
                   output.status.success = true
                   output.status.message = defaultSuccessMessage
@@ -295,7 +292,7 @@ exports.livesById = function(req, res) {
                 if (err) {
                   output.status.message = err.message
                 } else if (lives) {
-                  responseLive = lives
+                  responseLive = checktime(lives)
                   output.status.code = 200
                   output.status.success = true
                   output.status.message = defaultSuccessMessage
