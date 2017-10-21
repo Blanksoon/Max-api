@@ -1,3 +1,5 @@
+var moment = require('moment-timezone')
+
 var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var jwt = require('jsonwebtoken')
@@ -117,37 +119,28 @@ exports.insertValue = function(req, res) {
     return res.json(output)
   })
 }
-const checktime = lives =>
-  new Promise(async (resolve, reject) => {
-    var i = 0
-    var today = new Date()
-    today = Date.now()
-    var newLiveFromDate = new Date()
-    var newLiveToDate = new Date()
-    while (i < Object.keys(lives).length) {
-      //console.log(i)
-      if (lives[i].liveFromDate <= today) {
-        newLiveFromDate = lives[i].liveFromDate
-        newLiveToDate = lives[i].liveToDate
-        newLiveFromDate.setDate(newLiveFromDate.getDate() + 1)
-        newLiveToDate.setDate(newLiveToDate.getDate() + 1)
-        //console.log('newLiveToDate', newLiveFromDate)
-        await Live.findOneAndUpdate(
-          { _id: lives[i]._id },
-          { $set: { liveFromDate: newLiveFromDate, liveToDate: newLiveToDate } }
-        )
-          .then(function(live) {
-            //console.log('live', live)
-          })
-          .catch(function(err) {
-            //console.log('error', err.message)
-          })
-      }
-      i++
+const checktime = async lives => {
+  const today = new Date()
+  const newLives = lives.map(live => {
+    const newLiveFromDate = new Date(live.liveFromDate)
+    const newLiveToDate = new Date(live.liveToDate)
+    if (today.getTime() > newLiveToDate.getTime()) {
+      newLiveFromDate.setDate(today.getDate() + 1)
+      newLiveToDate.setDate(today.getDate() + 1)
     }
-    //console.log('success')
-    resolve('success')
+    live.liveFromDate = newLiveFromDate
+    live.liveToDate = newLiveToDate
+    liveFromTime = moment.tz(live.liveFromDate, 'Asia/Bangkok').format('HH:mm')
+    liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
+    // Sat. Oct, 21st, 2017
+    live.liveDateStr_en = moment
+      .tz(live.liveFromDate, 'Asia/Bangkok')
+      .format('ddd. MMM Do, YYYY')
+    live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
+    return live
   })
+  return newLives
+}
 
 exports.lives = function(req, res) {
   var decoded = {}

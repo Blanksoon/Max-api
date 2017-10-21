@@ -10,7 +10,7 @@ bodyParser = require('body-parser')
 express = require('express')
 //'mongodb://mmt:maxworldchampion2016@localhost/max_api_phase2',
 mongoose.connect(
-  'mongodb://mmt:maxworldchampion2016@beta.maxmuaythai.com/max_api_phase2',
+  'mongodb://mmt:maxworldchampion2016@www.maxmuaythai.com/max_api_phase2',
   {
     useMongoClient: true,
   }
