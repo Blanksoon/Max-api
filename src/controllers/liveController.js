@@ -123,7 +123,9 @@ const checktime = lives => {
   const today = new Date()
   const newLives = lives.map(live => {
     const newLiveFromDate = new Date(live.liveFromDate)
+    newLiveFromDate.setDate(today.getDate())
     const newLiveToDate = new Date(live.liveToDate)
+    newLiveToDate.setDate(today.getDate())
     if (today.getTime() > newLiveToDate.getTime()) {
       newLiveFromDate.setDate(today.getDate() + 1)
       newLiveToDate.setDate(today.getDate() + 1)
