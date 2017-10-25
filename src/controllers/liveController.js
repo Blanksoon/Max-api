@@ -5,19 +5,43 @@ var mongoose = require('mongoose'),
   Order = mongoose.model('Order')
 Live = mongoose.model('Live')
 
-//global variable
-// var output = {
-//   status: {
-//     code: 400,
-//     success: false,
-//     message: defaultErrorMessage,
-//   },
-//   data: [],
-// }
-// var order = '' // status order
-// var json = {} // output
-// var outputvods = {} // data vod and error
-// var token = '' //token
+//function
+const readJwt = (token, req) => {
+  return new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
+      //console.log('decoded', decoded.data.email)
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        resolve(error)
+      }
+      resolve(decoded)
+    })
+  })
+}
+
+const queryOrder = query => {
+  return new Promise((resolve, reject) => {
+    let statusOders = ''
+    Order.find(query)
+      .then(function(order) {
+        if (Object.keys(order).length != 0) {
+          statusOders = 'you have purchase'
+          resolve(statusOders)
+        } else {
+          statusOders = `you have't purchase`
+          resolve(statusOders)
+        }
+      })
+      .catch(function(err) {
+        resolve(err.message)
+      })
+  })
+}
 
 function prepareData(data, vodUrl) {
   var outputPrepareData = []
@@ -90,6 +114,18 @@ function setData(data, message) {
   }
 }
 
+function setDataOutput(outputvods, output) {
+  if (outputvods.error == 'none') {
+    output.status.code = 200
+    output.status.success = true
+    output.status.message = defaultSuccessMessage
+    output.data = outputvods.data
+  } else {
+    output.status.message = outputvods.error
+  }
+  return output
+}
+
 async function findLives(status, query) {
   var statusOrder = ''
   var dataLives = {
@@ -120,41 +156,6 @@ async function findLives(status, query) {
   return returnVods
 }
 
-const readJwt = (token, req) =>
-  new Promise((resolve, reject) => {
-    const error = {
-      statusJwt: '',
-      err: '',
-    }
-    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
-      console.log('decoded', decoded.data.email)
-      if (err) {
-        error.statusJwt = 'Failed to authenticate token.'
-        error.err = err
-        resolve(error)
-      }
-      resolve(decoded)
-    })
-  })
-
-const queryOrder = query =>
-  new Promise((resolve, reject) => {
-    let statusOders = ''
-    Order.find(query)
-      .then(function(order) {
-        if (Object.keys(order).length != 0) {
-          statusOders = 'you have purchase'
-          resolve(statusOders)
-        } else {
-          statusOders = `you have't purchase`
-          resolve(statusOders)
-        }
-      })
-      .catch(function(err) {
-        resolve(err.message)
-      })
-  })
-
 async function decodeJwt(token, req) {
   var status = ''
   try {
@@ -170,18 +171,6 @@ async function decodeJwt(token, req) {
     console.log(err)
   }
   return status
-}
-
-function setDataOutput(outputvods, output) {
-  if (outputvods.error == 'none') {
-    output.status.code = 200
-    output.status.success = true
-    output.status.message = defaultSuccessMessage
-    output.data = outputvods.data
-  } else {
-    output.status.message = outputvods.error
-  }
-  return output
 }
 
 //controllers

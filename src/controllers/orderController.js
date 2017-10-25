@@ -9,14 +9,45 @@ var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var moment = require('moment')
 
-//global variable
-var output = {
-  status: {
-    code: 400,
-    success: false,
-    message: defaultErrorMessage,
-  },
-  data: [],
+//function
+const findOrders = (query, output) => {
+  return new Promise((resolve, reject) => {
+    Order.find(query)
+      .then(function(order) {
+        if (Object.keys(order).length != 0) {
+          output.status.code = 403
+          output.status.success = false
+          output.status.message = 'you have purchase'
+          resolve('you have purchase')
+        } else {
+          output.status.code = 200
+          output.status.success = true
+          output.status.message = `you don't have ticket`
+          resolve(`you don't have ticket`)
+        }
+      })
+      .catch(function(err) {
+        console.log('err', err)
+        resolve(err.message)
+      })
+  })
+}
+
+const creatOrders = (newOrder, output) => {
+  return new Promise((resolve, reject) => {
+    newOrder
+      .save(function(order) {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = defaultSuccessMessage
+        output.data = order
+        resolve('success')
+      })
+      .catch(function(err) {
+        output.status.message = err.message
+        resolve(err.message)
+      })
+  })
 }
 
 function genNextQueryParams(params) {
@@ -65,6 +96,7 @@ function setData(data) {
   return output
 }
 
+//controllers
 exports.search = function(req, res) {
   var output = {
     status: {
@@ -104,46 +136,7 @@ exports.search = function(req, res) {
     res.json(output)
   }
 }
-//function
-const findOrders = (query, output) =>
-  new Promise((resolve, reject) => {
-    Order.find(query)
-      .then(function(order) {
-        if (Object.keys(order).length != 0) {
-          output.status.code = 403
-          output.status.success = false
-          output.status.message = 'you have purchase'
-          resolve('you have purchase')
-        } else {
-          output.status.code = 200
-          output.status.success = true
-          output.status.message = `you don't have ticket`
-          resolve(`you don't have ticket`)
-        }
-      })
-      .catch(function(err) {
-        console.log('err', err)
-        resolve(err.message)
-      })
-  })
 
-const creatOrders = (newOrder, output) =>
-  new Promise((resolve, reject) => {
-    newOrder
-      .save(function(order) {
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = defaultSuccessMessage
-        output.data = order
-        resolve('success')
-      })
-      .catch(function(err) {
-        output.status.message = err.message
-        resolve(err.message)
-      })
-  })
-
-//controllers
 exports.checkSubScribe = async function(req, res) {
   var output = {
     status: {

@@ -9,6 +9,42 @@ var defaultErrorMessage = 'data_not_found'
 var jwt = require('jsonwebtoken')
 
 //functions
+const readJwt = (token, req) => {
+  return new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        resolve(error)
+      }
+      resolve(decoded)
+    })
+  })
+}
+
+const queryOrder = query => {
+  return new Promise((resolve, reject) => {
+    let statusOders = ''
+    Order.find(query)
+      .then(function(order) {
+        if (Object.keys(order).length != 0) {
+          statusOders = 'you have purchase'
+          resolve(statusOders)
+        } else {
+          statusOders = `you have't purchase`
+          resolve(statusOders)
+        }
+      })
+      .catch(function(err) {
+        resolve(err.message)
+      })
+  })
+}
+
 function genNextQueryParams(params) {
   var nextQueryParams = ''
 
@@ -57,7 +93,7 @@ function setQueryParams(params) {
 }
 
 function prepareData(data, vodUrl) {
-  console.log('vodUrl', vodUrl)
+  //console.log('vodUrl', vodUrl)
   var outputPrepareData = []
   var newData = {}
   if (vodUrl == 'null') {
@@ -132,9 +168,24 @@ function setData(data, message) {
   }
 }
 
+function setDataOutput(outputvods, output) {
+  if (outputvods.error == 'none') {
+    output.status.code = 200
+    output.status.success = true
+    output.status.message = defaultSuccessMessage
+    output.data = outputvods.data
+  } else {
+    output.status.message = outputvods.error
+  }
+  return output
+}
+
 async function findVods(status, query) {
-  console.log('status', status)
-  console.log('query', typeof query)
+  // console.log('status', status)
+  // console.log('query', query)
+  if (query == null) {
+    query = {}
+  }
   var statusOrder = ''
   var dataVods = {
     error: 'none',
@@ -184,40 +235,6 @@ async function findVods(status, query) {
   return returnVods
 }
 
-const readJwt = (token, req) =>
-  new Promise((resolve, reject) => {
-    const error = {
-      statusJwt: '',
-      err: '',
-    }
-    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
-      if (err) {
-        error.statusJwt = 'Failed to authenticate token.'
-        error.err = err
-        resolve(error)
-      }
-      resolve(decoded)
-    })
-  })
-
-const queryOrder = query =>
-  new Promise((resolve, reject) => {
-    let statusOders = ''
-    Order.find(query)
-      .then(function(order) {
-        if (Object.keys(order).length != 0) {
-          statusOders = 'you have purchase'
-          resolve(statusOders)
-        } else {
-          statusOders = `you have't purchase`
-          resolve(statusOders)
-        }
-      })
-      .catch(function(err) {
-        resolve(err.message)
-      })
-  })
-
 async function decodeJwt(token, req) {
   var status = ''
   try {
@@ -236,18 +253,6 @@ async function decodeJwt(token, req) {
     console.log(err)
   }
   return status
-}
-
-function setDataOutput(outputvods, output) {
-  if (outputvods.error == 'none') {
-    output.status.code = 200
-    output.status.success = true
-    output.status.message = defaultSuccessMessage
-    output.data = outputvods.data
-  } else {
-    output.status.message = outputvods.error
-  }
-  return output
 }
 
 //controllers
@@ -289,6 +294,7 @@ exports.search = function(req, res) {
 
 exports.vods = async function(req, res) {
   var token = req.query.token
+  var searchName = req.query.search
   var outputvods = {}
   var json = {}
   var order = ''
@@ -301,7 +307,40 @@ exports.vods = async function(req, res) {
     data: [],
   }
   var progName = req.query.progname
-  if (progName != 'undefined' && progName != '' && progName != undefined) {
+  if (
+    searchName != 'undefined' &&
+    searchName != '' &&
+    searchName != undefined
+  ) {
+    if (token == undefined || token == '' || token == 'undefined') {
+      outputvods = await findVods('not-paid', {
+        programName_en: { $regex: '.*' + searchName + '.*' },
+      })
+      json = setDataOutput(outputvods, output)
+      return res.json(json)
+    } else {
+      order = await decodeJwt(token, req)
+      if (order == 'you have purchase') {
+        outputvods = await findVods('paid', {
+          programName_en: { $regex: '.*' + searchName + '.*' },
+        })
+        json = setDataOutput(outputvods, output)
+      } else if (order == `you have't purchase`) {
+        outputvods = await findVods('not-paid', {
+          programName_en: { $regex: '.*' + searchName + '.*' },
+        })
+        json = setDataOutput(outputvods, output)
+      } else {
+        outputvods = { err: order }
+        json = setDataOutput(outputvods, output)
+      }
+      return res.json(json)
+    }
+  } else if (
+    progName != 'undefined' &&
+    progName != '' &&
+    progName != undefined
+  ) {
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVods('not-paid', {
         programName_en: progName,
@@ -327,6 +366,7 @@ exports.vods = async function(req, res) {
       return res.json(json)
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
+    //console.log('hi')
     outputvods = await findVods('not-paid', {})
     json = setDataOutput(outputvods, output)
     return res.json(json)

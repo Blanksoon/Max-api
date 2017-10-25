@@ -12,18 +12,316 @@ var bcrypt = require('bcrypt-nodejs')
 
 const log = console.log
 
-var output = {
-  status: {
-    code: 400,
-    success: false,
-    message: defaultErrorMessage,
-  },
-  data: [],
+var socialAuthen = []
+
+//function
+socialAuthen['local'] = async function(providerData, output) {
+  //console.log('provideData', providerData)
+  var code = ''
+  var user = await User.find({ email: providerData.email }).exec()
+  //console.log('user', user)
+  var password = bcrypt.hashSync(providerData.password)
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  //re.test(providerData.email)
+  if (!re.test(providerData.email)) {
+    //if false do it
+    output.status.message = 'email is invalid'
+    return 400
+  } else {
+    if (Object.keys(user).length == 0) {
+      var createObject = {
+        email: providerData.email,
+        password: password,
+        status: 'inactive',
+      }
+      var new_user = new User(createObject)
+      var statusUser = await createUser(new_user, 'local', output)
+      // console.log('coddddeeeeeeee', output)
+      // console.log('statusUser', statusUser)
+      return statusUser
+    } else {
+      output.status.message = 'You already register'
+      return 400
+    }
+  }
 }
-var order = '' // status order
-var json = {} // output
-var outputvods = {} // data vod and error
-var token = '' //token
+
+socialAuthen['facebook'] = async function(providerData) {
+  let facebookData = providerData
+  var response = {}
+  var checkNewUser = {}
+  var data = {}
+  try {
+    response = await fetch(
+      'https://graph.facebook.com/me?access_token=' + facebookData.accessToken
+    ).then(response => response.json())
+    if (response.error) {
+      return {
+        status: {
+          code: 400,
+          success: false,
+          message: response.error.message,
+        },
+        data: [],
+      }
+    }
+    if (response.id != facebookData.id || response.name != facebookData.name) {
+      return {
+        status: {
+          code: 400,
+          success: false,
+          message: 'token is invalid',
+        },
+        data: [],
+      }
+    }
+  } catch (err) {
+    return {
+      status: {
+        code: 400,
+        success: false,
+        message: err.message,
+      },
+      data: [],
+    }
+  }
+
+  try {
+    var token = ''
+    var user = await User.findOneAndUpdate(
+      { email: facebookData.email },
+      { fb_info: facebookData },
+      { new: true }
+    ).exec()
+    if (!user) {
+      var password = Date.now()
+      var createObject = {
+        email: facebookData.email,
+        password: bcrypt.hashSync(password), //if error is meaning this
+        fb_info: facebookData,
+      }
+      var new_user = new User(createObject)
+      checkNewUser = new User(createObject)
+      try {
+        user = await new_user.save()
+      } catch (err) {
+        return {
+          status: {
+            code: 400,
+            success: false,
+            message: err.message,
+          },
+          data: [],
+        }
+      }
+      token = await jwt.sign({ data: user }, app.get('secret'), {
+        expiresIn: app.get('tokenLifetime'),
+      })
+    }
+
+    if (Object.keys(checkNewUser).length != 0) {
+      var transporter = nodemailer.createTransport({
+        host: 'smtp.sparkpostmail.com',
+        port: 587,
+        //service: 'Gmail',
+        auth: {
+          user: 'SMTP_Injection', // Your email id
+          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+        },
+      })
+      var mailOptions = {
+        from: '<no-reply@maxmuaythai.com>', // sender address
+        to: `${checkNewUser.email}`, // list of receivers
+        subject: 'Promotion code for Max Muay Thai', // Subject line
+        text:
+          'Your promotion code for watch live and video in Max Muay Thai: ' +
+          'MWC2016',
+        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+      }
+      var statuEmail = await transporter
+        .sendMail(mailOptions)
+        .then(function(info) {
+          data = {
+            status: {
+              code: 200,
+              success: true,
+              message: defaultSuccessMessage,
+            },
+            data: {
+              token: token,
+              email: facebookData.email,
+            },
+          }
+          return data
+        })
+        .catch(function(err) {
+          return {
+            status: {
+              code: 400,
+              success: false,
+              message: `can't send email`,
+            },
+            data: {},
+          }
+        })
+      return statuEmail
+    } else {
+      return {
+        status: {
+          code: 200,
+          success: true,
+          message: defaultSuccessMessage,
+        },
+        data: {
+          token: token,
+          email: facebookData.email,
+        },
+      }
+    }
+  } catch (err) {
+    return {
+      status: {
+        code: 400,
+        success: false,
+        message: err.message,
+      },
+      data: [],
+    }
+  }
+}
+
+const email = (text, output, subject) => {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      host: 'smtp.sparkpostmail.com',
+      port: 587,
+      auth: {
+        user: 'SMTP_Injection', // Your email id
+        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+      },
+    })
+    var mailOptions = {
+      from: '<no-reply@maxmuaythai.com>', // sender address
+      to: `${output.data.email}`, // list of receivers
+      subject: `${subject}`, // Subject line
+      text: `${text}`,
+      // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      //console.log('senemail', output)
+      if (error) {
+        console.log('error', error)
+        output.status.code = '400'
+        output.status.success = false
+        output.status.message = 'Cannot send email'
+        output.data = {}
+        resolve('false')
+      } else {
+        //console.log('hhiiiiiii')
+        resolve('success')
+      }
+    })
+  })
+}
+
+const checkAuthen = (providerName, output) => {
+  if (socialAuthen[providerName] == undefined) {
+    //console.log('hi')
+    output.status.message = providerName + ' is not support'
+    return false
+  } else {
+    return true
+  }
+}
+
+const verifyToken = (token, req) => {
+  var query = {}
+  return new Promise(async (resolve, reject) => {
+    await jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+      if (err) {
+        output.status.code = 403
+        output.status.message = 'Failed to authenticate token.'
+        query = {
+          email: '',
+          status: 'unauthorized',
+        }
+        resolve(query)
+      } else {
+        //console.log('decoded', decoded)
+        query = {
+          email: decoded.data.email,
+          password: decoded.data.password,
+          status: 'authorize',
+        }
+        resolve(query)
+      }
+    })
+  })
+}
+
+const activateUser = (query, output, text, subject) => {
+  return new Promise((resolve, reject) => {
+    User.findOneAndUpdate(query, { $set: { status: 'active' } })
+      .then(async function(user) {
+        text =
+          'Your promotion code for watch live and video in Max Muay Thai: MWC2016'
+        output.data = query
+        await email(text, output, subject)
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = 'active email is success'
+        resolve('success')
+      })
+      .catch(function(err) {
+        console.log(err)
+        resolve('false')
+      })
+  })
+}
+
+const changePasswordUser = (query, output, text, subject, newPassword) => {
+  return new Promise((resolve, reject) => {
+    User.findOneAndUpdate(query, { $set: { password: newPassword } })
+      .then(async function(user) {
+        output.data = query
+        await email(text, output, subject)
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = 'successful to change password'
+        resolve('success')
+      })
+      .catch(function(err) {
+        console.log(err)
+        resolve('false')
+      })
+  })
+}
+
+const createUser = (newUser, type, output) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // console.log('create User')
+      const user = await newUser.save()
+      //console.log('user', user)
+      const token = jwt.sign({ data: user }, app.get('secret'), {
+        expiresIn: app.get('tokenLifetime'),
+      })
+      // console.log('token', token)
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = defaultSuccessMessage
+      output.data = {
+        token: token,
+        email: newUser.email,
+      }
+      // console.log('pooooo', output.status.code)
+      resolve(output.status.code)
+    } catch (err) {
+      log('err', err)
+      resolve(err)
+    }
+  })
+}
 
 function genNextQueryParams(params) {
   var nextQueryParams = ''
@@ -71,6 +369,7 @@ function setData(data) {
   return output
 }
 
+//controllers
 exports.login = function(req, res) {
   var queryParams = {
     email: req.body.email,
@@ -259,208 +558,6 @@ exports.delete = function(req, res) {
   )
 }
 
-const createUser = (newUser, type) => {
-  new Promise(async (resolve, reject) => {
-    console.log('create User')
-    try {
-      const user = await newUser.save()
-      const token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
-      })
-      output.status.code = 200
-      output.status.success = true
-      output.status.message = defaultSuccessMessage
-      output.data = {
-        token: token,
-        email: user.email,
-      }
-      resolve(output.status.code)
-    } catch (err) {
-      log('err', err)
-      if (type == 'local') {
-        output.status.message = 'You already register'
-      } else {
-        output.status.message = err.message
-      }
-      resolve(output.status.code)
-    }
-  })
-}
-
-var socialAuthen = []
-socialAuthen['local'] = async function(providerData) {
-  //console.log('provideData', providerData)
-  var code = ''
-  var user = await User.find({ email: providerData.email }).exec()
-  //console.log('user', user)
-  var password = bcrypt.hashSync(providerData.password)
-  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  re.test(providerData.email)
-  if (!re) {
-    output.status.message = 'email is invalid'
-    return 400
-  } else {
-    if (Object.keys(user).length == 0) {
-      var createObject = {
-        email: providerData.email,
-        password: password,
-        status: 'inactive',
-      }
-      var new_user = new User(createObject)
-      const user = await createUser(new_user, 'local')
-      console.log('coddddeeeeeeee')
-      return user
-    } else {
-      output.status.message = 'You already register'
-      return 400
-    }
-  }
-}
-
-socialAuthen['facebook'] = async function(providerData) {
-  let facebookData = providerData
-  var response = {}
-  var checkNewUser = {}
-  var data = {}
-  try {
-    response = await fetch(
-      'https://graph.facebook.com/me?access_token=' + facebookData.accessToken
-    ).then(response => response.json())
-    if (response.error) {
-      return {
-        status: {
-          code: 400,
-          success: false,
-          message: response.error.message,
-        },
-        data: [],
-      }
-    }
-    if (response.id != facebookData.id || response.name != facebookData.name) {
-      return {
-        status: {
-          code: 400,
-          success: false,
-          message: 'token is invalid',
-        },
-        data: [],
-      }
-    }
-  } catch (err) {
-    return {
-      status: {
-        code: 400,
-        success: false,
-        message: err.message,
-      },
-      data: [],
-    }
-  }
-
-  try {
-    var token = ''
-    var user = await User.findOneAndUpdate(
-      { email: facebookData.email },
-      { fb_info: facebookData },
-      { new: true }
-    ).exec()
-    if (!user) {
-      var password = Date.now()
-      var createObject = {
-        email: facebookData.email,
-        password: bcrypt.hashSync(password), //if error is meaning this
-        fb_info: facebookData,
-      }
-      var new_user = new User(createObject)
-      checkNewUser = new User(createObject)
-      try {
-        user = await new_user.save()
-      } catch (err) {
-        return {
-          status: {
-            code: 400,
-            success: false,
-            message: err.message,
-          },
-          data: [],
-        }
-      }
-      token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
-      })
-    }
-
-    if (Object.keys(checkNewUser).length != 0) {
-      var transporter = nodemailer.createTransport({
-        host: 'smtp.sparkpostmail.com',
-        port: 587,
-        //service: 'Gmail',
-        auth: {
-          user: 'SMTP_Injection', // Your email id
-          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-        },
-      })
-      var mailOptions = {
-        from: '<no-reply@maxmuaythai.com>', // sender address
-        to: `${checkNewUser.email}`, // list of receivers
-        subject: 'Promotion code for Max Muay Thai', // Subject line
-        text:
-          'Your promotion code for watch live and video in Max Muay Thai: ' +
-          'MWC2016',
-        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-      }
-      var statuEmail = await transporter
-        .sendMail(mailOptions)
-        .then(function(info) {
-          data = {
-            status: {
-              code: 200,
-              success: true,
-              message: defaultSuccessMessage,
-            },
-            data: {
-              token: token,
-              email: facebookData.email,
-            },
-          }
-          return data
-        })
-        .catch(function(err) {
-          return {
-            status: {
-              code: 400,
-              success: false,
-              message: `can't send email`,
-            },
-            data: {},
-          }
-        })
-      return statuEmail
-    } else {
-      return {
-        status: {
-          code: 200,
-          success: true,
-          message: defaultSuccessMessage,
-        },
-        data: {
-          token: token,
-          email: facebookData.email,
-        },
-      }
-    }
-  } catch (err) {
-    return {
-      status: {
-        code: 400,
-        success: false,
-        message: err.message,
-      },
-      data: [],
-    }
-  }
-}
-
 exports.sendEmail = function(req, res) {
   var transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -494,105 +591,41 @@ exports.sendEmail = function(req, res) {
   })
 }
 
-const email = response => {
-  //console.log('response', response)
-  new Promise((resolve, reject) => {
-    var transporter = nodemailer.createTransport({
-      host: 'smtp.sparkpostmail.com',
-      port: 587,
-      auth: {
-        user: 'SMTP_Injection', // Your email id
-        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-      },
-    })
-    var mailOptions = {
-      from: '<no-reply@maxmuaythai.com>', // sender address
-      to: `${response.data.email}`, // list of receivers
-      subject: 'Please verify your email', // Subject line
-      text:
-        'Activate Account please enter link ' +
-        'https://www.maxmuaythai.com/verify?token=' +
-        response.data.token,
-      // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-    }
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        output.status.message = 'Cannot send email'
-        resolve('false')
-      } else {
-        console.log('hhiiiiiii')
-        resolve('success')
-      }
-    })
-  })
-}
-
-const checkAuthen = providerName => {
-  if (socialAuthen[providerName] == undefined) {
-    //console.log('hi')
-    output.status.message = providerName + ' is not support'
-    return false
-  } else {
-    return true
-  }
-}
-
 exports.localRegister = async function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
   var response = ''
+  var text = ''
   var j = JSON.stringify(req.body)
-  var auth = checkAuthen(providerName)
+  var subject = 'Please verify your email'
+
+  var auth = checkAuthen(providerName, output)
   if (auth == false) {
     return res.json(output)
   } else {
-    response = await socialAuthen[providerName](providerData)
-    //console.log(response)
+    response = await socialAuthen[providerName](providerData, output)
+    //console.log('token when register', output.data.token)
     if (response != 400) {
-      //console.log('jg')
-      await email(output)
+      //console.log('token in email', output.data.token)
+      ;(text =
+        'Activate Account please enter link ' +
+        'https://www.maxmuaythai.com/verify?token=' +
+        output.data.token),
+        await email(text, output, subject)
       return res.json(output)
     } else {
       return res.json(output)
     }
   }
 }
-
-//console.log(response)
-// //console.log('aaaaaa', response.data.token)
-// var transporter = nodemailer.createTransport({
-//   host: 'smtp.sparkpostmail.com',
-//   port: 587,
-//   //service: 'Gmail',
-//   auth: {
-//     user: 'SMTP_Injection', // Your email id
-//     pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-//   },
-// })
-// var mailOptions = {
-//   from: '<no-reply@maxmuaythai.com>', // sender address
-//   to: `${response.data.email}`, // list of receivers
-//   subject: 'Please verify your email', // Subject line
-//   text:
-//     'Activate Account please enter link ' +
-//     'https://www.maxmuaythai.com/verify?token=' +
-//     response.data.token,
-//   // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-// }
-// transporter.sendMail(mailOptions, function(error, info) {
-//   if (error) {
-//     //console.log(error)
-//     response.status.code = 400
-//     response.status.success = false
-//     response.status.message = 'Cannot send email'
-//     response.data = {}
-//     return res.json(response)
-//   } else {
-//     //console.log('Message sent: ' + info.response)
-//     //res.json({ yo: 'success' })
-//     return res.json(response)
-//   }
-// })
 
 exports.localLogin = async function(req, res) {
   var password = bcrypt.hashSync(req.body.provider_data.password)
@@ -646,70 +679,28 @@ exports.localLogin = async function(req, res) {
 exports.activateLocalUser = async function(req, res) {
   var token = req.query.token
   //console.log('token', token)
-  jwt.verify(token, req.app.get('secret'), function(err, decoded) {
-    if (err) {
-      return res.json({
-        status: {
-          code: 403,
-          success: false,
-          message: 'Failed to authenticate token.',
-        },
-        data: [],
-      })
-    } else {
-      decoded = decoded
-      var queryParams = {
-        email: decoded.data.email,
-      }
-      User.findOneAndUpdate(
-        queryParams,
-        { $set: { status: 'active' } },
-        function(err, user) {
-          if (err) {
-            return res.send(err)
-          } else {
-            var transporter = nodemailer.createTransport({
-              host: 'smtp.sparkpostmail.com',
-              port: 587,
-              //service: 'Gmail',
-              auth: {
-                user: 'SMTP_Injection', // Your email id
-                pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-              },
-            })
-            var mailOptions = {
-              from: '<no-reply@maxmuaythai.com>', // sender address
-              to: `${user.email}`, // list of receivers
-              subject: 'Promotion code for Max Muay Thai', // Subject line
-              text:
-                'Your promotion code for watch live and video in Max Muay Thai: ' +
-                'MWC2016',
-              // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-            }
-            transporter.sendMail(mailOptions, function(error, info) {
-              if (error) {
-                //console.log(error)
-                response.status.code = 400
-                response.status.success = false
-                response.status.message = 'Cannot send email'
-                response.data = {}
-                return res.json(response)
-              } else {
-                return res.send({
-                  status: {
-                    code: 200,
-                    success: true,
-                    message: 'active email is success',
-                  },
-                  data: [],
-                })
-              }
-            })
-          }
-        }
-      )
-    }
-  })
+  var decode = {}
+  var query = {}
+  var statusToken = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: {},
+  }
+  var text = ''
+  var subject = 'Promotion code for Max Muay Thai'
+  statusToken = await verifyToken(token, req)
+  if (statusToken.status == 'authorize') {
+    query = { email: statusToken.email }
+    await activateUser(query, output, text, subject)
+    return res.json(output)
+  } else {
+    output.status.message = 'unauthorized your token'
+    return res.json(output)
+  }
 }
 
 exports.fbLogin = async function(req, res) {
@@ -728,7 +719,68 @@ exports.fbLogin = async function(req, res) {
   else {
     var response = await socialAuthen[providerName](providerData)
 
-    console.log('response', response)
+    //console.log('response', response)
     return res.json(response)
+  }
+}
+
+exports.checkOldPassword = async function(req, res) {
+  var token = req.query.token
+  var password = req.body.password
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  var statusToken = await verifyToken(token, req)
+  if (bcrypt.compareSync(password, statusToken.password)) {
+    output.status.code = 200
+    output.status.success = true
+    output.status.message = 'your password is verify'
+  } else {
+    output.status.message = `your password isn't verify`
+  }
+  return res.json(output)
+}
+
+exports.changePassword = async function(req, res) {
+  var token = req.query.token
+  var password = req.body.password
+  var query = {}
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  var newPassword = bcrypt.hashSync(password)
+  var text = 'Successful change password you can login with new password'
+  var subject = 'Sucessful to change password'
+  var statusToken = await verifyToken(token, req)
+  var statusPassword = ''
+  if (statusToken.status == 'authorize') {
+    query = { email: statusToken.email }
+    statusPassword = await changePasswordUser(
+      query,
+      output,
+      text,
+      subject,
+      newPassword
+    )
+    output.data = {}
+    if (statusPassword == 'success') {
+      return res.json(output)
+    } else {
+      output.status.message = 'error'
+      return res.json(output)
+    }
+  } else {
+    output.status.message = 'unauthorized your token'
+    return res.json(output)
   }
 }
