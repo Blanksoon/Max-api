@@ -11,3 +11,32 @@ var tokeninlocal =
 
 var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 console.log('re: ', !re.test('farm@.com'))
+
+// Not tested.
+Wechat.auth(scope, function(response) {
+  // $ = jQuery
+  var appId = 'YOUR_APP_ID'
+  var appSecret = 'YOUR_APP_SECRET'
+  $.get(
+    'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' +
+      appId +
+      '&secret=' +
+      appSecret +
+      '&code=' +
+      response.code +
+      '&grant_type=authorization_code',
+    function(accessTokenResponse) {
+      // you should save access token response somewhere, e.g. cookies, local storage, etc.
+      var accessToken = accessTokenResponse.access_token
+      var openId = accessTokenResponse.openid
+
+      // get user information
+      $.get(
+        "https://api.weixin.qq.com/sns/userinfo?access_token=' + accessToken + '&openid=' + openId + '&lang=zh_CN",
+        function(userInfoResponse) {
+          console.log(userInfoResponse)
+        }
+      )
+    }
+  )
+})

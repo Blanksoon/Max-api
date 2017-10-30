@@ -616,8 +616,8 @@ exports.localRegister = async function(req, res) {
     if (response != 400) {
       //console.log('token in email', output.data.token)
       ;(text =
-        'Activate Account please enter link ' +
-        'https://www.maxmuaythai.com/verify?token=' +
+        'Activate Account please enter link \
+        https://www.maxmuaythai.com/verify?token=' +
         output.data.token),
         await email(text, output, subject)
       return res.json(output)
