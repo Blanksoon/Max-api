@@ -96,7 +96,7 @@ function prepareData(data, vodUrl) {
   //console.log('vodUrl', vodUrl)
   var outputPrepareData = []
   var newData = {}
-  if (vodUrl == 'null') {
+  if (vodUrl == null) {
     data.forEach(function(record) {
       newData = {
         id: record._id,
@@ -126,11 +126,6 @@ function prepareData(data, vodUrl) {
     data.forEach(function(record) {
       newData = {
         id: record._id,
-        programName_en: record.programName_en,
-        programName_th: record.programName_th,
-        promoFromTime: record.promoFromTime,
-        promoToTime: record.promoToTime,
-        free: record.free,
         logoUrl: record.logoUrl,
         videoUrl: record.videoUrl,
         promoUrl: record.promoUrl,
@@ -154,10 +149,10 @@ function prepareData(data, vodUrl) {
 function setData(data, message) {
   var outputJson = []
   if (message == 'not-paid') {
-    outputJson = prepareData(data, 'null')
+    outputJson = prepareData(data, null)
     return outputJson
   } else if (message == 'feature-vod') {
-    outputJson = prepareData(data, 'null')
+    outputJson = prepareData(data, null)
     return outputJson
   } else if (message == 'feature-vod-paid') {
     outputJson = prepareData(data, data[0].videoUrl)

@@ -46,7 +46,7 @@ const queryOrder = query => {
 function prepareData(data, vodUrl) {
   var outputPrepareData = []
   var newData = {}
-  if (vodUrl == 'null') {
+  if (vodUrl == null) {
     data.forEach(function(record) {
       newData = {
         id: record._id,
@@ -106,7 +106,7 @@ function prepareData(data, vodUrl) {
 function setData(data, message) {
   var outputJson = []
   if (message == 'not-paid') {
-    outputJson = prepareData(data, 'null')
+    outputJson = prepareData(data, null)
     return outputJson
   } else {
     outputJson = prepareData(data, data)
