@@ -121,4 +121,5 @@ module.exports = function(app) {
   app.get('/activate-user', user.activateLocalUser)
   app.post('/check-old-password', user.checkOldPassword)
   app.post('/change-password', user.changePassword)
+  app.post('/forgot-password', user.forgotPassword)
 }

@@ -303,6 +303,7 @@ exports.vods = async function(req, res) {
   }
   var progName = req.query.progname
   if (
+    //Search vod
     searchName != 'undefined' &&
     searchName != '' &&
     searchName != undefined
@@ -332,6 +333,7 @@ exports.vods = async function(req, res) {
       return res.json(json)
     }
   } else if (
+    //Filter program
     progName != 'undefined' &&
     progName != '' &&
     progName != undefined
@@ -361,7 +363,7 @@ exports.vods = async function(req, res) {
       return res.json(json)
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
-    //console.log('hi')
+    //Find all vod
     outputvods = await findVods('not-paid', {})
     json = setDataOutput(outputvods, output)
     return res.json(json)

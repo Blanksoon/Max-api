@@ -747,6 +747,7 @@ exports.checkOldPassword = async function(req, res) {
 }
 
 exports.changePassword = async function(req, res) {
+  console.log('hi')
   var token = req.query.token
   var password = req.body.password
   var query = {}
@@ -783,4 +784,45 @@ exports.changePassword = async function(req, res) {
     output.status.message = 'unauthorized your token'
     return res.json(output)
   }
+}
+
+exports.forgotPassword = async function(req, res) {
+  var userEmail = req.body.email
+  var query = {}
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  var text = ''
+  var subject = 'Forgot you password Max Muay Thai'
+  await User.find({ email: userEmail })
+    .then(async function(user) {
+      if (Object.keys(user).length != 0) {
+        const token = jwt.sign({ data: user }, app.get('secret'), {
+          expiresIn: app.get('tokenLifetime'),
+        })
+        output.data = { email: userEmail }
+        text =
+          'Change your password from https://www.maxmuaythai.com/verify?token=' +
+          token
+        const statusEmail = await email(text, output, subject)
+        if (statusEmail === 'success') {
+          output.status.code = 200
+          output.status.success = true
+          output.status.message =
+            'Please check your email for change your password'
+        }
+      } else {
+        output.status.message = 'Email is invalid'
+      }
+    })
+    .catch(function(err) {
+      console.log(err)
+      output.status.message = err
+    })
+  return res.json(output)
 }
