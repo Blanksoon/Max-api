@@ -247,12 +247,27 @@ const verifyToken = (token, req) => {
         }
         resolve(query)
       } else {
-        query = {
-          email: decoded.data[0].email,
-          password: decoded.data[0].password,
-          status: 'authorize',
+        console.log('decoded.data.email', decoded.data.email)
+        if (
+          decoded.data.email == undefined ||
+          decoded.data.email == 'undefined'
+        ) {
+          console.log('fisofjo')
+          query = {
+            email: decoded.data[0].email,
+            password: decoded.data[0].password,
+            status: 'authorize',
+          }
+          resolve(query)
+        } else {
+          console.log('hiiiii')
+          query = {
+            email: decoded.data.email,
+            password: decoded.data.password,
+            status: 'authorize',
+          }
+          resolve(query)
         }
-        resolve(query)
       }
     })
   })
