@@ -247,10 +247,9 @@ const verifyToken = (token, req) => {
         }
         resolve(query)
       } else {
-        //console.log('decoded', decoded)
         query = {
-          email: decoded.data.email,
-          password: decoded.data.password,
+          email: decoded.data[0].email,
+          password: decoded.data[0].password,
           status: 'authorize',
         }
         resolve(query)
@@ -759,10 +758,12 @@ exports.changePassword = async function(req, res) {
     },
     data: [],
   }
+  var statusToken = {}
   var newPassword = bcrypt.hashSync(password)
   var text = 'Successful change password you can login with new password'
   var subject = 'Sucessful to change password'
   var statusToken = await verifyToken(token, req)
+  console.log('statusToken', statusToken)
   var statusPassword = ''
   if (statusToken.status == 'authorize') {
     query = { email: statusToken.email }
@@ -807,7 +808,7 @@ exports.forgotPassword = async function(req, res) {
         })
         output.data = { email: userEmail }
         text =
-          'Change your password from https://www.maxmuaythai.com/verify?token=' +
+          'Change your password from http://localhost:8080/changePassword?token=' +
           token
         const statusEmail = await email(text, output, subject)
         if (statusEmail === 'success') {
