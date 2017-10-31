@@ -88,7 +88,7 @@ function setData(data, message) {
         promoToTime: record.promoToTime,
         free: record.free,
         logoUrl: record.logoUrl,
-        videoUrl: 'null',
+        videoUrl: null,
         promoUrl: record.promoUrl,
         thumbnailUrl: record.thumbnailUrl,
         title_en: record.title_en,
