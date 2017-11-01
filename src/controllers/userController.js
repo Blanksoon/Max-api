@@ -761,7 +761,6 @@ exports.checkOldPassword = async function(req, res) {
 }
 
 exports.changePassword = async function(req, res) {
-  console.log('hi')
   var token = req.query.token
   var password = req.body.password
   var query = {}
@@ -841,4 +840,35 @@ exports.forgotPassword = async function(req, res) {
       output.status.message = err
     })
   return res.json(output)
+}
+
+exports.profileUser = async function(req, res) {
+  const output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  const token = req.query.token
+  const emailUser = await verifyToken(token, req)
+  console.log('emailUser', emailUser)
+  await User.find({ email: emailUser.email }, { email: 1, password: 1 })
+    .then(function(user) {
+      if (Object.keys(user).length != 0) {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message = 'success'
+        output.data = user
+      } else {
+        output.status.message = 'user not found'
+      }
+    })
+    .catch(function(err) {
+      console.log('err', err)
+      output.status.message = err
+    })
+  console.log('output', output)
+  return res.send(output)
 }
