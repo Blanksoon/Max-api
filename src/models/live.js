@@ -79,39 +79,10 @@ var LiveSchema = new Schema({
     type: String,
     required: 'logoUrl is required',
   },
-  // description_en: {
-  // OnAirTime: {
-  //   type: String,
-  //   required: 'OnAirTime is required',
-  //default: Date.now,
-  // },
-  // OnAirDate: {
-  //   type: String,
-  //   required: 'OnAirDate is required',
-  // },
-  //   type: String,
-  //   required: 'description_en is required',
-  // },
-  // description_th: {
-  //   type: String,
-  //   required: 'description_th is required',
-  // },
-  // thumbnailUrl: {
-  //   type: String,
-  //   required: 'thumbnailUrl is required',
-  // },
-  // shortDescription_en: {
-  //   type: String,
-  //   required: 'shortDescription_en is required',
-  // },
-  // shortDescription_th: {
-  //   type: String,
-  //   required: 'shortDescription_th is required',
-  // },
-  // channel: {
-  //   type: String,
-  //   required: 'channel is required',
-  // },
+  price: {
+    type: Number,
+    required: 'price is required',
+  },
   versionKey: false,
 })
 

@@ -69,6 +69,7 @@ function prepareData(data, vodUrl) {
         promoUrl: record.promoUrl,
         bannerUrl: record.bannerUrl,
         logoUrl: record.logoUrl,
+        price: record.price,
       }
       outputPrepareData.push(newData)
     })
@@ -96,6 +97,7 @@ function prepareData(data, vodUrl) {
         promoUrl: record.promoUrl,
         bannerUrl: record.bannerUrl,
         logoUrl: record.logoUrl,
+        price: record.price,
       }
       outputPrepareData.push(newData)
     })
