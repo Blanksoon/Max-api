@@ -12,6 +12,26 @@ var UserSchema = new Schema({
     type: String,
     required: 'password is required',
   },
+  name: {
+    type: String,
+    default: 'undefiend',
+  },
+  lastname: {
+    type: String,
+    default: 'undefiend',
+  },
+  gender: {
+    type: String,
+    default: 'undefined',
+  },
+  date_birth: {
+    type: String,
+    default: 'undefined',
+  },
+  country: {
+    type: String,
+    default: 'undefined',
+  },
   fb_info: {
     type: Object,
     default: null,

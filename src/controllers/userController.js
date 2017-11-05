@@ -210,7 +210,7 @@ const email = (text, output, subject) => {
     transporter.sendMail(mailOptions, function(error, info) {
       //console.log('senemail', output)
       if (error) {
-        console.log('error', error)
+        //console.log('error', error)
         output.status.code = '400'
         output.status.success = false
         output.status.message = 'Cannot send email'
@@ -247,12 +247,12 @@ const verifyToken = (token, req) => {
         }
         resolve(query)
       } else {
-        console.log('decoded.data.email', decoded.data.email)
+        //console.log('decoded.data.email', decoded.data.email)
         if (
           decoded.data.email == undefined ||
           decoded.data.email == 'undefined'
         ) {
-          console.log('fisofjo')
+          //console.log('fisofjo')
           query = {
             email: decoded.data[0].email,
             password: decoded.data[0].password,
@@ -260,7 +260,7 @@ const verifyToken = (token, req) => {
           }
           resolve(query)
         } else {
-          console.log('hiiiii')
+          //console.log('hiiiii')
           query = {
             email: decoded.data.email,
             password: decoded.data.password,
@@ -777,7 +777,7 @@ exports.changePassword = async function(req, res) {
   var text = 'Successful change password you can login with new password'
   var subject = 'Sucessful to change password'
   var statusToken = await verifyToken(token, req)
-  console.log('statusToken', statusToken)
+  //console.log('statusToken', statusToken)
   var statusPassword = ''
   if (statusToken.status == 'authorize') {
     query = { email: statusToken.email }
@@ -853,7 +853,7 @@ exports.profileUser = async function(req, res) {
   }
   const token = req.query.token
   const emailUser = await verifyToken(token, req)
-  console.log('emailUser', emailUser)
+  //console.log('emailUser', emailUser)
   await User.find({ email: emailUser.email }, { email: 1, password: 1 })
     .then(function(user) {
       if (Object.keys(user).length != 0) {
@@ -869,6 +869,6 @@ exports.profileUser = async function(req, res) {
       console.log('err', err)
       output.status.message = err
     })
-  console.log('output', output)
+  //console.log('output', output)
   return res.send(output)
 }
