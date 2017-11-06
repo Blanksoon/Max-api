@@ -13,30 +13,34 @@ var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0
 console.log('re: ', !re.test('farm@.com'))
 
 // Not tested.
-Wechat.auth(scope, function(response) {
-  // $ = jQuery
-  var appId = 'YOUR_APP_ID'
-  var appSecret = 'YOUR_APP_SECRET'
-  $.get(
-    'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' +
-      appId +
-      '&secret=' +
-      appSecret +
-      '&code=' +
-      response.code +
-      '&grant_type=authorization_code',
-    function(accessTokenResponse) {
-      // you should save access token response somewhere, e.g. cookies, local storage, etc.
-      var accessToken = accessTokenResponse.access_token
-      var openId = accessTokenResponse.openid
+// Wechat.auth(scope, function(response) {
+//   // $ = jQuery
+//   var appId = 'YOUR_APP_ID'
+//   var appSecret = 'YOUR_APP_SECRET'
+//   $.get(
+//     'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' +
+//       appId +
+//       '&secret=' +
+//       appSecret +
+//       '&code=' +
+//       response.code +
+//       '&grant_type=authorization_code',
+//     function(accessTokenResponse) {
+//       // you should save access token response somewhere, e.g. cookies, local storage, etc.
+//       var accessToken = accessTokenResponse.access_token
+//       var openId = accessTokenResponse.openid
 
-      // get user information
-      $.get(
-        "https://api.weixin.qq.com/sns/userinfo?access_token=' + accessToken + '&openid=' + openId + '&lang=zh_CN",
-        function(userInfoResponse) {
-          console.log(userInfoResponse)
-        }
-      )
-    }
-  )
-})
+//       // get user information
+//       $.get(
+//         "https://api.weixin.qq.com/sns/userinfo?access_token=' + accessToken + '&openid=' + openId + '&lang=zh_CN",
+//         function(userInfoResponse) {
+//           console.log(userInfoResponse)
+//         }
+//       )
+//     }
+//   )
+// })
+
+var name = 'thammarong kikasemsri'
+var testName = name.split(/[ ]+/)
+console.log(testNam[0])

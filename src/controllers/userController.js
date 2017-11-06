@@ -88,17 +88,50 @@ socialAuthen['facebook'] = async function(providerData) {
 
   try {
     var token = ''
+    var name = facebookData.name.split(/[ ]+/)
     var user = await User.findOneAndUpdate(
       { email: facebookData.email },
       { fb_info: facebookData },
       { new: true }
     ).exec()
+    console.log('user', user)
+    if (user.country == 'undefined') {
+      await User.updateMany(
+        { email: facebookData.email },
+        { $set: { country: facebookData.locale } }
+      )
+    }
+    if (user.gender == 'undefined') {
+      await User.updateMany(
+        { email: facebookData.email },
+        { $set: { country: facebookData.gender } }
+      )
+    }
+    if (user.name == 'undefined') {
+      await User.updateMany(
+        { email: facebookData.email },
+        { $set: { country: facebookData.name[0] } }
+      )
+    }
+    if (user.lastname == 'undefined') {
+      await User.updateMany(
+        { email: facebookData.email },
+        { $set: { country: facebookData.name[1] } }
+      )
+    }
     if (!user) {
+      //console.log('hi')
       var password = Date.now()
+      // console.log('facebookData', facebookData)
+      //console.log('name', name)
       var createObject = {
         email: facebookData.email,
         password: bcrypt.hashSync(password), //if error is meaning this
         fb_info: facebookData,
+        name: name[0],
+        lastname: name[1],
+        gender: facebookData.gender,
+        //country: facebookData.locale,
       }
       var new_user = new User(createObject)
       checkNewUser = new User(createObject)
@@ -117,6 +150,7 @@ socialAuthen['facebook'] = async function(providerData) {
       token = await jwt.sign({ data: user }, app.get('secret'), {
         expiresIn: app.get('tokenLifetime'),
       })
+    } else {
     }
 
     if (Object.keys(checkNewUser).length != 0) {
@@ -166,6 +200,9 @@ socialAuthen['facebook'] = async function(providerData) {
         })
       return statuEmail
     } else {
+      token = await jwt.sign({ data: user }, app.get('secret'), {
+        expiresIn: app.get('tokenLifetime'),
+      })
       return {
         status: {
           code: 200,
@@ -854,7 +891,18 @@ exports.profileUser = async function(req, res) {
   const token = req.query.token
   const emailUser = await verifyToken(token, req)
   //console.log('emailUser', emailUser)
-  await User.find({ email: emailUser.email }, { email: 1, password: 1 })
+  await User.find(
+    { email: emailUser.email },
+    {
+      email: 1,
+      password: 1,
+      country: 1,
+      gender: 1,
+      name: 1,
+      lastname: 1,
+      date_birth: 1,
+    }
+  )
     .then(function(user) {
       if (Object.keys(user).length != 0) {
         output.status.code = 200

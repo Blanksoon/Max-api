@@ -96,7 +96,7 @@ function prepareData(data, vodUrl) {
   //console.log('vodUrl', vodUrl)
   var outputPrepareData = []
   var newData = {}
-  if (vodUrl == null) {
+  if (vodUrl == 'null') {
     data.forEach(function(record) {
       newData = {
         id: record._id,
@@ -149,10 +149,10 @@ function prepareData(data, vodUrl) {
 function setData(data, message) {
   var outputJson = []
   if (message == 'not-paid') {
-    outputJson = prepareData(data, null)
+    outputJson = prepareData(data, 'null')
     return outputJson
   } else if (message == 'feature-vod') {
-    outputJson = prepareData(data, null)
+    outputJson = prepareData(data, 'null')
     return outputJson
   } else if (message == 'feature-vod-paid') {
     outputJson = prepareData(data, data[0].videoUrl)
@@ -335,8 +335,7 @@ exports.vods = async function(req, res) {
   } else if (
     //Filter program
     progName != 'undefined' &&
-    progName != '' &&
-    progName != undefined
+    progName != ''
   ) {
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVods('not-paid', {

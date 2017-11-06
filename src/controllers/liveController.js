@@ -1,4 +1,5 @@
 var defaultSuccessMessage = 'success'
+var moment = require('moment-timezone')
 var defaultErrorMessage = 'data_not_found'
 var jwt = require('jsonwebtoken')
 var mongoose = require('mongoose'),
@@ -46,7 +47,7 @@ const queryOrder = query => {
 function prepareData(data, vodUrl) {
   var outputPrepareData = []
   var newData = {}
-  if (vodUrl == null) {
+  if (vodUrl == 'null') {
     data.forEach(function(record) {
       newData = {
         id: record._id,
@@ -108,7 +109,7 @@ function prepareData(data, vodUrl) {
 function setData(data, message) {
   var outputJson = []
   if (message == 'not-paid') {
-    outputJson = prepareData(data, null)
+    outputJson = prepareData(data, 'null')
     return outputJson
   } else {
     outputJson = prepareData(data, data)
@@ -116,12 +117,13 @@ function setData(data, message) {
   }
 }
 
-function setDataOutput(outputvods, output) {
+async function setDataOutput(outputvods, output) {
   if (outputvods.error == 'none') {
+    const liveData = await checktime(outputvods.data)
     output.status.code = 200
     output.status.success = true
     output.status.message = defaultSuccessMessage
-    output.data = outputvods.data
+    output.data = liveData
   } else {
     output.status.message = outputvods.error
   }
@@ -173,6 +175,36 @@ async function decodeJwt(token, req) {
     console.log(err)
   }
   return status
+}
+
+function checktime(lives) {
+  //console.log('lives', lives)
+  const today = new Date()
+  const newLives = lives.map(live => {
+    const newLiveFromDate = new Date(live.liveFromDate)
+    newLiveFromDate.setDate(today.getDate())
+    newLiveFromDate.setMonth(today.getMonth())
+    const newLiveToDate = new Date(live.liveToDate)
+    newLiveToDate.setDate(today.getDate())
+    newLiveToDate.setMonth(today.getMonth())
+    if (today.getTime() > newLiveToDate.getTime()) {
+      newLiveFromDate.setDate(today.getDate() + 1)
+      newLiveToDate.setDate(today.getDate() + 1)
+    }
+    live.liveFromDate = newLiveFromDate
+    //console.log(newLiveToDate)
+    live.liveToDate = newLiveToDate
+    liveFromTime = moment.tz(live.liveFromDate, 'Asia/Bangkok').format('HH:mm')
+    liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
+    // Sat. Oct, 21st, 2017
+    live.liveDateStr_en = moment
+      .tz(live.liveFromDate, 'Asia/Bangkok')
+      .format('ddd. MMM Do, YYYY')
+    live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
+    return live
+  })
+  //console.log(newLives)
+  return newLives
 }
 
 //controllers
@@ -230,6 +262,7 @@ exports.insertValue = function(req, res) {
 }
 
 exports.lives = async function(req, res) {
+  //console.log('hi')
   var token = req.query.token
   var outputvods = {}
   var json = {}
@@ -244,7 +277,8 @@ exports.lives = async function(req, res) {
   }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', {})
-    json = setDataOutput(outputvods, output)
+    json = await setDataOutput(outputvods, output)
+    //console.log('json1', json)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
@@ -258,6 +292,7 @@ exports.lives = async function(req, res) {
       outputvods = { err: order }
       json = setDataOutput(outputvods, output)
     }
+    //console.log('json2', json)
     return res.json(json)
   }
 }
