@@ -88,7 +88,7 @@ function setData(data, message) {
         promoToTime: record.promoToTime,
         free: record.free,
         logoUrl: record.logoUrl,
-        videoUrl: null,
+        videoUrl: 'null',
         promoUrl: record.promoUrl,
         thumbnailUrl: record.thumbnailUrl,
         title_en: record.title_en,
@@ -221,7 +221,7 @@ exports.vods = function(req, res) {
   var decoded = {}
   var token = req.query.token
   var progName = req.query.progname
-  //console.log('progName', progName)
+  //console.log('progNamesssss', progName)
   //console.log('test', req.query.token)
   var output = {
     status: {
@@ -238,10 +238,12 @@ exports.vods = function(req, res) {
         if (err) {
           output.status.message = err.message
         } else if (vods) {
+          //console.log('vods', vods)
           output.status.code = 200
           output.status.success = true
           output.status.message = defaultSuccessMessage
           if (token == 'undefined') {
+            //console.log('vods', vods)
             output.data = setData(vods, 'not-paid')
           } else {
             output.data = setData(vods, 'not-paid')
@@ -314,6 +316,7 @@ exports.vods = function(req, res) {
       if (err) {
         output.status.message = err.message
       } else if (vods) {
+        //console.log('vods', vods)
         output.status.code = 200
         output.status.success = true
         output.status.message = defaultSuccessMessage
@@ -341,7 +344,7 @@ exports.vods = function(req, res) {
         }
         Order.findOne(queryParams, function(err, order) {
           if (err) {
-            //console.log(err)
+            console.log(err)
             //console.log('1')
             Vod.findOne({}, function(err, vods) {
               if (err) {
@@ -355,7 +358,7 @@ exports.vods = function(req, res) {
               return res.json(output)
             }).sort({ onAirDate: -1 })
           } else if (order) {
-            //console.log('err', order)
+            console.log('err', order)
             //console.log('2')
             Vod.find({}, function(err, vods) {
               if (err) {

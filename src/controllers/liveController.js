@@ -124,13 +124,16 @@ const checktime = lives => {
   const newLives = lives.map(live => {
     const newLiveFromDate = new Date(live.liveFromDate)
     newLiveFromDate.setDate(today.getDate())
+    newLiveFromDate.setMonth(today.getMonth())
     const newLiveToDate = new Date(live.liveToDate)
     newLiveToDate.setDate(today.getDate())
+    newLiveToDate.setMonth(today.getMonth())
     if (today.getTime() > newLiveToDate.getTime()) {
       newLiveFromDate.setDate(today.getDate() + 1)
       newLiveToDate.setDate(today.getDate() + 1)
     }
     live.liveFromDate = newLiveFromDate
+    //console.log(newLiveToDate)
     live.liveToDate = newLiveToDate
     liveFromTime = moment.tz(live.liveFromDate, 'Asia/Bangkok').format('HH:mm')
     liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
@@ -141,6 +144,7 @@ const checktime = lives => {
     live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
     return live
   })
+  //console.log(newLives)
   return newLives
 }
 
