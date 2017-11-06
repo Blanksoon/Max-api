@@ -94,36 +94,6 @@ socialAuthen['facebook'] = async function(providerData) {
       { fb_info: facebookData },
       { new: true }
     ).exec()
-    if (user.country == 'undefined') {
-      await User.updateMany(
-        { email: facebookData.email },
-        { $set: { country: facebookData.locale } }
-      )
-    }
-    if (user.gender == 'undefined') {
-      await User.updateMany(
-        { email: facebookData.email },
-        { $set: { gender: facebookData.gender } }
-      )
-    }
-    if (user.name == 'undefined') {
-      await User.updateMany(
-        { email: facebookData.email },
-        { $set: { name: name[0] } }
-      )
-    }
-    if (user.lastname == 'undefined') {
-      await User.updateMany(
-        { email: facebookData.email },
-        { $set: { lastname: name[1] } }
-      )
-    }
-    if (user.status == 'inactive') {
-      await User.updateMany(
-        { email: facebookData.email },
-        { $set: { status: 'active' } }
-      )
-    }
     if (!user) {
       //console.log('hi')
       var password = Date.now()
@@ -156,6 +126,36 @@ socialAuthen['facebook'] = async function(providerData) {
         expiresIn: app.get('tokenLifetime'),
       })
     } else {
+      if (user.country == 'undefined') {
+        await User.updateMany(
+          { email: facebookData.email },
+          { $set: { country: facebookData.locale } }
+        )
+      }
+      if (user.gender == 'undefined') {
+        await User.updateMany(
+          { email: facebookData.email },
+          { $set: { gender: facebookData.gender } }
+        )
+      }
+      if (user.name == 'undefined') {
+        await User.updateMany(
+          { email: facebookData.email },
+          { $set: { name: name[0] } }
+        )
+      }
+      if (user.lastname == 'undefined') {
+        await User.updateMany(
+          { email: facebookData.email },
+          { $set: { lastname: name[1] } }
+        )
+      }
+      if (user.status == 'inactive') {
+        await User.updateMany(
+          { email: facebookData.email },
+          { $set: { status: 'active' } }
+        )
+      }
     }
 
     if (Object.keys(checkNewUser).length != 0) {
