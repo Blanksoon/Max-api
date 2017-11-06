@@ -94,7 +94,6 @@ socialAuthen['facebook'] = async function(providerData) {
       { fb_info: facebookData },
       { new: true }
     ).exec()
-    console.log('user', user)
     if (user.country == 'undefined') {
       await User.updateMany(
         { email: facebookData.email },
@@ -104,19 +103,25 @@ socialAuthen['facebook'] = async function(providerData) {
     if (user.gender == 'undefined') {
       await User.updateMany(
         { email: facebookData.email },
-        { $set: { country: facebookData.gender } }
+        { $set: { gender: facebookData.gender } }
       )
     }
     if (user.name == 'undefined') {
       await User.updateMany(
         { email: facebookData.email },
-        { $set: { country: facebookData.name[0] } }
+        { $set: { name: name[0] } }
       )
     }
     if (user.lastname == 'undefined') {
       await User.updateMany(
         { email: facebookData.email },
-        { $set: { country: facebookData.name[1] } }
+        { $set: { lastname: name[1] } }
+      )
+    }
+    if (user.status == 'inactive') {
+      await User.updateMany(
+        { email: facebookData.email },
+        { $set: { status: 'active' } }
       )
     }
     if (!user) {
@@ -861,13 +866,13 @@ exports.forgotPassword = async function(req, res) {
         text =
           'Change your password from http://localhost:8080/changePassword?token=' +
           token
-        const statusEmail = await email(text, output, subject)
-        if (statusEmail === 'success') {
-          output.status.code = 200
-          output.status.success = true
-          output.status.message =
-            'Please check your email for change your password'
-        }
+        // const statusEmail = await email(text, output, subject)
+        // if (statusEmail === 'success') {
+        output.status.code = 200
+        output.status.success = true
+        output.status.message =
+          'Please check your email for change your password'
+        //   }
       } else {
         output.status.message = 'Email is invalid'
       }

@@ -14,11 +14,11 @@ var UserSchema = new Schema({
   },
   name: {
     type: String,
-    default: 'undefiend',
+    default: 'undefined',
   },
   lastname: {
     type: String,
-    default: 'undefiend',
+    default: 'undefined',
   },
   gender: {
     type: String,
