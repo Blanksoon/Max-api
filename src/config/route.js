@@ -123,4 +123,5 @@ module.exports = function(app) {
   app.post('/change-password', user.changePassword)
   app.post('/forgot-password', user.forgotPassword)
   app.get('/profile', user.profileUser)
+  app.post('/update-user', user.updateUser)
 }

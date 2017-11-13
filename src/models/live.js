@@ -27,6 +27,14 @@ var LiveSchema = new Schema({
     type: String,
     required: 'liveDateStr_th is required',
   },
+  startTime: {
+    type: String,
+    required: 'startTime is required',
+  },
+  endTime: {
+    type: String,
+    required: 'endTime is required',
+  },
   liveFromDate: {
     type: Date,
     required: 'liveFromDate is required',

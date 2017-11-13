@@ -925,3 +925,33 @@ exports.profileUser = async function(req, res) {
   //console.log('output', output)
   return res.send(output)
 }
+
+exports.updateUser = async function(req, res) {
+  console.log('hi', req.body)
+  const output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  const token = req.query.token
+  const decoded = await verifyToken(token, req)
+  //console.log('decoded', decoded)
+  const user = await User.findOneAndUpdate(
+    { email: decoded.email },
+    {
+      name: req.body.name,
+      lastname: req.body.lastname,
+      country: req.body.country,
+      gender: req.body.newGender,
+    },
+    { new: true }
+  )
+  //console.log('user', user)
+  output.status.code = 200
+  output.status.success = true
+  output.status.message = 'successful to update profile'
+  res.send(output)
+}
