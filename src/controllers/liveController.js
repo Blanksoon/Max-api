@@ -59,6 +59,7 @@ function prepareData(data, vodUrl) {
         liveDateStr_th: record.liveDateStr_th,
         startTime: record.startTime,
         endTime: record.endTime,
+        liveDay: record.liveDay,
         liveFromDate: record.liveFromDate,
         liveToDate: record.liveToDate,
         shortDesc1_en: record.shortDesc1_en,
@@ -89,6 +90,7 @@ function prepareData(data, vodUrl) {
         liveDateStr_th: record.liveDateStr_th,
         startTime: record.startTime,
         endTime: record.endTime,
+        liveDay: record.liveDay,
         liveFromDate: record.liveFromDate,
         liveToDate: record.liveToDate,
         shortDesc1_en: record.shortDesc1_en,
@@ -182,22 +184,26 @@ async function decodeJwt(token, req) {
 }
 
 function checktime(lives) {
-  //console.log('lives', lives)
-  const today = new Date()
   const newLives = lives.map(live => {
-    const newLiveFromDate = new Date(live.liveFromDate)
-    newLiveFromDate.setDate(today.getDate())
-    newLiveFromDate.setMonth(today.getMonth())
-    const newLiveToDate = new Date(live.liveToDate)
-    newLiveToDate.setDate(today.getDate())
-    newLiveToDate.setMonth(today.getMonth())
-    if (today.getTime() > newLiveToDate.getTime()) {
-      newLiveFromDate.setDate(today.getDate() + 1)
-      newLiveToDate.setDate(today.getDate() + 1)
+    const curDate = new Date()
+    // Calculate this live liveDate for this week
+    const liveDate = new Date()
+    liveDate.setDate(
+      curDate.getDate() + (7 + live.liveDay - curDate.getDay()) % 7
+    )
+    // Covert liveDate to ISO string
+    const dateStr = `${liveDate.getFullYear()}-${liveDate.getMonth() +
+      1}-${liveDate.getDate()}`
+    // Concat liveDate with startTime and endTime
+    live.liveFromDate = new Date(`${dateStr}T${live.startTime}+0700`)
+    live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
+
+    // The live for current week has already ended
+    if (curDate.getTime() > live.liveToDate.getTime()) {
+      live.liveFromDate.setDate(live.liveFromDate.getDate() + 7)
+      live.liveToDate.setDate(live.liveToDate.getDate() + 7)
     }
-    live.liveFromDate = newLiveFromDate
-    //console.log(newLiveToDate)
-    live.liveToDate = newLiveToDate
+
     liveFromTime = moment.tz(live.liveFromDate, 'Asia/Bangkok').format('HH:mm')
     liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
     // Sat. Oct, 21st, 2017
@@ -207,7 +213,6 @@ function checktime(lives) {
     live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
     return live
   })
-  //console.log(newLives)
   return newLives
 }
 

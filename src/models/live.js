@@ -19,14 +19,6 @@ var LiveSchema = new Schema({
     type: Number,
     required: 'showOrder is required',
   },
-  liveDateStr_en: {
-    type: String,
-    required: 'liveDateStr_en is required',
-  },
-  liveDateStr_th: {
-    type: String,
-    required: 'liveDateStr_th is required',
-  },
   startTime: {
     type: String,
     required: 'startTime is required',
@@ -35,13 +27,9 @@ var LiveSchema = new Schema({
     type: String,
     required: 'endTime is required',
   },
-  liveFromDate: {
-    type: Date,
-    required: 'liveFromDate is required',
-  },
-  liveToDate: {
-    type: Date,
-    required: 'liveToDate is required',
+  liveDay: {
+    type: String, // 0 - Sunday, 6 - Saturday
+    required: 'liveDay is required',
   },
   shortDesc1_en: {
     type: String,
