@@ -1,4 +1,5 @@
 var defaultSuccessMessage = 'success'
+var fetch = require('isomorphic-unfetch')
 var moment = require('moment-timezone')
 var defaultErrorMessage = 'data_not_found'
 var jwt = require('jsonwebtoken')
@@ -44,7 +45,18 @@ const queryOrder = query => {
   })
 }
 
-function prepareData(data, vodUrl) {
+async function createToken() {
+  const server = 'http://139.59.127.206:8008'
+  const apiKey = 'badc87ee-3c81-486f-9e3e-fee583dbc9c8'
+  try {
+    const response = await fetch(`${server}?apiKey=${apiKey}`)
+    const json = await response.json()
+    return json.token
+  } catch (err) {
+    return ''
+  }
+}
+async function prepareData(data, vodUrl) {
   var outputPrepareData = []
   var newData = {}
   if (vodUrl == 'null') {
@@ -79,6 +91,7 @@ function prepareData(data, vodUrl) {
     })
     return outputPrepareData
   } else {
+    const token = await createToken()
     data.forEach(function(record) {
       newData = {
         id: record._id,
@@ -100,7 +113,7 @@ function prepareData(data, vodUrl) {
         desc_en: record.desc_en,
         desc_th: record.desc_th,
         fightcardUrl: record.fightcardUrl,
-        videoUrl: record.videoUrl,
+        videoUrl: `${record.videoUrl}?hdnts=${token}`,
         promoUrl: record.promoUrl,
         bannerUrl: record.bannerUrl,
         logoUrl: record.logoUrl,
@@ -112,13 +125,13 @@ function prepareData(data, vodUrl) {
   }
 }
 
-function setData(data, message) {
+async function setData(data, message) {
   var outputJson = []
   if (message == 'not-paid') {
-    outputJson = prepareData(data, 'null')
+    outputJson = await prepareData(data, 'null')
     return outputJson
   } else {
-    outputJson = prepareData(data, data)
+    outputJson = await prepareData(data, data)
     return outputJson
   }
 }
@@ -150,9 +163,9 @@ async function findLives(status, query) {
   }
   returnVods = await Live.find(query)
     .sort({ onAirDate: -1 })
-    .then(function(lives) {
+    .then(async function(lives) {
       if (Object.keys(lives).length != 0) {
-        dataLives.data = setData(lives, statusOrder)
+        dataLives.data = await setData(lives, statusOrder)
         return dataLives
       } else {
         dataLives.error = 'data not found'
