@@ -136,9 +136,9 @@ async function setData(data, message) {
   }
 }
 
-async function setDataOutput(outputvods, output) {
+function setDataOutput(outputvods, output) {
   if (outputvods.error == 'none') {
-    const liveData = await checktime(outputvods.data)
+    const liveData = checktime(outputvods.data)
     output.status.code = 200
     output.status.success = true
     output.status.message = defaultSuccessMessage
@@ -299,7 +299,7 @@ exports.lives = async function(req, res) {
   }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', {})
-    json = await setDataOutput(outputvods, output)
+    json = setDataOutput(outputvods, output)
     //console.log('json1', json)
     return res.json(json)
   } else {
@@ -339,7 +339,7 @@ exports.livesById = async function(req, res) {
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
-      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
+      outputvos = await findLives('paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)
     } else if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
