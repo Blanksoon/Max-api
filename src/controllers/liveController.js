@@ -339,7 +339,7 @@ exports.livesById = async function(req, res) {
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
-      outputvos = await findLives('paid', { _id: `${req.params.liveId}` })
+      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)
     } else if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
