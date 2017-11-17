@@ -3,6 +3,10 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
 var LiveSchema = new Schema({
+  productId: {
+    type: String,
+    required: 'productId is required',
+  },
   programName: {
     type: String,
     required: 'programName is required',

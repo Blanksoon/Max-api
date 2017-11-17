@@ -9,10 +9,10 @@ var defaultSuccessMessage = 'success'
 var defaultErrorMessage = 'data_not_found'
 var nodemailer = require('nodemailer')
 var bcrypt = require('bcrypt-nodejs')
-
 const log = console.log
-
+//const stagingUrl = 'http://159.203.140.5:8080/verify?token='
 var socialAuthen = []
+var stagingUrl = require('../config/url')
 
 //function
 socialAuthen['local'] = async function(providerData, output) {
@@ -669,12 +669,11 @@ exports.localRegister = async function(req, res) {
   } else {
     response = await socialAuthen[providerName](providerData, output)
     //console.log('token when register', output.data.token)
+    console.log(stagingUrl)
     if (response != 400) {
       //console.log('token in email', output.data.token)
       ;(text =
-        'Activate Account please enter link \
-        https://www.maxmuaythai.com/verify?token=' +
-        output.data.token),
+        'Activate Account please enter link' + stagingUrl + output.data.token),
         await email(text, output, subject)
       return res.json(output)
     } else {
@@ -710,6 +709,7 @@ exports.localLogin = async function(req, res) {
           var token = jwt.sign({ data: user }, req.app.get('secret'), {
             expiresIn: req.app.get('tokenLifetime'),
           })
+          console.log('output', output)
           output.status.code = 200
           output.status.success = true
           output.status.message = defaultSuccessMessage
@@ -945,7 +945,8 @@ exports.updateUser = async function(req, res) {
       name: req.body.name,
       lastname: req.body.lastname,
       country: req.body.country,
-      gender: req.body.newGender,
+      gender: req.body.gender,
+      date_birth: req.body.birthDay,
     },
     { new: true }
   )

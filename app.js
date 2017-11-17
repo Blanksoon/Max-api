@@ -6,6 +6,7 @@ Vod = require('./src/models/vod')
 User = require('./src/models/user')
 Order = require('./src/models/order')
 Live = require('./src/models/live')
+Subscribe = require('./src/models/subscribe')
 bodyParser = require('body-parser')
 express = require('express')
 //'mongodb://mmt:maxworldchampion2016@localhost/max_api_phase2',

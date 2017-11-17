@@ -25,8 +25,8 @@ var UserSchema = new Schema({
     default: 'undefined',
   },
   date_birth: {
-    type: String,
-    default: 'undefined',
+    type: Date,
+    //default: 'undefined',
   },
   country: {
     type: String,

@@ -56,6 +56,7 @@ async function createToken() {
     return ''
   }
 }
+
 async function prepareData(data, vodUrl) {
   var outputPrepareData = []
   var newData = {}
@@ -63,6 +64,7 @@ async function prepareData(data, vodUrl) {
     data.forEach(function(record) {
       newData = {
         id: record._id,
+        productId: record.productId,
         programName: record.programName,
         title_en: record.title_en,
         title_th: record.title_th,
@@ -95,6 +97,7 @@ async function prepareData(data, vodUrl) {
     data.forEach(function(record) {
       newData = {
         id: record._id,
+        productId: record.productId,
         programName: record.programName,
         title_en: record.title_en,
         title_th: record.title_th,
