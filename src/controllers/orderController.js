@@ -137,12 +137,13 @@ function setData(data) {
 
 async function decodeJwt(token, req) {
   var status = {}
+  var today = Date.now()
   try {
     const decode = await readJwt(token, req)
     if (decode.statusJwt == 'Failed to authenticate token.') {
       status = decode.statusJwt
     } else {
-      const query = { userId: decode.data.email }
+      const query = { userId: decode.data.email, expiredDate: { $gte: today } }
       const order = await queryOrder(query)
       status = order
     }
@@ -223,6 +224,7 @@ async function prepareData(data, vodUrl) {
       bannerUrl: record.bannerUrl,
       logoUrl: record.logoUrl,
       price: record.price,
+      status: record.status,
     }
     outputPrepareData.push(newData)
   })
@@ -232,23 +234,15 @@ async function prepareData(data, vodUrl) {
 const setDataProduct = (data, exceptionData) => {
   return new Promise((resolve, reject) => {
     try {
-      //console.log('hi1')
-      //const result = []
       let i = 0
-      // console.log('exceptionData', exceptionData)
-      // console.log(data.length)
       while (i < data.length) {
         //const result = data.filter(product => product.productId != exceptionData)
-        // console.log('i', data.length)
-        // console.log('sdoasdjoiasd', data[i])
         if (data[i] == null) {
         } else if (data[i].productId == exceptionData) {
-          data[i] = null
-          //console.log('iiiiiii', data.length)
+          data[i].status = 'unenable'
         }
         i++
       }
-      //console.log(result)
       resolve('hi')
     } catch (err) {
       resolve(err)
@@ -362,7 +356,6 @@ exports.products = async function(req, res) {
     },
   }
   const token = req.query.token
-  console.log('token', token)
   let outputvods = await findLives('not-paid', {})
   let subscribes = await Subscribe.find({}, { productId: 1, price: 1 })
     .then(async function(subscribe) {
@@ -376,18 +369,9 @@ exports.products = async function(req, res) {
       return err
     })
   if (token == undefined || token == 'undefined') {
-    //let outputvods = await findLives('not-paid', {})
-    // let subscribes = await Subscribe.find({}, { productId: 1, price: 1 })
-    //   .then(async function(subscribe) {
-    //     if (Object.keys(subscribe).length != 0) {
-    //       return subscribe
-    //     } else {
-    //       return []
-    //     }
-    //   })
-    //   .catch(function(err) {
-    //     return err
-    //   })
+    output.status.code = 200
+    output.status.success = true
+    output.status.message = 'success'
     output.data.lives = outputvods.data
     output.data.subscribe = subscribes
   } else {
@@ -395,11 +379,12 @@ exports.products = async function(req, res) {
     if (decoded == `you have't purchase`) {
       output.data.lives = outputvods
       output.data.subscribe = subscribes
+    } else if (decoded == `Failed to authenticate token.`) {
+      output.status.message = 'Failed to authenticate token.'
     } else {
       const product = []
       let i = 0
       while (i < decoded.length) {
-        console.log(decoded[i].productId)
         product[i] = decoded[i].productId
         i++
       }
@@ -418,15 +403,45 @@ exports.products = async function(req, res) {
         await setDataProduct(notPaidSubscribe, product[i])
         i++
       }
-      const resultSubscribe = notPaidSubscribe.filter(
-        product => product != null
-      )
-      output.data.subscribe = resultSubscribe
-      //console.log(notPaidLive)
-      // output.data.lives = setDataProduct(outputvods.data, product)
+      // const resultSubscribe = notPaidSubscribe.filter(
+      //   product => product != null
+      // )
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = 'success'
+      output.data.subscribe = notPaidSubscribe
     }
   }
   res.send(output)
+}
+
+exports.getTokenPaypal = async function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: {
+      lives: [],
+      subscribe: [],
+    },
+  }
+}
+
+exports.createPaymentPaypal = async function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: {
+      lives: [],
+      subscribe: [],
+    },
+  }
+  const token = req.query.token
 }
 
 exports.insertValue = function(req, res) {

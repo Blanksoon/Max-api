@@ -31,10 +31,15 @@ var OrderSchema = new Schema({
     type: Date,
     default: null,
   },
-  // startDate: {
-  //   type: Date,
-  //   default: Date.now,
-  // },
+  expiredDate: {
+    type: Date,
+    required: 'expiredDate is required',
+    //default: null,
+  },
+  status: {
+    type: String,
+    required: 'status is required',
+  },
   // endDate: {
   //   type: Date,
   // },

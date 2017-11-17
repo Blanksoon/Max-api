@@ -142,6 +142,7 @@ async function setData(data, message) {
 function setDataOutput(outputvods, output) {
   if (outputvods.error == 'none') {
     const liveData = checktime(outputvods.data)
+    //console.log('liveData', liveData)
     output.status.code = 200
     output.status.success = true
     output.status.message = defaultSuccessMessage
@@ -191,6 +192,7 @@ async function decodeJwt(token, req) {
     } else {
       const query = { userId: decode.data.email }
       const order = await queryOrder(query)
+      //console.log(order)
       status = order
     }
   } catch (err) {
@@ -227,6 +229,7 @@ function checktime(lives) {
       .tz(live.liveFromDate, 'Asia/Bangkok')
       .format('ddd. MMM Do, YYYY')
     live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
+    //console.log('live', live)
     return live
   })
   return newLives
@@ -302,6 +305,7 @@ exports.lives = async function(req, res) {
   }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', {})
+    //console.log('outputvods', outputvods)
     json = setDataOutput(outputvods, output)
     //console.log('json1', json)
     return res.json(json)
@@ -337,13 +341,15 @@ exports.livesById = async function(req, res) {
   }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+    //console.log('outputvods', outputvods)
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == 'you have purchase') {
-      outputvos = await findLives('paid', { _id: `${req.params.liveId}` })
+      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)
+      //console.log(json)
     } else if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)

@@ -126,6 +126,11 @@ function prepareData(data, vodUrl) {
     data.forEach(function(record) {
       newData = {
         id: record._id,
+        programName_en: record.programName_en,
+        programName_th: record.programName_th,
+        promoFromTime: record.promoFromTime,
+        promoToTime: record.promoToTime,
+        free: record.free,
         logoUrl: record.logoUrl,
         videoUrl: record.videoUrl,
         promoUrl: record.promoUrl,
@@ -335,7 +340,8 @@ exports.vods = async function(req, res) {
   } else if (
     //Filter program
     progName != 'undefined' &&
-    progName != ''
+    progName != '' &&
+    progName != undefined
   ) {
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVods('not-paid', {
@@ -364,6 +370,7 @@ exports.vods = async function(req, res) {
   } else if (token == undefined || token == '' || token == 'undefined') {
     //Find all vod
     outputvods = await findVods('not-paid', {})
+    console.log('1', outputvods)
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
