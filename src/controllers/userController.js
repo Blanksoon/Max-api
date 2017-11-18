@@ -673,7 +673,10 @@ exports.localRegister = async function(req, res) {
     if (response != 400) {
       //console.log('token in email', output.data.token)
       ;(text =
-        'Activate Account please enter link' + stagingUrl + output.data.token),
+        'Activate Account please enter link' +
+        stagingUrl +
+        '/verify?token=' +
+        output.data.token),
         await email(text, output, subject)
       return res.json(output)
     } else {
@@ -864,15 +867,17 @@ exports.forgotPassword = async function(req, res) {
         })
         output.data = { email: userEmail }
         text =
-          'Change your password from http://localhost:8080/changePassword?token=' +
+          'Change your password from ' +
+          stagingUrl +
+          '/changePassword?token=' +
           token
-        // const statusEmail = await email(text, output, subject)
-        // if (statusEmail === 'success') {
-        output.status.code = 200
-        output.status.success = true
-        output.status.message =
-          'Please check your email for change your password'
-        //   }
+        const statusEmail = await email(text, output, subject)
+        if (statusEmail === 'success') {
+          output.status.code = 200
+          output.status.success = true
+          output.status.message =
+            'Please check your email for change your password'
+        }
       } else {
         output.status.message = 'Email is invalid'
       }
