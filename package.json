@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha",
-    "dev": "cross-env NODE_ENV=dev nodemon app",
+    "dev": "cross-env NODE_ENV=dev nodemon app --exec babel-node",
     "start": "cross-env NODE_ENV=prod node ./app"
   },
   "directories": {
@@ -74,6 +74,7 @@
     "on-finished": "^2.3.0",
     "parseurl": "^1.3.2",
     "path-to-regexp": "^2.0.0",
+    "paypal-rest-sdk": "^1.7.1",
     "process-nextick-args": "^1.0.7",
     "proxy-addr": "^2.0.1",
     "qs": "^6.5.1",
@@ -98,6 +99,8 @@
     "vary": "^1.1.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "cross-env": "^5.1.1"
   },
   "author": "",

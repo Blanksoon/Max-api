@@ -1,12 +1,12 @@
 'use strict'
-var vods = require('../../data/vods/vods')
-var vodslogin = require('../../data/vods/buyVods')
-var mongoose = require('mongoose'),
-  Vod = mongoose.model('Vod')
-Order = mongoose.model('Order')
-var defaultSuccessMessage = 'success'
-var defaultErrorMessage = 'data_not_found'
-var jwt = require('jsonwebtoken')
+const vods = require('../../data/vods/vods')
+const vodslogin = require('../../data/vods/buyVods')
+const mongoose = require('mongoose')
+const Vod = mongoose.model('Vod')
+const Order = mongoose.model('Order')
+const defaultSuccessMessage = 'success'
+const defaultErrorMessage = 'data_not_found'
+const jwt = require('jsonwebtoken')
 
 //functions
 const readJwt = (token, req) => {

@@ -5,16 +5,22 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 // Global import
-mongoose = require('mongoose')
-Vod = require('./src/models/vod')
-User = require('./src/models/user')
-Order = require('./src/models/order')
-Live = require('./src/models/live')
-Subscribe = require('./src/models/subscribe')
+const mongoose = require('mongoose')
+const paypal = require('./src/utils/paypal')
+const Vod = require('./src/models/vod')
+const User = require('./src/models/user')
+const Order = require('./src/models/order')
+const Live = require('./src/models/live')
+const Subscribe = require('./src/models/subscribe')
 
 // Config depedencies
 mongoose.connect(env.MONGO_CONNS, {
   useMongoClient: true,
+})
+paypal.configure({
+  mode: env.PAYPAL_MODE,
+  client_id: env.PAYPAL_CLIENTID,
+  client_secret: env.PAYPAL_CLIENTSCRET,
 })
 
 // Application specific variables

@@ -1,11 +1,11 @@
-var defaultSuccessMessage = 'success'
-var fetch = require('isomorphic-unfetch')
-var moment = require('moment-timezone')
-var defaultErrorMessage = 'data_not_found'
-var jwt = require('jsonwebtoken')
-var mongoose = require('mongoose'),
-  Order = mongoose.model('Order')
-Live = mongoose.model('Live')
+const defaultSuccessMessage = 'success'
+const fetch = require('isomorphic-unfetch')
+const moment = require('moment-timezone')
+const defaultErrorMessage = 'data_not_found'
+const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
+const Order = mongoose.model('Order')
+const Live = mongoose.model('Live')
 
 //function
 const readJwt = (token, req) => {
