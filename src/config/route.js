@@ -63,12 +63,13 @@ var verifyToken = function verifyToken(req, res, next) {
 }
 
 module.exports = function(app) {
-  var middleware = [verifyToken]
+  const middleware = [verifyToken]
   //var middleware = []; uneble Token
-  var vod = require('../controllers/vodController')
-  var user = require('../controllers/userController')
-  var order = require('../controllers/orderController')
-  var live = require('../controllers/liveController')
+  const vod = require('../controllers/vodController')
+  const user = require('../controllers/userController')
+  const order = require('../controllers/orderController')
+  const live = require('../controllers/liveController')
+  const ppcheckout = require('../controllers/ppcheckoutController')
 
   app.all('/*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -111,6 +112,9 @@ module.exports = function(app) {
   app.route('/order').post(middleware, order.search)
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   app.route('/subscribe').post(middleware, order.subscribe)
+
+  // Paypal checkout
+  app.route('/ppcheckout').post(ppcheckout.create)
 
   // Login and Validate Token Routes
   app.route('/login').post(user.login)

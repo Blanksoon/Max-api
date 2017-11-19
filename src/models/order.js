@@ -37,12 +37,13 @@ var OrderSchema = new Schema({
     //default: null,
   },
   status: {
-    type: String,
+    type: String, // possible value is 'created', 'approved', 'cancelled'
     required: 'status is required',
   },
-  // endDate: {
-  //   type: Date,
-  // },
+  paypal: {
+    payerId: String,
+    paymentId: String,
+  },
   versionKey: false,
 })
 
