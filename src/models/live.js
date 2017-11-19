@@ -101,34 +101,39 @@ const liveSchema = new Schema({
 // - liveToDate
 // - liveDateStr_en
 function addLiveDate(live) {
-  const curDate = new Date()
-  // Calculate this live liveDate for this week
-  const liveDate = new Date()
-  liveDate.setDate(
-    curDate.getDate() + (7 + live.liveDay - curDate.getDay()) % 7
-  )
-  // Covert liveDate to ISO string
-  const dateStr = `${liveDate.getFullYear()}-${liveDate.getMonth() +
-    1}-${liveDate.getDate()}`
-  // Concat liveDate with startTime and endTime
-  live.liveFromDate = new Date(`${dateStr}T${live.startTime}+0700`)
-  live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
+  if (live) {
+    const curDate = new Date()
+    // Calculate this live liveDate for this week
+    const liveDate = new Date()
+    liveDate.setDate(
+      curDate.getDate() + (7 + live.liveDay - curDate.getDay()) % 7
+    )
+    // Covert liveDate to ISO string
+    const dateStr = `${liveDate.getFullYear()}-${liveDate.getMonth() +
+      1}-${liveDate.getDate()}`
+    // Concat liveDate with startTime and endTime
+    live.liveFromDate = new Date(`${dateStr}T${live.startTime}+0700`)
+    live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
 
-  // The live for current week has already ended
-  if (curDate.getTime() > live.liveToDate.getTime()) {
-    live.liveFromDate.setDate(live.liveFromDate.getDate() + 7)
-    live.liveToDate.setDate(live.liveToDate.getDate() + 7)
+    // The live for current week has already ended
+    if (curDate.getTime() > live.liveToDate.getTime()) {
+      live.liveFromDate.setDate(live.liveFromDate.getDate() + 7)
+      live.liveToDate.setDate(live.liveToDate.getDate() + 7)
+    }
+
+    const liveFromTime = moment
+      .tz(live.liveFromDate, 'Asia/Bangkok')
+      .format('HH:mm')
+    const liveToTime = moment
+      .tz(live.liveToDate, 'Asia/Bangkok')
+      .format('HH:mm')
+    // Sat. Oct, 21st, 2017
+    live.liveDateStr_en = moment
+      .tz(live.liveFromDate, 'Asia/Bangkok')
+      .format('ddd. MMM Do, YYYY')
+
+    live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
   }
-
-  const liveFromTime = moment
-    .tz(live.liveFromDate, 'Asia/Bangkok')
-    .format('HH:mm')
-  const liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
-  // Sat. Oct, 21st, 2017
-  live.liveDateStr_en = moment
-    .tz(live.liveFromDate, 'Asia/Bangkok')
-    .format('ddd. MMM Do, YYYY')
-  live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
 }
 
 liveSchema.post('findOne', live => {
