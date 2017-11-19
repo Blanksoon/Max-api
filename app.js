@@ -14,6 +14,7 @@ const Subscribe = require('./src/models/subscribe')
 const paypal = require('./src/utils/paypal')
 
 // Config depedencies
+mongoose.Promise = global.Promise
 mongoose.connect(env.MONGO_CONNS, {
   useMongoClient: true,
 })

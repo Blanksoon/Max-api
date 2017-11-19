@@ -1,6 +1,5 @@
 const defaultSuccessMessage = 'success'
 const fetch = require('isomorphic-unfetch')
-const moment = require('moment-timezone')
 const defaultErrorMessage = 'data_not_found'
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
@@ -141,12 +140,10 @@ async function setData(data, message) {
 
 function setDataOutput(outputvods, output) {
   if (outputvods.error == 'none') {
-    const liveData = checktime(outputvods.data)
-    //console.log('liveData', liveData)
     output.status.code = 200
     output.status.success = true
     output.status.message = defaultSuccessMessage
-    output.data = liveData
+    output.data = outputvods.data
   } else {
     output.status.message = outputvods.error
   }
@@ -199,40 +196,6 @@ async function decodeJwt(token, req) {
     console.log(err)
   }
   return status
-}
-
-function checktime(lives) {
-  const newLives = lives.map(live => {
-    const curDate = new Date()
-    // Calculate this live liveDate for this week
-    const liveDate = new Date()
-    liveDate.setDate(
-      curDate.getDate() + (7 + live.liveDay - curDate.getDay()) % 7
-    )
-    // Covert liveDate to ISO string
-    const dateStr = `${liveDate.getFullYear()}-${liveDate.getMonth() +
-      1}-${liveDate.getDate()}`
-    // Concat liveDate with startTime and endTime
-    live.liveFromDate = new Date(`${dateStr}T${live.startTime}+0700`)
-    live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
-
-    // The live for current week has already ended
-    if (curDate.getTime() > live.liveToDate.getTime()) {
-      live.liveFromDate.setDate(live.liveFromDate.getDate() + 7)
-      live.liveToDate.setDate(live.liveToDate.getDate() + 7)
-    }
-
-    liveFromTime = moment.tz(live.liveFromDate, 'Asia/Bangkok').format('HH:mm')
-    liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
-    // Sat. Oct, 21st, 2017
-    live.liveDateStr_en = moment
-      .tz(live.liveFromDate, 'Asia/Bangkok')
-      .format('ddd. MMM Do, YYYY')
-    live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
-    //console.log('live', live)
-    return live
-  })
-  return newLives
 }
 
 //controllers

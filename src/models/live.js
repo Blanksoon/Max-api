@@ -1,8 +1,9 @@
-'use strict'
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+import moment from 'moment-timezone'
 
-var LiveSchema = new Schema({
+const Schema = mongoose.Schema
+
+const liveSchema = new Schema({
   productId: {
     type: String,
     required: 'productId is required',
@@ -88,6 +89,54 @@ var LiveSchema = new Schema({
     default: 'enable',
   },
   versionKey: false,
+
+  // Auto calculated fields
+  liveFromDate: Date,
+  liveToDate: Date,
+  liveDateStr_en: String,
 })
 
-module.exports = mongoose.model('Live', LiveSchema)
+// Method to auto caculate following fields
+// - liveFromDate
+// - liveToDate
+// - liveDateStr_en
+function addLiveDate(live) {
+  const curDate = new Date()
+  // Calculate this live liveDate for this week
+  const liveDate = new Date()
+  liveDate.setDate(
+    curDate.getDate() + (7 + live.liveDay - curDate.getDay()) % 7
+  )
+  // Covert liveDate to ISO string
+  const dateStr = `${liveDate.getFullYear()}-${liveDate.getMonth() +
+    1}-${liveDate.getDate()}`
+  // Concat liveDate with startTime and endTime
+  live.liveFromDate = new Date(`${dateStr}T${live.startTime}+0700`)
+  live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
+
+  // The live for current week has already ended
+  if (curDate.getTime() > live.liveToDate.getTime()) {
+    live.liveFromDate.setDate(live.liveFromDate.getDate() + 7)
+    live.liveToDate.setDate(live.liveToDate.getDate() + 7)
+  }
+
+  const liveFromTime = moment
+    .tz(live.liveFromDate, 'Asia/Bangkok')
+    .format('HH:mm')
+  const liveToTime = moment.tz(live.liveToDate, 'Asia/Bangkok').format('HH:mm')
+  // Sat. Oct, 21st, 2017
+  live.liveDateStr_en = moment
+    .tz(live.liveFromDate, 'Asia/Bangkok')
+    .format('ddd. MMM Do, YYYY')
+  live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
+}
+
+liveSchema.post('findOne', live => {
+  addLiveDate(live)
+})
+liveSchema.post('find', lives => {
+  lives.forEach(live => {
+    addLiveDate(live)
+  })
+})
+module.exports = mongoose.model('Live', liveSchema)
