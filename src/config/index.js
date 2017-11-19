@@ -1,23 +1,6 @@
-var config = {
-  local: {
-    secret: 'examplesecretkey',
-    tokenLifetime: 5000 * 5000,
-    mode: 'local',
-    port: 3002,
-  },
-  staging: {
-    secret: 'examplesecretkey',
-    tokenLifetime: 60 * 60,
-    mode: 'staging',
-    port: 4000,
-  },
-  production: {
-    secret: 'examplesecretkey',
-    tokenLifetime: 5000 * 5000,
-    mode: 'production',
-    port: 5000,
-  },
-}
-module.exports = function(mode) {
-  return config[mode || process.argv[2] || 'local'] || config.local
-}
+const dotenv = require('dotenv')
+const targetEnv = process.env.NODE_ENV || 'dev'
+console.log('Target environment: ' + targetEnv)
+dotenv.config({
+  path: './.env.' + targetEnv,
+})

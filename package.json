@@ -2,10 +2,11 @@
   "name": "max-api",
   "version": "1.0.0",
   "description": "max-muaythai api",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "mocha",
-    "dev": "nodemon app"
+    "dev": "cross-env NODE_ENV=dev nodemon app",
+    "start": "cross-env NODE_ENV=prod node ./app"
   },
   "directories": {
     "lib": "lib",
@@ -30,6 +31,7 @@
     "debug": "^3.0.1",
     "depd": "^1.1.1",
     "destroy": "^1.0.4",
+    "dotenv": "^4.0.0",
     "ee-first": "^1.1.1",
     "encodeurl": "^1.0.1",
     "es6-promise": "^4.1.1",
@@ -95,7 +97,9 @@
     "utils-merge": "^1.0.0",
     "vary": "^1.1.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cross-env": "^5.1.1"
+  },
   "author": "",
   "license": "ISC",
   "keywords": [],
