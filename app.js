@@ -6,12 +6,12 @@ const cors = require('cors')
 
 // Global import
 const mongoose = require('mongoose')
-const paypal = require('./src/utils/paypal')
 const Vod = require('./src/models/vod')
 const User = require('./src/models/user')
 const Order = require('./src/models/order')
 const Live = require('./src/models/live')
 const Subscribe = require('./src/models/subscribe')
+const paypal = require('./src/utils/paypal')
 
 // Config depedencies
 mongoose.connect(env.MONGO_CONNS, {
@@ -25,7 +25,8 @@ paypal.configure({
 
 // Application specific variables
 app.set('secret', env.JWT_SECRET)
-app.set('tokenLifetime', env.JWT_TOKEN_LIFETIME)
+// app.set('tokenLifetime', env.JWT_TOKEN_LIFETIME)
+app.set('tokenLifetime', parseInt(env.JWT_TOKEN_LIFETIME))
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }))
