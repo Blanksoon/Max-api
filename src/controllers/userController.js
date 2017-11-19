@@ -702,7 +702,6 @@ exports.localLogin = async function(req, res) {
   }
   User.findOne(queryParams, function(err, user) {
     if (err) {
-      console.log(err)
       output.status.message = err
     } else if (user) {
       if (bcrypt.compareSync(req.body.provider_data.password, user.password)) {
@@ -712,7 +711,6 @@ exports.localLogin = async function(req, res) {
           var token = jwt.sign({ data: user }, req.app.get('secret'), {
             expiresIn: req.app.get('tokenLifetime'),
           })
-          console.log('output', output)
           output.status.code = 200
           output.status.success = true
           output.status.message = defaultSuccessMessage
