@@ -1,10 +1,14 @@
-'use strict'
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+import orderId from 'order-id'
+import env from '../config/env'
+
+const Schema = mongoose.Schema
+const idGenerator = orderId(env.ORDER_ID_SECRET)
 
 var OrderSchema = new Schema({
   orderId: {
     type: String,
+    default: idGenerator.generate,
     required: 'orderId is required',
   },
   productId: {
