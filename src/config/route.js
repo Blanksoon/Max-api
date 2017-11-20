@@ -112,6 +112,7 @@ module.exports = function(app) {
   app.route('/order').post(middleware, order.search)
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   app.route('/subscribe').post(middleware, order.subscribe)
+  app.get('/product', order.products)
 
   // Paypal checkout
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
@@ -130,6 +131,6 @@ module.exports = function(app) {
   app.post('/forgot-password', user.forgotPassword)
   app.get('/profile', user.profileUser)
   app.post('/update-user', user.updateUser)
-  app.get('/product', order.products)
+  app.get('/purchase-history', order.purchaseHistory)
   app.get('/test', order.insertOrder)
 }

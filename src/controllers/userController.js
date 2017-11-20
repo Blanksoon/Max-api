@@ -276,7 +276,7 @@ const checkAuthen = (providerName, output) => {
   }
 }
 
-const verifyToken = (token, req) => {
+const verifyToken = (token, req, output) => {
   var query = {}
   return new Promise(async (resolve, reject) => {
     await jwt.verify(token, req.app.get('secret'), function(err, decoded) {
@@ -897,7 +897,7 @@ exports.profileUser = async function(req, res) {
     data: [],
   }
   const token = req.query.token
-  const emailUser = await verifyToken(token, req)
+  const emailUser = await verifyToken(token, req, output)
   //console.log('emailUser', emailUser)
   await User.find(
     { email: emailUser.email },
@@ -916,7 +916,7 @@ exports.profileUser = async function(req, res) {
         output.status.code = 200
         output.status.success = true
         output.status.message = 'success'
-        output.data = user
+        output.data = user[0]
       } else {
         output.status.message = 'user not found'
       }
