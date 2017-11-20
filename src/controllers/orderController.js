@@ -234,7 +234,7 @@ async function prepareData(data, vodUrl) {
 function setDate(notPaidLive) {
   let i = 0
   while (i < notPaidLive.length) {
-    console.log('a')
+    //console.log('a')
     if (i == 0) {
       notPaidLive[i].startTime = '19.20'
       notPaidLive[i].endTime = '22.00'
