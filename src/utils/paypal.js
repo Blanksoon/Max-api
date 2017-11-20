@@ -56,14 +56,14 @@ export async function createPayment(order) {
     })
   })
 }
-export async function executePayment(payerId, paymentId) {
+export async function executePayment(payerId, paymentId, price) {
   const execute_payment_json = {
     payer_id: payerId,
     transactions: [
       {
         amount: {
           currency: 'USD',
-          total: '1.99',
+          total: price,
         },
       },
     ],
@@ -74,6 +74,7 @@ export async function executePayment(payerId, paymentId) {
       payment
     ) {
       if (error) {
+        error.code = error.httpStatusCode
         reject(error)
       } else {
         resolve(payment)
