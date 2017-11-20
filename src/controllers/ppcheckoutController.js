@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import Live from '../models/live'
 import Order from '../models/order'
-import { createPayment } from '../utils/paypal'
+import { createPayment, executePayment } from '../utils/paypal'
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -66,15 +66,54 @@ exports.createPayment = async function(req, res) {
 exports.executePayment = async function(req, res) {
   const payerId = req.query.PayerID
   const paymentId = req.query.paymentId
-  const orderId = req.body.orderId
-  try {
-    const payment = paypal
-  } catch (error) {
-    const order = Order.find({
-      orderId,
+  const orderId = req.params.orderId
+
+  if (typeof orderId === 'undefined') {
+    res.status(200).send({
+      status: {
+        code: 400,
+        success: false,
+        message: 'Missing orderId',
+      },
+      data: [],
     })
-    order.status = 'error'
-    order.save()
+  }
+  const order = await Order.findOne({
+    orderId: orderId,
+  })
+  try {
+    if (order) {
+      try {
+        const payment = await executePayment(payerId, paymentId, order.price)
+        if (payment.state === 'approved') {
+          order.status = 'approved'
+          order.paypal = {
+            payerId,
+            paymentId,
+          }
+          await order.save()
+          res.redirect('http://www.maxmuaythai.com')
+        }
+      } catch (error) {
+        order.status = 'error'
+        await order.save()
+        throw error.response
+      }
+    } else {
+      throw {
+        code: 404,
+        message: 'order not found',
+      }
+    }
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
   }
 }
 
