@@ -31,6 +31,7 @@ const queryOrder = query => {
     let statusOders = ''
     Order.find(query)
       .then(function(order) {
+        //console.log('order', order)
         if (Object.keys(order).length != 0) {
           statusOders = 'you have purchase'
           resolve(statusOders)
@@ -237,6 +238,8 @@ async function findVods(status, query) {
 
 async function decodeJwt(token, req) {
   var status = ''
+  var today = Date.now()
+  //console.log(today)
   try {
     const decode = await readJwt(token, req)
     if (decode.statusJwt == 'Failed to authenticate token.') {
@@ -244,9 +247,14 @@ async function decodeJwt(token, req) {
       status = decode.statusJwt
     } else {
       //console.log('decode', decode)
-      const query = { userId: decode.data.email }
+      const query = {
+        userId: decode.data._id,
+        expiredDate: { $gte: today },
+        $or: [{ productId: '2001' }, { productId: '2002' }],
+      }
+      //const query = { userId: decode.data.email }
       const order = await queryOrder(query)
-      //console.log('ordersss', ordersss)
+      //console.log('ordersss', order)
       status = order
     }
   } catch (err) {
@@ -370,7 +378,6 @@ exports.vods = async function(req, res) {
   } else if (token == undefined || token == '' || token == 'undefined') {
     //Find all vod
     outputvods = await findVods('not-paid', {})
-    console.log('1', outputvods)
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {

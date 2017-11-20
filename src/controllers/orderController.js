@@ -143,7 +143,7 @@ async function decodeJwt(token, req) {
     if (decode.statusJwt == 'Failed to authenticate token.') {
       status = decode.statusJwt
     } else {
-      const query = { userId: decode.data.email, expiredDate: { $gte: today } }
+      const query = { userId: decode.data._id, expiredDate: { $gte: today } }
       const order = await queryOrder(query)
       status = order
     }
@@ -231,19 +231,32 @@ async function prepareData(data, vodUrl) {
   return outputPrepareData
 }
 
-const setDataProduct = (data, exceptionData) => {
+const setDataProduct = (data, exceptionData, type) => {
   return new Promise((resolve, reject) => {
     try {
-      let i = 0
-      while (i < data.length) {
-        //const result = data.filter(product => product.productId != exceptionData)
-        if (data[i] == null) {
-        } else if (data[i].productId == exceptionData) {
-          data[i].status = 'unenable'
+      if (type == 'lives') {
+        let i = 0
+        while (i < data.length) {
+          //const result = data.filter(product => product.productId != exceptionData)
+          if (data[i] == null) {
+          } else if (data[i].id == exceptionData) {
+            data[i].status = 'unenable'
+          }
+          i++
         }
-        i++
+        resolve('hi')
+      } else {
+        let i = 0
+        while (i < data.length) {
+          //const result = data.filter(product => product.productId != exceptionData)
+          if (data[i] == null) {
+          } else if (data[i].productId == exceptionData) {
+            data[i].status = 'unenable'
+          }
+          i++
+        }
+        resolve('hi')
       }
-      resolve('hi')
     } catch (err) {
       resolve(err)
     }
@@ -314,7 +327,7 @@ exports.subscribe = async function(req, res) {
     },
     data: [],
   }
-  console.log('req.decoded.data.email', req.decoded.data.email)
+  //console.log('req.decoded.data.email', req.decoded.data.email)
   //console.log(req.body.promocode)
   if (req.body.promocode == 'MWC2016') {
     statusOrders = await findOrders(
@@ -324,7 +337,7 @@ exports.subscribe = async function(req, res) {
       },
       output
     )
-    console.log('hi', statusOrders)
+    //console.log('hi', statusOrders)
     if (statusOrders == `you don't have ticket`) {
       var dateNow = new Date()
       var endDate = moment(dateNow).add(1, 'months')
@@ -357,7 +370,10 @@ exports.products = async function(req, res) {
   }
   const token = req.query.token
   let outputvods = await findLives('not-paid', {})
-  let subscribes = await Subscribe.find({}, { productId: 1, price: 1 })
+  let subscribes = await Subscribe.find(
+    {},
+    { productId: 1, price: 1, status: 1 }
+  )
     .then(async function(subscribe) {
       if (Object.keys(subscribe).length != 0) {
         return subscribe
@@ -377,6 +393,7 @@ exports.products = async function(req, res) {
   } else {
     const decoded = await decodeJwt(token, req)
     if (decoded == `you have't purchase`) {
+      console.log('hhhhhh')
       output.data.lives = outputvods
       output.data.subscribe = subscribes
     } else if (decoded == `Failed to authenticate token.`) {
@@ -392,17 +409,19 @@ exports.products = async function(req, res) {
       const notPaidLive = outputvods.data
       //console.log('ff', notPaidLive[1].productId)
       while (i < product.length) {
-        await setDataProduct(notPaidLive, product[i])
+        await setDataProduct(notPaidLive, product[i], 'lives')
         i++
       }
-      const resultLive = notPaidLive.filter(product => product != null)
-      output.data.lives = resultLive
+      //const resultLive = notPaidLive.filter(product => product != null)
+      output.data.lives = notPaidLive
       const notPaidSubscribe = subscribes
       i = 0
+      //console.log(product)
       while (i < product.length) {
-        await setDataProduct(notPaidSubscribe, product[i])
+        await setDataProduct(notPaidSubscribe, product[i], 'subscribe')
         i++
       }
+      i = 0
       // const resultSubscribe = notPaidSubscribe.filter(
       //   product => product != null
       // )
@@ -504,4 +523,22 @@ exports.insertOrder = function(req, res) {
     }
     return res.json(output)
   })
+}
+
+exports.purchaseHistory = async function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  const token = req.query.token
+  const decoded = await decodeJwt(token, req)
+  output.status.code = 200
+  output.status.success = true
+  output.status.message = 'success'
+  output.data = decoded
+  res.send(output)
 }

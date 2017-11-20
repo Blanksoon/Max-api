@@ -32,7 +32,7 @@ const queryOrder = query => {
       .then(function(order) {
         if (Object.keys(order).length != 0) {
           statusOders = 'you have purchase'
-          resolve(statusOders)
+          resolve(order)
         } else {
           statusOders = `you have't purchase`
           resolve(statusOders)
@@ -41,6 +41,28 @@ const queryOrder = query => {
       .catch(function(err) {
         resolve(err.message)
       })
+  })
+}
+
+const setDataProduct = (data, exceptionData, buyLives) => {
+  return new Promise((resolve, reject) => {
+    try {
+      let i = 0
+      // console.log('set', exceptionData)
+      // console.log('id', data.data[0])
+      while (i < data.data.length) {
+        //const result = data.filter(product => product.productId != exceptionData)
+        if (data.data[i].id == exceptionData) {
+          //console.log('hi')
+          //data[i].status = 'unenable'
+          data.data[i].videoUrl = buyLives.data[i].videoUrl
+        }
+        i++
+      }
+      resolve('hi')
+    } catch (err) {
+      resolve(err)
+    }
   })
 }
 
@@ -182,12 +204,23 @@ async function findLives(status, query) {
 
 async function decodeJwt(token, req) {
   var status = ''
+  var today = Date.now()
   try {
     const decode = await readJwt(token, req)
     if (decode.statusJwt == 'Failed to authenticate token.') {
       status = decode.statusJwt
     } else {
-      const query = { userId: decode.data.email }
+      const query = {
+        userId: decode.data._id,
+        expiredDate: { $gte: today },
+        $or: [
+          { productId: '59dc6d2786595e42a27635c4' },
+          { productId: '59dc6d66af142842d0bc2551' },
+          { productId: '59dc6da4ab8a7442f58390f4' },
+          { productId: '59dc6dcb61490e430a0d6ec8' },
+          { productId: '2002' },
+        ],
+      }
       const order = await queryOrder(query)
       //console.log(order)
       status = order
@@ -253,7 +286,6 @@ exports.insertValue = function(req, res) {
 }
 
 exports.lives = async function(req, res) {
-  //console.log('hi')
   var token = req.query.token
   var outputvods = {}
   var json = {}
@@ -268,23 +300,40 @@ exports.lives = async function(req, res) {
   }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', {})
-    //console.log('outputvods', outputvods)
     json = setDataOutput(outputvods, output)
-    //console.log('json1', json)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
-    if (order == 'you have purchase') {
-      outputvods = await findLives('paid', {})
-      json = setDataOutput(outputvods, output)
-    } else if (order == `you have't purchase`) {
+    if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', {})
       json = setDataOutput(outputvods, output)
+    } else if (order.length != 0) {
+      outputvods = await findLives('not-paid', {})
+      const buyLives = await findLives('paid', {})
+      const lives = outputvods
+      let i = 0
+      let subscribe = false
+      while (i < order.length) {
+        if (order[i].productId == '2002') {
+          subscribe = true
+        }
+        i++
+      }
+      if (subscribe == false) {
+        i = 0
+        while (i < order.length) {
+          await setDataProduct(lives, order[i].productId, buyLives)
+          i++
+        }
+        json = setDataOutput(lives, output)
+      } else {
+        outputvods = await findLives('paid', {})
+        json = setDataOutput(outputvods, output)
+      }
     } else {
       outputvods = { err: order }
       json = setDataOutput(outputvods, output)
     }
-    //console.log('json2', json)
     return res.json(json)
   }
 }
@@ -304,18 +353,36 @@ exports.livesById = async function(req, res) {
   }
   if (token == undefined || token == 'undefined' || token == '') {
     outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
-    //console.log('outputvods', outputvods)
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
-    if (order == 'you have purchase') {
-      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
-      json = setDataOutput(outputvods, output)
-      //console.log(json)
-    } else if (order == `you have't purchase`) {
+    if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)
+    } else if (order.length != 0) {
+      outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+      const buyLives = await findLives('paid', { _id: `${req.params.liveId}` })
+      const lives = outputvods
+      let i = 0
+      let subscribe = false
+      while (i < order.length) {
+        if (order[i].productId == '2002') {
+          subscribe = true
+        }
+        i++
+      }
+      if (subscribe == false) {
+        i = 0
+        while (i < order.length) {
+          await setDataProduct(lives, order[i].productId, buyLives)
+          i++
+        }
+        json = setDataOutput(lives, output)
+      } else {
+        outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
+        json = setDataOutput(outputvods, output)
+      }
     } else {
       outputvods = { err: order }
       json = setDataOutput(outputvods, output)

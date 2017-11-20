@@ -11,6 +11,10 @@ var SubscribeSchema = new Schema({
     type: Number,
     required: 'price is required',
   },
+  status: {
+    type: String,
+    default: 'enable',
+  },
   versionKey: false,
 })
 
