@@ -5,8 +5,10 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha",
-    "dev": "cross-env NODE_ENV=dev nodemon app --exec babel-node",
-    "start": "cross-env NODE_ENV=prod node ./app"
+    "dev": "cross-env NODE_ENV=dev nodemon ./src/app --exec babel-node",
+    "staging": "npm run build && cross-env NODE_ENV=staging node ./dist/app",
+    "build": "babel -d dist src",
+    "start": "npm run build && cross-env NODE_ENV=prod node ./dist/app"
   },
   "directories": {
     "lib": "lib",
@@ -16,6 +18,7 @@
     "accepts": "^1.3.4",
     "array-flatten": "^2.1.1",
     "async": "^2.5.0",
+    "babel-polyfill": "^6.26.0",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.0",
     "body-parser": "^1.18.0",

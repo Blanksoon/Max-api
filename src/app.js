@@ -1,4 +1,6 @@
-const env = require('./src/config/env')
+require('babel-polyfill')
+
+const env = require('./config/env')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -6,12 +8,12 @@ const cors = require('cors')
 
 // Global import
 const mongoose = require('mongoose')
-const Vod = require('./src/models/vod')
-const User = require('./src/models/user')
-const Order = require('./src/models/order')
-const Live = require('./src/models/live')
-const Subscribe = require('./src/models/subscribe')
-const paypal = require('./src/utils/paypal')
+const Vod = require('./models/vod')
+const User = require('./models/user')
+const Order = require('./models/order')
+const Live = require('./models/live')
+const Subscribe = require('./models/subscribe')
+const paypal = require('./utils/paypal')
 
 // Config depedencies
 mongoose.Promise = global.Promise
@@ -36,7 +38,7 @@ app.use(cors())
 app.use(express.static('./public'))
 
 // Config routes
-var routes = require('./src/config/route')
+var routes = require('./config/route')
 routes(app)
 
 app.listen(env.SERVER_PORT, function() {
