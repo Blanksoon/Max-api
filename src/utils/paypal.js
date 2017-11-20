@@ -1,30 +1,33 @@
-const paypal = require('paypal-rest-sdk')
-const env = require('../config/env')
+import paypal from 'paypal-rest-sdk'
+import env from '../config/env'
 
-exports.configure = function(config) {
+const mongoose = require('mongoose')
+const Order = mongoose.model('Order')
+
+export function configure(config) {
   paypal.configure({
     mode: config.mode,
     client_id: config.client_id,
     client_secret: config.client_secret,
   })
 }
-exports.createPayment = function(config) {
+export async function createPayment(order) {
   const create_payment_json = {
     intent: 'sale',
     payer: {
       payment_method: 'paypal',
     },
     redirect_urls: {
-      return_url: 'http://localhost:3000/success',
-      cancel_url: 'http://localhost:3000/cancel',
+      return_url: `${env.SERVER_IP}:${env.SERVER_PORT}/ppcheckout/${order.orderId}/success`,
+      cancel_url: `${env.SERVER_IP}:${env.SERVER_PORT}/ppcheckout/${order.orderId}/cancel`,
     },
     transactions: [
       {
         item_list: {
           items: [
             {
-              name: 'one time maxmuay thai live',
-              price: '1.99',
+              name: order.productName,
+              price: order.price,
               currency: 'USD',
               quantity: 1,
             },
@@ -32,10 +35,49 @@ exports.createPayment = function(config) {
         },
         amount: {
           currency: 'USD',
-          total: '1.99',
+          total: order.price,
         },
-        description: 'Purchase 1 time access to maxmuaythai live',
+        description: `Purchase 1 time access to ${order.productName}`,
       },
     ],
   }
+  return new Promise((resolve, reject) => {
+    paypal.payment.create(create_payment_json, function(error, payment) {
+      if (error) {
+        console.log(error)
+        reject(error)
+      } else {
+        payment.links.forEach(link => {
+          if (link.rel === 'approval_url') {
+            resolve(link.href)
+          }
+        })
+      }
+    })
+  })
+}
+export async function executePayment(payerId, paymentId) {
+  const execute_payment_json = {
+    payer_id: payerId,
+    transactions: [
+      {
+        amount: {
+          currency: 'USD',
+          total: '1.99',
+        },
+      },
+    ],
+  }
+  return new Promise((resolve, reject) => {
+    paypal.payment.execute(paymentId, execute_payment_json, function(
+      error,
+      payment
+    ) {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(payment)
+      }
+    })
+  })
 }

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import Live from '../models/live'
 import Order from '../models/order'
+import { createPayment } from '../utils/paypal'
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -16,11 +17,12 @@ const readJwt = (token, req) => {
   })
 }
 
-exports.create = async function(req, res) {
+exports.createPayment = async function(req, res) {
   const token = req.query.token
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id
+    const email = decode.data.email
     const liveId = req.params.liveId
 
     // Verified the product exists
@@ -30,8 +32,10 @@ exports.create = async function(req, res) {
       const expiredDate = new Date(live.liveToDate)
       expiredDate.setDate(expiredDate.getDate() + 1)
       const order = new Order({
-        productId: liveId,
+        productId: live.id,
+        productName: live.title_en,
         userId,
+        email,
         price: live.price,
         purchaseDate: new Date(),
         platform: 'paypal',
@@ -39,7 +43,8 @@ exports.create = async function(req, res) {
         status: 'created',
       })
       const saved = await order.save()
-      res.send(saved)
+      const approvalUrl = await createPayment(saved)
+      res.redirect(approvalUrl)
     } else {
       throw {
         code: 404,
@@ -49,11 +54,30 @@ exports.create = async function(req, res) {
   } catch (error) {
     res.status(200).send({
       status: {
-        code: error.code,
+        code: error.code || 500,
         success: false,
         message: error.message,
       },
       data: [],
     })
   }
+}
+
+exports.executePayment = async function(req, res) {
+  const payerId = req.query.PayerID
+  const paymentId = req.query.paymentId
+  const orderId = req.body.orderId
+  try {
+    const payment = paypal
+  } catch (error) {
+    const order = Order.find({
+      orderId,
+    })
+    order.status = 'error'
+    order.save()
+  }
+}
+
+exports.cancelPayment = async function(req, res) {
+  console.log('cancel')
 }

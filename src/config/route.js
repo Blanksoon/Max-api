@@ -114,7 +114,9 @@ module.exports = function(app) {
   app.route('/subscribe').post(middleware, order.subscribe)
 
   // Paypal checkout
-  app.route('/ppcheckout/:liveId').post(ppcheckout.create)
+  app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
+  app.route('/ppcheckout/:liveId/success').post(ppcheckout.executePayment)
+  app.route('/ppcheckout/:liveId/cancel').post(ppcheckout.cancelPayment)
 
   // Login and Validate Token Routes
   app.route('/login').post(user.login)

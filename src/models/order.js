@@ -13,11 +13,19 @@ var OrderSchema = new Schema({
   },
   productId: {
     type: String,
-    required: 'itemId is required',
+    required: 'productId is required',
+  },
+  productName: {
+    type: String,
+    required: 'productName is required',
   },
   userId: {
     type: String,
     required: 'userId is required',
+  },
+  email: {
+    type: String,
+    required: 'email is required',
   },
   price: {
     type: Number,
