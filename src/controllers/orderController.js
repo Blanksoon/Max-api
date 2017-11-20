@@ -231,6 +231,29 @@ async function prepareData(data, vodUrl) {
   return outputPrepareData
 }
 
+function setDate(notPaidLive) {
+  let i = 0
+  while (i < notPaidLive.length) {
+    console.log('a')
+    if (i == 0) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
+    if (i == 1) {
+      notPaidLive[i].startTime = '20.00'
+      notPaidLive[i].endTime = '22.00'
+    }
+    if (i == 2) {
+      notPaidLive[i].startTime = '14.00'
+      notPaidLive[i].endTime = '16.00'
+    }
+    if (i == 3) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
+    i++
+  }
+}
 const setDataProduct = (data, exceptionData, type) => {
   return new Promise((resolve, reject) => {
     try {
@@ -385,6 +408,7 @@ exports.products = async function(req, res) {
       return err
     })
   if (token == undefined || token == 'undefined') {
+    await setDate(outputvods.data)
     output.status.code = 200
     output.status.success = true
     output.status.message = 'success'
@@ -393,7 +417,7 @@ exports.products = async function(req, res) {
   } else {
     const decoded = await decodeJwt(token, req)
     if (decoded == `you have't purchase`) {
-      console.log('hhhhhh')
+      await setDate(outputvods.data)
       output.data.lives = outputvods
       output.data.subscribe = subscribes
     } else if (decoded == `Failed to authenticate token.`) {
@@ -412,6 +436,8 @@ exports.products = async function(req, res) {
         await setDataProduct(notPaidLive, product[i], 'lives')
         i++
       }
+      await setDate(notPaidLive)
+
       //const resultLive = notPaidLive.filter(product => product != null)
       output.data.lives = notPaidLive
       const notPaidSubscribe = subscribes
