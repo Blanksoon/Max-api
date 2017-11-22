@@ -686,7 +686,7 @@ exports.localRegister = async function(req, res) {
 }
 
 exports.localLogin = async function(req, res) {
-  var password = bcrypt.hashSync(req.body.provider_data.password)
+  //var password = bcrypt.hashSync(req.body.provider_data.password)
 
   var queryParams = {
     email: req.body.provider_data.email,

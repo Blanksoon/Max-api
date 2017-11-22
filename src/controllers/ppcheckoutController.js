@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import Live from '../models/live'
 import Order from '../models/order'
 import { createPayment, executePayment } from '../utils/paypal'
+import braintree from 'braintree'
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -119,4 +120,21 @@ exports.executePayment = async function(req, res) {
 
 exports.cancelPayment = async function(req, res) {
   console.log('cancel')
+}
+
+exports.BraintreeToken = async function(req, res) {
+  let clientToken
+  let gateway = braintree.connect({
+    environment: braintree.Environment.Sandbox,
+    merchantId: 'hcd2xp39kgttcpsm',
+    publicKey: 'snd9fsqtb8rwbrbt',
+    privateKey: '9eda331084fe0007bdbda77a783bebf6',
+  })
+
+  await gateway.clientToken.generate({}).then(function(response) {
+    console.log('response', response)
+    clientToken = response.clientToken
+  })
+  console.log('clientToken', clientToken)
+  res.send(clientToken)
 }

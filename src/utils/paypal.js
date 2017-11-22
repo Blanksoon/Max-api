@@ -1,5 +1,6 @@
 import paypal from 'paypal-rest-sdk'
 import env from '../config/env'
+import braintree from 'braintree'
 
 const mongoose = require('mongoose')
 const Order = mongoose.model('Order')
