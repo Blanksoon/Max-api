@@ -1,33 +1,30 @@
-'use strict'
+import jwt from 'jsonwebtoken'
+import fetch from 'node-fetch'
+import env from '../config/env'
+import User from '../models/user'
 
-var mongoose = require('mongoose'),
-  User = mongoose.model('User'),
-  jwt = require('jsonwebtoken'),
-  fetch = require('node-fetch')
-
-var defaultSuccessMessage = 'success'
-var defaultErrorMessage = 'data_not_found'
-var nodemailer = require('nodemailer')
-var bcrypt = require('bcrypt-nodejs')
+const defaultSuccessMessage = 'success'
+const defaultErrorMessage = 'data_not_found'
+const nodemailer = require('nodemailer')
+const bcrypt = require('bcrypt-nodejs')
 const log = console.log
-//const stagingUrl = 'http://159.203.140.5:8080/verify?token='
-var socialAuthen = []
-var stagingUrl = require('../config/url')
+const socialAuthen = []
 
 //function
 socialAuthen['local'] = async function(providerData, output) {
-  //console.log('provideData', providerData)
   var code = ''
   var user = await User.find({ email: providerData.email }).exec()
-  //console.log('user', user)
   var password = bcrypt.hashSync(providerData.password)
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  //re.test(providerData.email)
+
+  // Not a valid email
   if (!re.test(providerData.email)) {
     //if false do it
     output.status.message = 'email is invalid'
     return 400
   } else {
+    // Email is valid
+    // Email does not exist in db
     if (Object.keys(user).length == 0) {
       var createObject = {
         email: providerData.email,
@@ -36,10 +33,9 @@ socialAuthen['local'] = async function(providerData, output) {
       }
       var new_user = new User(createObject)
       var statusUser = await createUser(new_user, 'local', output)
-      // console.log('coddddeeeeeeee', output)
-      // console.log('statusUser', statusUser)
       return statusUser
     } else {
+      // Email already exist
       output.status.message = 'You already register'
       return 400
     }
@@ -122,8 +118,8 @@ socialAuthen['facebook'] = async function(providerData) {
           data: [],
         }
       }
-      token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
+      token = await jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: env.JWT_TOKEN_LIFETIME,
       })
     } else {
       if (user.country == 'undefined') {
@@ -205,8 +201,8 @@ socialAuthen['facebook'] = async function(providerData) {
         })
       return statuEmail
     } else {
-      token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
+      token = await jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: env.JWT_TOKEN_LIFETIME,
       })
       return {
         status: {
@@ -279,7 +275,7 @@ const checkAuthen = (providerName, output) => {
 const verifyToken = (token, req, output) => {
   var query = {}
   return new Promise(async (resolve, reject) => {
-    await jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+    await jwt.verify(token, env.JWT_SECRET, function(err, decoded) {
       if (err) {
         output.status.code = 403
         output.status.message = 'Failed to authenticate token.'
@@ -315,21 +311,13 @@ const verifyToken = (token, req, output) => {
   })
 }
 
-const activateUser = (query, output, text, subject) => {
+const activateUser = (query, output) => {
   return new Promise((resolve, reject) => {
     User.findOneAndUpdate(query, { $set: { status: 'active' } })
-      .then(async function(user) {
-        text =
-          'Your promotion code for watch live and video in Max Muay Thai: MWC2016'
-        output.data = query
-        await email(text, output, subject)
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = 'active email is success'
+      .then(function(user) {
         resolve('success')
       })
       .catch(function(err) {
-        console.log(err)
         resolve('false')
       })
   })
@@ -359,8 +347,8 @@ const createUser = (newUser, type, output) => {
       // console.log('create User')
       const user = await newUser.save()
       //console.log('user', user)
-      const token = jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
+      const token = jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
       })
       // console.log('token', token)
       output.status.code = 200
@@ -445,8 +433,8 @@ exports.login = function(req, res) {
     if (err) {
       output.status.message = err.message
     } else if (user) {
-      var token = jwt.sign({ data: user }, req.app.get('secret'), {
-        expiresIn: req.app.get('tokenLifetime'),
+      var token = jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
       })
       output.status.code = 200
       output.status.success = true
@@ -514,8 +502,8 @@ exports.create = function(req, res) {
     if (err) {
       output.status.message = err.message
     } else {
-      var token = jwt.sign({ data: user }, req.app.get('secret'), {
-        expiresIn: req.app.get('tokenLifetime'),
+      var token = jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
       })
       output.status.code = 200
       output.status.success = true
@@ -669,12 +657,11 @@ exports.localRegister = async function(req, res) {
   } else {
     response = await socialAuthen[providerName](providerData, output)
     //console.log('token when register', output.data.token)
-    console.log(stagingUrl)
     if (response != 400) {
       //console.log('token in email', output.data.token)
       ;(text =
-        'Activate Account please enter link' +
-        stagingUrl +
+        'Activate Account please enter link ' +
+        env.FRONTEND_URL +
         '/verify?token=' +
         output.data.token),
         await email(text, output, subject)
@@ -686,12 +673,9 @@ exports.localRegister = async function(req, res) {
 }
 
 exports.localLogin = async function(req, res) {
-  //var password = bcrypt.hashSync(req.body.provider_data.password)
-
   var queryParams = {
     email: req.body.provider_data.email,
   }
-  //console.log('queryParams', queryParams)
   var output = {
     status: {
       code: 400,
@@ -708,8 +692,8 @@ exports.localLogin = async function(req, res) {
         if (user.status == 'inactive') {
           output.status.message = 'You are not activate'
         } else {
-          var token = jwt.sign({ data: user }, req.app.get('secret'), {
-            expiresIn: req.app.get('tokenLifetime'),
+          var token = jwt.sign({ data: user }, env.JWT_SECRET, {
+            expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
           })
           output.status.code = 200
           output.status.success = true
@@ -747,14 +731,13 @@ exports.activateLocalUser = async function(req, res) {
     },
     data: {},
   }
-  var text = ''
-  var subject = 'Promotion code for Max Muay Thai'
   statusToken = await verifyToken(token, req)
   if (statusToken.status == 'authorize') {
     query = { email: statusToken.email }
-    await activateUser(query, output, text, subject)
+    await activateUser(query, output)
     return res.json(output)
   } else {
+    console.log('unauthorize')
     output.status.message = 'unauthorized your token'
     return res.json(output)
   }
@@ -860,8 +843,8 @@ exports.forgotPassword = async function(req, res) {
   await User.find({ email: userEmail })
     .then(async function(user) {
       if (Object.keys(user).length != 0) {
-        const token = jwt.sign({ data: user }, app.get('secret'), {
-          expiresIn: app.get('tokenLifetime'),
+        const token = jwt.sign({ data: user }, env.JWT_SECRET, {
+          expiresIn: env.JWT_TOKEN_LIFETIME,
         })
         output.data = { email: userEmail }
         text =
