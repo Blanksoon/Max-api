@@ -8,24 +8,23 @@ const defaultErrorMessage = 'data_not_found'
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt-nodejs')
 const log = console.log
-//const stagingUrl = 'http://159.203.140.5:8080/verify?token='
 const socialAuthen = []
-const stagingUrl = require('../config/url')
 
 //function
 socialAuthen['local'] = async function(providerData, output) {
-  //console.log('provideData', providerData)
   var code = ''
   var user = await User.find({ email: providerData.email }).exec()
-  //console.log('user', user)
   var password = bcrypt.hashSync(providerData.password)
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  //re.test(providerData.email)
+
+  // Not a valid email
   if (!re.test(providerData.email)) {
     //if false do it
     output.status.message = 'email is invalid'
     return 400
   } else {
+    // Email is valid
+    // Email does not exist in db
     if (Object.keys(user).length == 0) {
       var createObject = {
         email: providerData.email,
@@ -34,10 +33,9 @@ socialAuthen['local'] = async function(providerData, output) {
       }
       var new_user = new User(createObject)
       var statusUser = await createUser(new_user, 'local', output)
-      // console.log('coddddeeeeeeee', output)
-      // console.log('statusUser', statusUser)
       return statusUser
     } else {
+      // Email already exist
       output.status.message = 'You already register'
       return 400
     }
@@ -277,7 +275,7 @@ const checkAuthen = (providerName, output) => {
 const verifyToken = (token, req, output) => {
   var query = {}
   return new Promise(async (resolve, reject) => {
-    await jwt.verify(token, req.app.get('secret'), function(err, decoded) {
+    await jwt.verify(token, env.JWT_SECRET, function(err, decoded) {
       if (err) {
         output.status.code = 403
         output.status.message = 'Failed to authenticate token.'
@@ -313,21 +311,13 @@ const verifyToken = (token, req, output) => {
   })
 }
 
-const activateUser = (query, output, text, subject) => {
+const activateUser = (query, output) => {
   return new Promise((resolve, reject) => {
     User.findOneAndUpdate(query, { $set: { status: 'active' } })
-      .then(async function(user) {
-        text =
-          'Your promotion code for watch live and video in Max Muay Thai: MWC2016'
-        output.data = query
-        await email(text, output, subject)
-        output.status.code = 200
-        output.status.success = true
-        output.status.message = 'active email is success'
+      .then(function(user) {
         resolve('success')
       })
       .catch(function(err) {
-        console.log(err)
         resolve('false')
       })
   })
@@ -358,7 +348,7 @@ const createUser = (newUser, type, output) => {
       const user = await newUser.save()
       //console.log('user', user)
       const token = jwt.sign({ data: user }, env.JWT_SECRET, {
-        expiresIn: env.JWT_TOKEN_LIFETIME,
+        expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
       })
       // console.log('token', token)
       output.status.code = 200
@@ -668,12 +658,11 @@ exports.localRegister = async function(req, res) {
   } else {
     response = await socialAuthen[providerName](providerData, output)
     //console.log('token when register', output.data.token)
-    console.log(stagingUrl)
     if (response != 400) {
       //console.log('token in email', output.data.token)
       ;(text =
-        'Activate Account please enter link' +
-        stagingUrl +
+        'Activate Account please enter link ' +
+        env.FRONTEND_URL +
         '/verify?token=' +
         output.data.token),
         await email(text, output, subject)
@@ -688,7 +677,6 @@ exports.localLogin = async function(req, res) {
   var queryParams = {
     email: req.body.provider_data.email,
   }
-
   var output = {
     status: {
       code: 400,
@@ -744,14 +732,13 @@ exports.activateLocalUser = async function(req, res) {
     },
     data: {},
   }
-  var text = ''
-  var subject = 'Promotion code for Max Muay Thai'
   statusToken = await verifyToken(token, req)
   if (statusToken.status == 'authorize') {
     query = { email: statusToken.email }
-    await activateUser(query, output, text, subject)
+    await activateUser(query, output)
     return res.json(output)
   } else {
+    console.log('unauthorize')
     output.status.message = 'unauthorized your token'
     return res.json(output)
   }
