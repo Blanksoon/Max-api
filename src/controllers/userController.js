@@ -659,13 +659,13 @@ exports.localRegister = async function(req, res) {
     //console.log('token when register', output.data.token)
     if (response != 400) {
       //console.log('token in email', output.data.token)
+      res.json(output)
       ;(text =
         'Activate Account please enter link ' +
         env.FRONTEND_URL +
         '/verify?token=' +
         output.data.token),
         await email(text, output, subject)
-      return res.json(output)
     } else {
       return res.json(output)
     }

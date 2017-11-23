@@ -122,6 +122,7 @@ module.exports = function(app) {
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
   app.route('/fb-login').post(user.fbLogin)
+  // app.route('/local-register').post(user.localRegister)
   app.route('/local-register').post(user.localRegister)
   app.route('/local-login').post(user.localLogin)
   app.post('/email', user.sendEmail)
