@@ -1,18 +1,16 @@
-'use strict'
+import jwt from 'jsonwebtoken'
+import fetch from 'node-fetch'
+import env from '../config/env'
+import User from '../models/user'
 
-var mongoose = require('mongoose'),
-  User = mongoose.model('User'),
-  jwt = require('jsonwebtoken'),
-  fetch = require('node-fetch')
-
-var defaultSuccessMessage = 'success'
-var defaultErrorMessage = 'data_not_found'
-var nodemailer = require('nodemailer')
-var bcrypt = require('bcrypt-nodejs')
+const defaultSuccessMessage = 'success'
+const defaultErrorMessage = 'data_not_found'
+const nodemailer = require('nodemailer')
+const bcrypt = require('bcrypt-nodejs')
 const log = console.log
 //const stagingUrl = 'http://159.203.140.5:8080/verify?token='
-var socialAuthen = []
-var stagingUrl = require('../config/url')
+const socialAuthen = []
+const stagingUrl = require('../config/url')
 
 //function
 socialAuthen['local'] = async function(providerData, output) {
@@ -122,8 +120,8 @@ socialAuthen['facebook'] = async function(providerData) {
           data: [],
         }
       }
-      token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
+      token = await jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: env.JWT_TOKEN_LIFETIME,
       })
     } else {
       if (user.country == 'undefined') {
@@ -205,8 +203,8 @@ socialAuthen['facebook'] = async function(providerData) {
         })
       return statuEmail
     } else {
-      token = await jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
+      token = await jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: env.JWT_TOKEN_LIFETIME,
       })
       return {
         status: {
@@ -359,8 +357,8 @@ const createUser = (newUser, type, output) => {
       // console.log('create User')
       const user = await newUser.save()
       //console.log('user', user)
-      const token = jwt.sign({ data: user }, app.get('secret'), {
-        expiresIn: app.get('tokenLifetime'),
+      const token = jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: env.JWT_TOKEN_LIFETIME,
       })
       // console.log('token', token)
       output.status.code = 200
@@ -648,6 +646,7 @@ exports.sendEmail = function(req, res) {
 }
 
 exports.localRegister = async function(req, res) {
+  console.log('localRegister!!!')
   var output = {
     status: {
       code: 400,
@@ -686,12 +685,10 @@ exports.localRegister = async function(req, res) {
 }
 
 exports.localLogin = async function(req, res) {
-  //var password = bcrypt.hashSync(req.body.provider_data.password)
-
   var queryParams = {
     email: req.body.provider_data.email,
   }
-  //console.log('queryParams', queryParams)
+
   var output = {
     status: {
       code: 400,
@@ -860,8 +857,8 @@ exports.forgotPassword = async function(req, res) {
   await User.find({ email: userEmail })
     .then(async function(user) {
       if (Object.keys(user).length != 0) {
-        const token = jwt.sign({ data: user }, app.get('secret'), {
-          expiresIn: app.get('tokenLifetime'),
+        const token = jwt.sign({ data: user }, env.JWT_SECRET, {
+          expiresIn: env.JWT_TOKEN_LIFETIME,
         })
         output.data = { email: userEmail }
         text =
