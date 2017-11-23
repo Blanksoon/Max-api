@@ -26,11 +26,6 @@ paypal.configure({
   client_secret: env.PAYPAL_CLIENT_SECRET,
 })
 
-// Application specific variables
-app.set('secret', env.JWT_SECRET)
-// app.set('tokenLifetime', env.JWT_TOKEN_LIFETIME)
-app.set('tokenLifetime', parseInt(env.JWT_TOKEN_LIFETIME))
-
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())

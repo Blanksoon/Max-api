@@ -1,4 +1,6 @@
 'use strict'
+import env from '../config/env'
+
 const vods = require('../../data/vods/vods')
 const vodslogin = require('../../data/vods/buyVods')
 const mongoose = require('mongoose')
@@ -15,7 +17,7 @@ const readJwt = (token, req) => {
       statusJwt: '',
       err: '',
     }
-    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
+    jwt.verify(token, env.JWT_SECRET, async function(err, decoded) {
       if (err) {
         error.statusJwt = 'Failed to authenticate token.'
         error.err = err
