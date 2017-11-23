@@ -636,7 +636,6 @@ exports.sendEmail = function(req, res) {
 }
 
 exports.localRegister = async function(req, res) {
-  console.log('localRegister!!!')
   var output = {
     status: {
       code: 400,
