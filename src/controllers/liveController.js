@@ -1,3 +1,5 @@
+import env from '../config/env'
+
 const defaultSuccessMessage = 'success'
 const fetch = require('isomorphic-unfetch')
 const defaultErrorMessage = 'data_not_found'
@@ -13,7 +15,7 @@ const readJwt = (token, req) => {
       statusJwt: '',
       err: '',
     }
-    jwt.verify(token, req.app.get('secret'), async function(err, decoded) {
+    jwt.verify(token, env.JWT_SECRET, async function(err, decoded) {
       //console.log('decoded', decoded.data.email)
       if (err) {
         error.statusJwt = 'Failed to authenticate token.'

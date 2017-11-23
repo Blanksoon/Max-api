@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
 import { createPayment, executePayment } from '../utils/paypal'
@@ -6,7 +7,7 @@ import braintree from 'braintree'
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, req.app.get('secret'), async function(error, decoded) {
+    jwt.verify(token, env.JWT_SECRET, async function(error, decoded) {
       if (error) {
         reject({
           code: 401,
