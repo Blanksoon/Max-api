@@ -433,8 +433,8 @@ exports.login = function(req, res) {
     if (err) {
       output.status.message = err.message
     } else if (user) {
-      var token = jwt.sign({ data: user }, req.app.get('secret'), {
-        expiresIn: req.app.get('tokenLifetime'),
+      var token = jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
       })
       output.status.code = 200
       output.status.success = true
@@ -502,8 +502,8 @@ exports.create = function(req, res) {
     if (err) {
       output.status.message = err.message
     } else {
-      var token = jwt.sign({ data: user }, req.app.get('secret'), {
-        expiresIn: req.app.get('tokenLifetime'),
+      var token = jwt.sign({ data: user }, env.JWT_SECRET, {
+        expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
       })
       output.status.code = 200
       output.status.success = true
@@ -693,8 +693,8 @@ exports.localLogin = async function(req, res) {
         if (user.status == 'inactive') {
           output.status.message = 'You are not activate'
         } else {
-          var token = jwt.sign({ data: user }, req.app.get('secret'), {
-            expiresIn: req.app.get('tokenLifetime'),
+          var token = jwt.sign({ data: user }, env.JWT_SECRET, {
+            expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
           })
           output.status.code = 200
           output.status.success = true
