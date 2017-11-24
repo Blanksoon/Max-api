@@ -119,6 +119,9 @@ module.exports = function(app) {
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)
   app.route('/client_token').get(ppcheckout.BraintreeToken)
   app.route('/purchase-live-paypal').post(ppcheckout.createAndSettledPayment)
+  app
+    .route('/cancel-live-paypal-braintree')
+    .post(ppcheckout.cancelReleasePayment)
 
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
