@@ -210,7 +210,7 @@ async function prepareData(data, vodUrl) {
   var newData = {}
   data.forEach(function(record) {
     newData = {
-      id: record._id,
+      _id: record._id,
       productId: record.productId,
       programName: record.programName,
       title_en: record.title_en,
@@ -272,7 +272,7 @@ const setDataProduct = (data, exceptionData, type) => {
         while (i < data.length) {
           //const result = data.filter(product => product.productId != exceptionData)
           if (data[i] == null) {
-          } else if (data[i].id == exceptionData) {
+          } else if (data[i]._id == exceptionData) {
             data[i].status = 'unenable'
           }
           i++
