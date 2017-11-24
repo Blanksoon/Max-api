@@ -427,8 +427,12 @@ exports.products = async function(req, res) {
   } else {
     const decoded = await decodeJwt(token, req)
     if (decoded == `you have't purchase`) {
+      //console.log('hisx')
+      output.status.code = 200
+      output.status.success = true
+      output.status.message = 'success'
       await setDate(outputvods.data)
-      output.data.lives = outputvods
+      output.data.lives = outputvods.data
       output.data.subscribe = subscribes
     } else if (decoded == `Failed to authenticate token.`) {
       output.status.message = 'Failed to authenticate token.'
