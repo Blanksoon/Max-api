@@ -301,16 +301,19 @@ exports.lives = async function(req, res) {
     data: [],
   }
   if (token == undefined || token == 'undefined' || token == '') {
-    outputvods = await findLives('not-paid', {})
+    //outputvods = await findLives('not-paid', {})
+    outputvods = await findLives('paid', {})
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == `you have't purchase`) {
-      outputvods = await findLives('not-paid', {})
+      //outputvods = await findLives('not-paid', {})
+      outputvods = await findLives('paid', {})
       json = setDataOutput(outputvods, output)
     } else if (order.length != 0) {
-      outputvods = await findLives('not-paid', {})
+      //outputvods = await findLives('not-paid', {})
+      outputvods = await findLives('paid', {})
       const buyLives = await findLives('paid', {})
       const lives = outputvods
       let i = 0
@@ -354,16 +357,19 @@ exports.livesById = async function(req, res) {
     data: [],
   }
   if (token == undefined || token == 'undefined' || token == '') {
-    outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+    //outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+    outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == `you have't purchase`) {
-      outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+      //outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)
     } else if (order.length != 0) {
-      outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+      //outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
+      outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
       const buyLives = await findLives('paid', { _id: `${req.params.liveId}` })
       const lives = outputvods
       let i = 0
