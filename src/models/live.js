@@ -96,6 +96,12 @@ const liveSchema = new Schema({
   liveDateStr_en: String,
 })
 
+function addLeadingZero(n) {
+  if (n < 10) {
+    return `0${n}`
+  }
+  return n
+}
 // Method to auto caculate following fields
 // - liveFromDate
 // - liveToDate
@@ -109,8 +115,11 @@ function addLiveDate(live) {
       curDate.getDate() + (7 + live.liveDay - curDate.getDay()) % 7
     )
     // Covert liveDate to ISO string
-    const dateStr = `${liveDate.getFullYear()}-${liveDate.getMonth() +
-      1}-${liveDate.getDate()}`
+    const yyyy = liveDate.getFullYear()
+    const mm = addLeadingZero(liveDate.getMonth())
+    const dd = addLeadingZero(liveDate.getDate())
+    const dateStr = `${yyyy}-${mm}-${dd}`
+
     // Concat liveDate with startTime and endTime
     live.liveFromDate = new Date(`${dateStr}T${live.startTime}+0700`)
     live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
