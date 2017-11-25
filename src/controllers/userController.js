@@ -744,9 +744,11 @@ exports.activateLocalUser = async function(req, res) {
 }
 
 exports.fbLogin = async function(req, res) {
+  console.log('hi')
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
-  //var j = JSON.stringify(req.body)
+  var j = JSON.stringify(req.body)
+  console.log('j', j)
   if (!socialAuthen[providerName])
     res.json({
       status: {

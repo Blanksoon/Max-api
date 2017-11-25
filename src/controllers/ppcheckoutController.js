@@ -291,6 +291,7 @@ exports.createAndSettledPayment = async function(req, res) {
 
 exports.cancelReleasePayment = async function(req, res) {
   const token = req.query.token
+  const productId = req.body.productId
   const output = {
     status: {
       code: 400,
@@ -308,6 +309,9 @@ exports.cancelReleasePayment = async function(req, res) {
   })
   try {
     const decode = await readJwtBraintree(token, req)
+    console.log('decode', decode.data._id)
+    let today = new Date()
+    today = Date.now()
     if (typeof token == 'undefined' || token == '') {
       output.status.message = 'token is undefiend'
       res.send(output)
@@ -315,7 +319,10 @@ exports.cancelReleasePayment = async function(req, res) {
       output.status.message = decode.message
       res.send(output)
     } else {
-      gateway.transaction.refund(req.body.transectionId, function(err, result) {
+      gateway.transaction.refund(req.body.transectionId, async function(
+        err,
+        result
+      ) {
         if (err) {
           res.status(200).send(err)
         } else {
@@ -333,6 +340,15 @@ exports.cancelReleasePayment = async function(req, res) {
             output.status.message = message
             res.status(200).send(output)
           } else {
+            await Order.findOneAndUpdate(
+              {
+                userId: decode.data._id,
+                expiredDate: { $gt: today },
+                productId: productId,
+                status: 'approved',
+              },
+              { status: 'cancel' }
+            )
             output.status.code = 200
             output.status.success = true
             output.status.message = 'cancel transection success'
