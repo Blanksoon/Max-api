@@ -84,7 +84,8 @@ socialAuthen['facebook'] = async function(providerData) {
 
   try {
     var token = ''
-    var name = facebookData.name.split(/[ ]+/)
+    //var name = facebookData.name.split(/[ ]+/)
+    //console.log('facebookData', facebookData)
     var user = await User.findOneAndUpdate(
       { email: facebookData.email },
       { fb_info: facebookData },
@@ -99,8 +100,8 @@ socialAuthen['facebook'] = async function(providerData) {
         email: facebookData.email,
         password: bcrypt.hashSync(password), //if error is meaning this
         fb_info: facebookData,
-        name: name[0],
-        lastname: name[1],
+        name: facebookData.first_name,
+        lastname: facebookData.last_name,
         gender: facebookData.gender,
         //country: facebookData.locale,
       }
@@ -122,28 +123,28 @@ socialAuthen['facebook'] = async function(providerData) {
         expiresIn: env.JWT_TOKEN_LIFETIME,
       })
     } else {
-      if (user.country == 'undefined') {
+      if (user.country == null) {
         await User.updateMany(
           { email: facebookData.email },
           { $set: { country: facebookData.locale } }
         )
       }
-      if (user.gender == 'undefined') {
+      if (user.gender == null) {
         await User.updateMany(
           { email: facebookData.email },
           { $set: { gender: facebookData.gender } }
         )
       }
-      if (user.name == 'undefined') {
+      if (user.name == null) {
         await User.updateMany(
           { email: facebookData.email },
-          { $set: { name: name[0] } }
+          { $set: { name: facebookData.first_name } }
         )
       }
-      if (user.lastname == 'undefined') {
+      if (user.lastname == null) {
         await User.updateMany(
           { email: facebookData.email },
-          { $set: { lastname: name[1] } }
+          { $set: { lastname: facebookData.last_name } }
         )
       }
       if (user.status == 'inactive') {
@@ -744,11 +745,11 @@ exports.activateLocalUser = async function(req, res) {
 }
 
 exports.fbLogin = async function(req, res) {
-  console.log('hi')
+  //console.log('hi')
   var providerName = req.body.provider_name
   var providerData = req.body.provider_data
   var j = JSON.stringify(req.body)
-  console.log('j', j)
+  //console.log('j', j)
   if (!socialAuthen[providerName])
     res.json({
       status: {
@@ -888,7 +889,6 @@ exports.profileUser = async function(req, res) {
     { email: emailUser.email },
     {
       email: 1,
-      password: 1,
       country: 1,
       gender: 1,
       name: 1,

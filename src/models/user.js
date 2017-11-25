@@ -18,19 +18,19 @@ var UserSchema = new Schema({
   },
   lastname: {
     type: String,
-    default: 'undefined',
+    default: null,
   },
   gender: {
     type: String,
-    default: 'undefined',
+    default: null,
   },
   date_birth: {
     type: Date,
-    //default: 'undefined',
+    default: null,
   },
   country: {
     type: String,
-    default: 'undefined',
+    default: null,
   },
   fb_info: {
     type: Object,
