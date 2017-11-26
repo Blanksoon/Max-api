@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import fetch from 'node-fetch'
 import env from '../config/env'
 import User from '../models/user'
+import moment from 'moment'
 
 const defaultSuccessMessage = 'success'
 const defaultErrorMessage = 'data_not_found'
@@ -898,10 +899,20 @@ exports.profileUser = async function(req, res) {
   )
     .then(function(user) {
       if (Object.keys(user).length != 0) {
+        const a = moment(user[0].date_birth).format('YYYY-MM-DDTHH:MM:SS')
+        const outputUser = {
+          _id: user[0]._id,
+          email: user[0].email,
+          country: user[0].country,
+          date_birth: a,
+          gender: user[0].gender,
+          lastname: user[0].lastname,
+          name: user[0].name,
+        }
         output.status.code = 200
         output.status.success = true
         output.status.message = 'success'
-        output.data = user[0]
+        output.data = outputUser
       } else {
         output.status.message = 'user not found'
       }
@@ -910,8 +921,8 @@ exports.profileUser = async function(req, res) {
       console.log('err', err)
       output.status.message = err
     })
-  //console.log('output', output)
-  return res.send(output)
+  console.log('output', output)
+  return res.json(output)
 }
 
 exports.updateUser = async function(req, res) {
