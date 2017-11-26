@@ -14,7 +14,7 @@ var UserSchema = new Schema({
   },
   name: {
     type: String,
-    default: 'undefined',
+    default: null,
   },
   lastname: {
     type: String,
