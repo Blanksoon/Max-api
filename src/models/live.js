@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import moment from 'moment-timezone'
+import { jwplayerUrl } from '../utils/jwplayer'
 
 const Schema = mongoose.Schema
 
@@ -147,10 +148,12 @@ function addLiveDate(live) {
 
 liveSchema.post('findOne', live => {
   addLiveDate(live)
+  live.promoUrl = jwplayerUrl(live.promoUrl)
 })
 liveSchema.post('find', lives => {
   lives.forEach(live => {
     addLiveDate(live)
+    live.promoUrl = jwplayerUrl(live.promoUrl)
   })
 })
 module.exports = mongoose.model('Live', liveSchema)
