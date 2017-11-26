@@ -116,7 +116,7 @@ function addLiveDate(live) {
     )
     // Covert liveDate to ISO string
     const yyyy = liveDate.getFullYear()
-    const mm = addLeadingZero(liveDate.getMonth())
+    const mm = addLeadingZero(liveDate.getMonth() + 1)
     const dd = addLeadingZero(liveDate.getDate())
     const dateStr = `${yyyy}-${mm}-${dd}`
 
