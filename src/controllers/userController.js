@@ -899,20 +899,24 @@ exports.profileUser = async function(req, res) {
   )
     .then(function(user) {
       if (Object.keys(user).length != 0) {
-        const a = moment(user[0].date_birth).format('YYYY-MM-DDTHH:MM:SS')
-        const outputUser = {
-          _id: user[0]._id,
-          email: user[0].email,
-          country: user[0].country,
-          date_birth: a,
-          gender: user[0].gender,
-          lastname: user[0].lastname,
-          name: user[0].name,
+        if (user[0].date_birth === null) {
+          output.data = user[0]
+        } else {
+          const a = moment(user[0].date_birth).format('YYYY-MM-DDTHH:MM:SS')
+          const outputUser = {
+            _id: user[0]._id,
+            email: user[0].email,
+            country: user[0].country,
+            date_birth: a,
+            gender: user[0].gender,
+            lastname: user[0].lastname,
+            name: user[0].name,
+          }
+          output.data = outputUser
         }
         output.status.code = 200
         output.status.success = true
         output.status.message = 'success'
-        output.data = outputUser
       } else {
         output.status.message = 'user not found'
       }
