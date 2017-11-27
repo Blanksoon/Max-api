@@ -10,6 +10,7 @@ import {
   billingPlan,
   createBilling,
   excuteBilling,
+  createWebhook,
 } from '../utils/paypal'
 import braintree from 'braintree'
 
@@ -632,4 +633,21 @@ exports.cancelReleasePayment = async function(req, res) {
       data: [],
     })
   }
+}
+
+// Web hook
+exports.createWebhook = async function(req, res) {
+  const eventTypes = [
+    { name: 'PAYMENT.SALE.COMPLETED' },
+    { name: 'BILLING.SUBSCRIPTION.CANCELLED' },
+  ]
+  try {
+    const webhook = await createWebhook(eventTypes)
+    console.log(webhook)
+  } catch (error) {
+    console.log(error)
+  }
+}
+exports.webhookHandler = async function(req, res) {
+  console.log(req)
 }

@@ -216,3 +216,36 @@ export function excuteBilling(paymentToken) {
     })
   })
 }
+export function createWebhook(eventTypes) {
+  const create_webhook_json = {
+    url: 'http://www.google.com', //`${env.SERVER_IP}:${env.SERVER_PORT}/ppcheckout/webhooks-handler`,
+    event_types: eventTypes,
+  }
+  console.log(create_webhook_json)
+
+  /* return new Promise((resolve, reject) => {
+    paypal.notification.webhook.del('98K37835PB985114G', function(
+      error,
+      response
+    ) {
+      if (error) {
+        throw error
+      } else {
+        console.log('webhook deleted')
+        console.log(response.httpStatusCode)
+      }
+    })
+  }) */
+  return new Promise((resolve, reject) => {
+    paypal.notification.webhook.create(create_webhook_json, function(
+      error,
+      webhook
+    ) {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(webhook)
+      }
+    })
+  })
+}
