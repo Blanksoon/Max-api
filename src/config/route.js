@@ -114,6 +114,8 @@ module.exports = function(app) {
   app.get('/product', order.products)
 
   // Paypal checkout
+  app.route('/ppcheckout/webhooks').post(ppcheckout.createWebhook)
+  app.route('/ppcheckout/webhooks_handler').post(ppcheckout.webhookHandler)
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)

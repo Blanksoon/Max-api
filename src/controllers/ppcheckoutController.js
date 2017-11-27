@@ -10,6 +10,7 @@ import {
   billingPlan,
   createBilling,
   excuteBilling,
+  createWebhook,
 } from '../utils/paypal'
 import braintree from 'braintree'
 //import env from '../config/env'
@@ -666,6 +667,23 @@ exports.cancelReleasePayment = async function(req, res) {
   }
 }
 
+<<<<<<< HEAD
+// Web hook
+exports.createWebhook = async function(req, res) {
+  const eventTypes = [
+    { name: 'PAYMENT.SALE.COMPLETED' },
+    { name: 'BILLING.SUBSCRIPTION.CANCELLED' },
+  ]
+  try {
+    const webhook = await createWebhook(eventTypes)
+    console.log(webhook)
+  } catch (error) {
+    console.log(error)
+  }
+}
+exports.webhookHandler = async function(req, res) {
+  console.log(req)
+=======
 exports.subscribeBraintree = async function(req, res) {
   const token = req.query.token
   try {
@@ -858,4 +876,5 @@ exports.cancelSubscribeBraintree = async function(req, res) {
       data: [],
     })
   }
+>>>>>>> 703c6fdb35be2c96d38a9d45bb28b36f398f55f2
 }
