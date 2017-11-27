@@ -601,6 +601,11 @@ exports.fetchSubscribe = async function(req, res) {
   }
   const token = req.query.token
   let decoded = await readJwt(token, req)
+  if (!decoded.data) {
+    output.status.message = decoded.statusJwt
+    res.status(200).send(output)
+  }
+
   let today = Date.now()
   const order = await Order.find({
     userId: decoded.data._id,
