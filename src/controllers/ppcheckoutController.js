@@ -2,7 +2,13 @@ import jwt from 'jsonwebtoken'
 import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
-import { createPayment, executePayment } from '../utils/paypal'
+import {
+  createPayment,
+  executePayment,
+  billingPlan,
+  createBilling,
+  excuteBilling,
+} from '../utils/paypal'
 import braintree from 'braintree'
 
 const readJwt = (token, req) => {
@@ -137,6 +143,131 @@ exports.cancelPayment = async function(req, res) {
   console.log('cancel')
 }
 
+exports.billingPlans = async function(req, res) {
+  var billingPlanAttributes = {
+    description: 'Watch unlimited lives and vods for 1 months : 3.99$',
+    merchant_preferences: {
+      auto_bill_amount: 'yes',
+      cancel_url: 'http://localhost:30002/subscribe/cancel',
+      initial_fail_amount_action: 'continue',
+      max_fail_attempts: '1',
+      return_url: 'http://localhost:3002/subscribe/success',
+    },
+    name: 'Monthly',
+    payment_definitions: [
+      {
+        amount: {
+          currency: 'USD',
+          value: '3.99',
+        },
+        cycles: '0',
+        frequency: 'MONTH',
+        frequency_interval: '1',
+        name: '1 month subscription',
+        type: 'REGULAR',
+      },
+    ],
+    type: 'INFINITE',
+  }
+  try {
+    const billingState = await billingPlan(billingPlanAttributes)
+    console.log('bill', billingState)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'Billing plan status: ' + billingState,
+      },
+      data: [],
+    })
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+  // paypal.billingPlan.create(billingPlanAttributes, async function(
+  //   error,
+  //   billingPlan
+  // ) {
+  //   try {
+  //     if (error) {
+  //       console.log(error)
+  //       throw error
+  //     } else {
+  //       console.log('Create Billing Plan Response')
+  //       console.log(billingPlan)
+  //       try {
+  //         await activateBillingPlan(billingPlan.id)
+  //       } catch (error) {
+  //         throw error
+  //       }
+  //     }
+  //   } catch (error) {
+  //     res.status(200).send({
+  //       status: {
+  //         code: error.code || 500,
+  //         success: false,
+  //         message: error.message,
+  //       },
+  //       data: [],
+  //     })
+  //   }
+  // })
+}
+
+exports.subscribe = async function(req, res) {
+  const isoDate = new Date()
+  isoDate.setSeconds(isoDate.getSeconds() + 4)
+  isoDate.toISOString().slice(0, 19) + 'Z'
+  const billingAgreementAttributes = {
+    name: 'Unlimited lives and vods',
+    description: 'Watch unlimited lives and vods for 1 month : 3.99$',
+    start_date: isoDate,
+    plan: {
+      id: 'P-5U1854360P88355135QTIYZI',
+    },
+    payer: {
+      payment_method: 'paypal',
+    },
+  }
+  try {
+    const approval_url = await createBilling(billingAgreementAttributes)
+    res.redirect(approval_url)
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.successSubscribe = async function(req, res) {
+  const paymentToken = req.query.token
+  try {
+    const result = await excuteBilling(paymentToken)
+    res.status(200).send({
+      result,
+    })
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
 exports.BraintreeToken = async function(req, res) {
   const token = req.query.token
   const output = {
@@ -241,13 +372,16 @@ exports.createAndSettledPayment = async function(req, res) {
                       purchaseDate: new Date(),
                       platform: req.body.platform,
                       expiredDate: expiredDate,
+                      paypal: {
+                        paymentId: settleResult.transaction.id,
+                      },
                       status: 'approved',
                     })
                     const saved = await order.save()
                     output.status.code = 200
                     output.status.success = true
                     output.status.message = 'thank you for purchase'
-                    console.log('resultxxx', settleResult)
+                    console.log('resultxxx', settleResult.transaction.id)
                     res.status(200).send(output)
                   } else {
                     const order = new Order({
@@ -309,7 +443,6 @@ exports.cancelReleasePayment = async function(req, res) {
   })
   try {
     const decode = await readJwtBraintree(token, req)
-    console.log('decode', decode.data._id)
     let today = new Date()
     today = Date.now()
     if (typeof token == 'undefined' || token == '') {
@@ -319,7 +452,13 @@ exports.cancelReleasePayment = async function(req, res) {
       output.status.message = decode.message
       res.send(output)
     } else {
-      gateway.transaction.refund(req.body.transectionId, async function(
+      const result = await Order.findOne({
+        userId: decode.data._id,
+        productId: productId,
+        expiredDate: { $gte: today },
+        status: 'approved',
+      })
+      gateway.transaction.refund(result.paypal.paymentId, async function(
         err,
         result
       ) {
@@ -340,22 +479,31 @@ exports.cancelReleasePayment = async function(req, res) {
             output.status.message = message
             res.status(200).send(output)
           } else {
+            // console.log(
+            //   'decode.data._id',
+            //   decode.data._id,
+            //   'productId',
+            //   productId
+            // )
             await Order.findOneAndUpdate(
               {
                 userId: decode.data._id,
-                expiredDate: { $gt: today },
+                expiredDate: { $gte: today },
                 productId: productId,
                 status: 'approved',
               },
-              { status: 'cancel' }
+              {
+                status: 'cancel',
+                paypal: {
+                  paymentId: result.transaction.id,
+                },
+              }
             )
             output.status.code = 200
             output.status.success = true
             output.status.message = 'cancel transection success'
             res.status(200).send(output)
           }
-          //console.log('2', result)
-          //res.status(200).send(result)
         }
       })
     }

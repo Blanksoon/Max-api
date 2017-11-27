@@ -117,6 +117,9 @@ module.exports = function(app) {
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)
+  app.route('/billingplans').post(ppcheckout.billingPlans)
+  app.route('/subscribe').post(ppcheckout.subscribe)
+  app.route('/subscribe/success').get(ppcheckout.successSubscribe)
   app.route('/client_token').get(ppcheckout.BraintreeToken)
   app
     .route('/purchase-live-paypal-braintree')
@@ -139,5 +142,5 @@ module.exports = function(app) {
   app.get('/profile', user.profileUser)
   app.post('/update-user', user.updateUser)
   app.get('/purchase-history', order.purchaseHistory)
-  app.get('/test', order.insertOrder)
+  //app.post('/test', ppcheckout.findOrder)
 }

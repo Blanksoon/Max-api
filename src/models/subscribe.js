@@ -15,6 +15,10 @@ var SubscribeSchema = new Schema({
     type: String,
     default: 'enable',
   },
+  billingPlanId: {
+    type: String,
+    default: null,
+  },
   versionKey: false,
 })
 
