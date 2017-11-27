@@ -338,7 +338,7 @@ exports.subscribe = async function(req, res) {
             },
           }
         )
-        res.status(200).send(billingAgreement.links[0].href)
+        res.status(200).send({ approvalUrl: billingAgreement.links[0].href })
       } else {
         throw {
           message: 'target subscribe not found',
@@ -682,6 +682,8 @@ exports.createWebhook = async function(req, res) {
 }
 exports.webhookHandler = async function(req, res) {
   console.log(req)
+}
+
 exports.subscribeBraintree = async function(req, res) {
   const token = req.query.token
   try {
