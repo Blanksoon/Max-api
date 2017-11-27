@@ -337,7 +337,7 @@ exports.subscribe = async function(req, res) {
             },
           }
         )
-        res.status(200).send(billingAgreement.links[0].href)
+        res.status(200).send({ approvalUrl: billingAgreement.links[0].href })
       } else {
         throw {
           message: 'target subscribe not found',
