@@ -42,23 +42,33 @@ const readJwtBraintree = (token, req) => {
   })
 }
 
-// const createCustomerBraintree = (data,gateway) =>{
+// const createCustomerBraintree = (data, gateway) => {
 //   return new Promise((resolve, reject) => {
-//     gateway.customer.create({
-//       firstName: "Charity",
-//       lastName: "Smith",
-//       paymentMethodNonce: nonceFromTheClient
-//     }, function (err, result) {
-//       if(err)
-//       result.success;
-//       // true
+//     gateway.customer.create(
+//       {
+//         firstName: 'Charity',
+//         lastName: 'Smith',
+//         paymentMethodNonce: nonceFromTheClient,
+//       },
+//       function(err, result) {
+//         if (err) {
+//           console.log('1',err)
+//         }else{
+//           console.log('2',result.success)
+//           console.log('3',result.customer.id)
+//           console.log('4',result.customer.paymentMethods[0].token)
+//resolve
+//}
+//result.success
+// true
 
-//       result.customer.id;
-//       // e.g 160923
+//result.customer.id
+// e.g 160923
 
-//       result.customer.paymentMethods[0].token;
-//       // e.g f28wm
-//     });
+//result.customer.paymentMethods[0].token
+// e.g f28wm
+//       }
+//     )
 //   })
 // }
 
@@ -256,7 +266,7 @@ exports.subscribe = async function(req, res) {
   }
   try {
     const decode = await readJwt(token, req)
-    const productId = req.body.productId
+    const productId = req.params.subscribeId
     const userId = decode.data._id
     const email = decode.data.email
     const isoDate = new Date()
@@ -371,14 +381,15 @@ exports.successSubscribe = async function(req, res) {
           order.expiredDate = result.agreement_details.next_billing_date
           await order.save()
           //console.log('hiz')
-          res.status(200).send({
-            status: {
-              code: 200,
-              success: true,
-              message: 'thank you for purchase',
-            },
-            data: [],
-          })
+          // res.status(200).send({
+          //   status: {
+          //     code: 200,
+          //     success: true,
+          //     message: 'thank you for purchase',
+          //   },
+          //   data: [],
+          // })
+          res.redirect('http://localhost:8080/getticket')
         }
       } catch (error) {
         order.status = 'error'
@@ -403,7 +414,7 @@ exports.successSubscribe = async function(req, res) {
   }
 }
 
-exports.BraintreeToken = async function(req, res) {
+exports.braintreeToken = async function(req, res) {
   const token = req.query.token
   const output = {
     status: {
