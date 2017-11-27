@@ -149,7 +149,7 @@ exports.executePayment = async function(req, res) {
             paymentId,
           }
           await order.save()
-          res.redirect('http://localhost:8080/getticket')
+          res.redirect(`${env.FRONTEND_URL}/getticket`)
         }
       } catch (error) {
         order.status = 'error'
@@ -175,7 +175,30 @@ exports.executePayment = async function(req, res) {
 }
 
 exports.cancelPayment = async function(req, res) {
-  console.log('cancel')
+  const orderId = req.params.orderId
+  if (typeof orderId === 'undefined') {
+    res.status(200).send({
+      status: {
+        code: 400,
+        success: false,
+        message: 'Missing orderId',
+      },
+      data: [],
+    })
+  }
+  const order = await Order.findOne({
+    orderId: orderId,
+  })
+  try {
+    if (order) {
+      order.status = 'canceled'
+      await order.save()
+      res.redirect(`${env.FRONTEND_URL}`)
+    }
+  } catch (error) {
+    console.log(error)
+    res.redirect(`${env.FRONTEND_URL}`)
+  }
 }
 
 exports.billingPlans = async function(req, res) {
