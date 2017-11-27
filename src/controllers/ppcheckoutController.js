@@ -68,7 +68,7 @@ exports.createPayment = async function(req, res) {
       })
       const saved = await order.save()
       const approvalUrl = await createPayment(saved)
-      res.send(approvalUrl)
+      res.send({ approvalUrl: approvalUrl })
     } else {
       throw {
         code: 404,
