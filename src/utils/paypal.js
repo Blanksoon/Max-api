@@ -249,3 +249,57 @@ export function createWebhook(eventTypes) {
     })
   })
 }
+export function cancelBilling(billingAgreementId) {
+  let cancel_note = {
+    note: 'Canceling the agreement',
+  }
+  return new Promise((resolve, reject) => {
+    paypal.billingAgreement.cancel(billingAgreementId, cancel_note, function(
+      error,
+      response
+    ) {
+      if (error) {
+        console.log(error)
+        reject(error)
+      } else {
+        console.log('Cancel Billing Agreement Response')
+        console.log(response)
+        resolve('success')
+        // paypal.billingPlan.get(billingAgreementId, function(
+        //   error,
+        //   billingPlan
+        // ) {
+        //   if (error) {
+        //     console.log('kkkkk', error.response)
+        //     reject(error)
+        //   } else {
+        //     console.log(billingPlan.state)
+        //     resolve(billingPlan.state)
+        //   }
+        // })
+      }
+    })
+  })
+}
+
+export function findTransactions() {
+  var billingAgreementId = 'I-LU134TMXS648'
+
+  var start_date = '2017-11-27'
+  var end_date = '2017-11-29'
+
+  paypal.billingAgreement.searchTransactions(
+    billingAgreementId,
+    start_date,
+    end_date,
+    function(error, results) {
+      if (error) {
+        console.log(error)
+        throw error
+      } else {
+        console.log('Billing Agreement Transactions Search Response')
+        console.log(results)
+      }
+    }
+  )
+}

@@ -11,6 +11,8 @@ import {
   createBilling,
   excuteBilling,
   createWebhook,
+  cancelBilling,
+  findTransactions,
 } from '../utils/paypal'
 import braintree from 'braintree'
 //import env from '../config/env'
@@ -397,7 +399,7 @@ exports.successSubscribe = async function(req, res) {
     if (order) {
       try {
         const result = await excuteBilling(paymentToken)
-        //console.log('result', result)
+        console.log('result', result)
         if (result.state === 'Active') {
           order.status = 'approved'
           order.paypal = {
@@ -431,6 +433,267 @@ exports.successSubscribe = async function(req, res) {
       }
     }
   } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.cancelSubscribe = async function(req, res) {
+  // await findTransactions()
+  // res.sendStatus(200)
+  const orderId = req.params.orderId
+  try {
+    const order = await Order.findOne({ orderId: orderId })
+    if (orderId === undefined || orderId === '') {
+      throw {
+        message: 'orderId not found',
+      }
+    }
+    if (order) {
+      console.log('paymentId', order.paypal)
+      const data = await cancelBilling(order.paypal.paymentId)
+      console.log(data)
+      if (data === 'success') {
+        order.cancelDate = Date.now()
+        order.status = 'cancel'
+        await order.save()
+        res.status(200).send({
+          status: {
+            code: 200,
+            success: true,
+            message: 'success for cancel subscribe',
+          },
+          data: [],
+        })
+      } else {
+        throw {
+          data,
+        }
+      }
+    } else {
+      throw {
+        message: 'target order not found',
+      }
+    }
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+// Web hook
+exports.createWebhook = async function(req, res) {
+  const eventTypes = [
+    { name: 'PAYMENT.SALE.COMPLETED' },
+    { name: 'BILLING.SUBSCRIPTION.CANCELLED' },
+  ]
+  try {
+    const webhook = await createWebhook(eventTypes)
+    console.log(webhook)
+  } catch (error) {
+    console.log(error)
+  }
+}
+exports.webhookHandler = async function(req, res) {
+  console.log(req)
+}
+
+//braintree
+exports.subscribeBraintree = async function(req, res) {
+  const token = req.query.token
+  try {
+    const decode = await readJwt(token, req)
+    const productId = req.body.productId
+    const userId = decode.data._id
+    const email = decode.data.email
+    const isoDate = new Date()
+    let today = new Date()
+    today = Date.now()
+    isoDate.setSeconds(isoDate.getSeconds() + 4)
+    isoDate.toISOString().slice(0, 19) + 'Z'
+    const subscribeProduct = await Subscribe.findOne({ _id: productId })
+    //const expiredDate = new Date(live.liveToDate)
+    const expiredDate = moment(today)
+      .add(30, 'day')
+      .calendar()
+    if (typeof token === 'undefined' || token === '') {
+      console.log('hi')
+      throw {
+        message: 'token is undefiend',
+      }
+    } else if (decode.code == 401) {
+      throw {
+        message: decode.message,
+      }
+    } else {
+      if (subscribeProduct) {
+        console.log(subscribeProduct)
+        const order = new Order({
+          productId: subscribeProduct._id,
+          productName: subscribeProduct.title_en,
+          userId,
+          email,
+          price: subscribeProduct.price,
+          purchaseDate: today,
+          platform: 'paypal',
+          expiredDate: expiredDate,
+          paypal: {
+            payerId: null,
+            paymentId: null,
+            tokenSubscribe: null,
+          },
+          status: 'created',
+        })
+        const saved = await order.save()
+        let gateway = braintree.connect({
+          environment: braintree.Environment.Sandbox,
+          merchantId: 'hcd2xp39kgttcpsm',
+          publicKey: 'snd9fsqtb8rwbrbt',
+          privateKey: '9eda331084fe0007bdbda77a783bebf6',
+        })
+        gateway.subscription.create(
+          {
+            paymentMethodNonce: 'cf8ae9d7-bf01-0a0a-5e10-a0c28400e6f8',
+            planId: subscribeProduct.billingPlanIdBraintree,
+          },
+          async function(error, result) {
+            if (error) {
+              throw error
+            } else {
+              // await Order.findOneAndUpdate(
+              //   {
+              //     userId: userId,
+              //     productId: subscribeProduct._id,
+              //     expiredDate: expiredDate,
+              //   },
+              //   {
+              //     paypal: {
+              //       payerId: null,
+              //       paymentId: null,
+              //       tokenSubscribe: tokenSubscribe,
+              //     },
+              //   }
+              // )
+              res.status(200).send(result)
+            }
+          }
+        )
+      } else {
+        throw {
+          message: 'target subscribe not found',
+        }
+      }
+    }
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.cancelSubscribeBraintree = async function(req, res) {
+  const token = req.query.token
+  const productId = req.body.productId
+  const output = {
+    status: {
+      code: 400,
+      success: false,
+      message: '',
+    },
+    data: {},
+  }
+  let defaultErrorMessage = 'data_not_found'
+  let gateway = braintree.connect({
+    environment: braintree.Environment.Sandbox,
+    merchantId: 'hcd2xp39kgttcpsm',
+    publicKey: 'snd9fsqtb8rwbrbt',
+    privateKey: '9eda331084fe0007bdbda77a783bebf6',
+  })
+  try {
+    const decode = await readJwtBraintree(token, req)
+    let today = new Date()
+    today = Date.now()
+    if (typeof token == 'undefined' || token == '') {
+      output.status.message = 'token is undefiend'
+      res.send(output)
+    } else if (decode.code == 401) {
+      output.status.message = decode.message
+      res.send(output)
+    } else {
+      const result = await Order.findOne({
+        userId: decode.data._id,
+        productId: productId,
+        expiredDate: { $gte: today },
+        status: 'approved',
+      })
+      gateway.subscription.cancel(result.paypal.SubscribtionId, async function(
+        err,
+        result
+      ) {
+        if (err) {
+          res.status(200).send(err)
+        } else {
+          let message
+          if (result.errors != undefined) {
+            const deepErrors = result.errors.deepErrors()
+            for (var i in deepErrors) {
+              if (deepErrors.hasOwnProperty(i)) {
+                // console.log('codexxx', deepErrors[i].code)
+                // console.log('messagexxx', deepErrors[i].message)
+                message = deepErrors[i].message
+                //console.log('attributexxx', deepErrors[i].attribute)
+              }
+            }
+            output.status.message = message
+            res.status(200).send(output)
+          } else {
+            // console.log(
+            //   'decode.data._id',
+            //   decode.data._id,
+            //   'productId',
+            //   productId
+            // )
+            await Order.findOneAndUpdate(
+              {
+                userId: decode.data._id,
+                expiredDate: { $gte: today },
+                productId: productId,
+                status: 'approved',
+              },
+              {
+                status: 'cancel',
+                paypal: {
+                  paymentId: result.transaction.id,
+                },
+              }
+            )
+            output.status.code = 200
+            output.status.success = true
+            output.status.message = 'cancel transection success'
+            res.status(200).send(output)
+          }
+        }
+      })
+    }
+  } catch (error) {
+    console.log('error', error)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -633,217 +896,6 @@ exports.cancelReleasePayment = async function(req, res) {
         status: 'approved',
       })
       gateway.transaction.refund(result.paypal.paymentId, async function(
-        err,
-        result
-      ) {
-        if (err) {
-          res.status(200).send(err)
-        } else {
-          let message
-          if (result.errors != undefined) {
-            const deepErrors = result.errors.deepErrors()
-            for (var i in deepErrors) {
-              if (deepErrors.hasOwnProperty(i)) {
-                // console.log('codexxx', deepErrors[i].code)
-                // console.log('messagexxx', deepErrors[i].message)
-                message = deepErrors[i].message
-                //console.log('attributexxx', deepErrors[i].attribute)
-              }
-            }
-            output.status.message = message
-            res.status(200).send(output)
-          } else {
-            // console.log(
-            //   'decode.data._id',
-            //   decode.data._id,
-            //   'productId',
-            //   productId
-            // )
-            await Order.findOneAndUpdate(
-              {
-                userId: decode.data._id,
-                expiredDate: { $gte: today },
-                productId: productId,
-                status: 'approved',
-              },
-              {
-                status: 'cancel',
-                paypal: {
-                  paymentId: result.transaction.id,
-                },
-              }
-            )
-            output.status.code = 200
-            output.status.success = true
-            output.status.message = 'cancel transection success'
-            res.status(200).send(output)
-          }
-        }
-      })
-    }
-  } catch (error) {
-    console.log('error', error)
-    res.status(200).send({
-      status: {
-        code: error.code || 500,
-        success: false,
-        message: error.message,
-      },
-      data: [],
-    })
-  }
-}
-
-// Web hook
-exports.createWebhook = async function(req, res) {
-  const eventTypes = [
-    { name: 'PAYMENT.SALE.COMPLETED' },
-    { name: 'BILLING.SUBSCRIPTION.CANCELLED' },
-  ]
-  try {
-    const webhook = await createWebhook(eventTypes)
-    console.log(webhook)
-  } catch (error) {
-    console.log(error)
-  }
-}
-exports.webhookHandler = async function(req, res) {
-  console.log(req)
-}
-
-exports.subscribeBraintree = async function(req, res) {
-  const token = req.query.token
-  try {
-    const decode = await readJwt(token, req)
-    const productId = req.body.productId
-    const userId = decode.data._id
-    const email = decode.data.email
-    const isoDate = new Date()
-    let today = new Date()
-    today = Date.now()
-    isoDate.setSeconds(isoDate.getSeconds() + 4)
-    isoDate.toISOString().slice(0, 19) + 'Z'
-    const subscribeProduct = await Subscribe.findOne({ _id: productId })
-    //const expiredDate = new Date(live.liveToDate)
-    const expiredDate = moment(today)
-      .add(30, 'day')
-      .calendar()
-    if (typeof token === 'undefined' || token === '') {
-      console.log('hi')
-      throw {
-        message: 'token is undefiend',
-      }
-    } else if (decode.code == 401) {
-      throw {
-        message: decode.message,
-      }
-    } else {
-      if (subscribeProduct) {
-        console.log(subscribeProduct)
-        const order = new Order({
-          productId: subscribeProduct._id,
-          productName: subscribeProduct.title_en,
-          userId,
-          email,
-          price: subscribeProduct.price,
-          purchaseDate: today,
-          platform: 'paypal',
-          expiredDate: expiredDate,
-          paypal: {
-            payerId: null,
-            paymentId: null,
-            tokenSubscribe: null,
-          },
-          status: 'created',
-        })
-        const saved = await order.save()
-        let gateway = braintree.connect({
-          environment: braintree.Environment.Sandbox,
-          merchantId: 'hcd2xp39kgttcpsm',
-          publicKey: 'snd9fsqtb8rwbrbt',
-          privateKey: '9eda331084fe0007bdbda77a783bebf6',
-        })
-        gateway.subscription.create(
-          {
-            paymentMethodNonce: 'cf8ae9d7-bf01-0a0a-5e10-a0c28400e6f8',
-            planId: subscribeProduct.billingPlanIdBraintree,
-          },
-          async function(error, result) {
-            if (error) {
-              throw error
-            } else {
-              // await Order.findOneAndUpdate(
-              //   {
-              //     userId: userId,
-              //     productId: subscribeProduct._id,
-              //     expiredDate: expiredDate,
-              //   },
-              //   {
-              //     paypal: {
-              //       payerId: null,
-              //       paymentId: null,
-              //       tokenSubscribe: tokenSubscribe,
-              //     },
-              //   }
-              // )
-              res.status(200).send(result)
-            }
-          }
-        )
-      } else {
-        throw {
-          message: 'target subscribe not found',
-        }
-      }
-    }
-  } catch (error) {
-    res.status(200).send({
-      status: {
-        code: error.code || 500,
-        success: false,
-        message: error.message,
-      },
-      data: [],
-    })
-  }
-}
-
-exports.cancelSubscribeBraintree = async function(req, res) {
-  const token = req.query.token
-  const productId = req.body.productId
-  const output = {
-    status: {
-      code: 400,
-      success: false,
-      message: '',
-    },
-    data: {},
-  }
-  let defaultErrorMessage = 'data_not_found'
-  let gateway = braintree.connect({
-    environment: braintree.Environment.Sandbox,
-    merchantId: 'hcd2xp39kgttcpsm',
-    publicKey: 'snd9fsqtb8rwbrbt',
-    privateKey: '9eda331084fe0007bdbda77a783bebf6',
-  })
-  try {
-    const decode = await readJwtBraintree(token, req)
-    let today = new Date()
-    today = Date.now()
-    if (typeof token == 'undefined' || token == '') {
-      output.status.message = 'token is undefiend'
-      res.send(output)
-    } else if (decode.code == 401) {
-      output.status.message = decode.message
-      res.send(output)
-    } else {
-      const result = await Order.findOne({
-        userId: decode.data._id,
-        productId: productId,
-        expiredDate: { $gte: today },
-        status: 'approved',
-      })
-      gateway.subscription.cancel(result.paypal.SubscribtionId, async function(
         err,
         result
       ) {
