@@ -120,6 +120,9 @@ module.exports = function(app) {
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)
+  app
+    .route('/ppcheckout/:orderId/cancel/subscribe')
+    .post(ppcheckout.cancelSubscribe)
   app.route('/billingplans').post(ppcheckout.billingPlans)
   app.route('/subscribe/:subscribeId').post(ppcheckout.subscribe)
   app.route('/subscribe/success').get(ppcheckout.successSubscribe)
