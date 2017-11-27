@@ -1,8 +1,8 @@
-'use strict'
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+import mongoose from 'mongoose'
+import { jwplayerUrl } from '../utils/jwplayer'
+const Schema = mongoose.Schema
 
-var VodSchema = new Schema({
+const vodSchema = new Schema({
   programName_en: {
     type: String,
     required: 'programName_en is required',
@@ -78,4 +78,14 @@ var VodSchema = new Schema({
   versionKey: false,
 })
 
-module.exports = mongoose.model('Vod', VodSchema)
+vodSchema.post('findOne', vod => {
+  vod.promoUrl = jwplayerUrl(vod.promoUrl)
+  vod.videoUrl = jwplayerUrl(vod.videoUrl)
+})
+vodSchema.post('find', vods => {
+  vods.forEach(vod => {
+    vod.promoUrl = jwplayerUrl(vod.promoUrl)
+    vod.videoUrl = jwplayerUrl(vod.videoUrl)
+  })
+})
+module.exports = mongoose.model('Vod', vodSchema)
