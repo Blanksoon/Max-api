@@ -112,6 +112,7 @@ module.exports = function(app) {
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
   //app.route('/subscribe').post(middleware, order.subscribe)
   app.get('/product', order.products)
+  app.get('/subscribe-history', order.fetchSubscribe)
 
   // Paypal checkout
   app.route('/ppcheckout/webhooks').post(ppcheckout.createWebhook)

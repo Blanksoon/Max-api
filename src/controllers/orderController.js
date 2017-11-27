@@ -355,44 +355,44 @@ exports.checkSubScribe = async function(req, res) {
   return res.json(output)
 }
 
-exports.subscribe = async function(req, res) {
-  var statusOrders = ''
-  var output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: [],
-  }
-  //console.log('req.decoded.data.email', req.decoded.data.email)
-  //console.log(req.body.promocode)
-  if (req.body.promocode == 'MWC2016') {
-    statusOrders = await findOrders(
-      {
-        userId: req.decoded.data.email,
-        productId: req.body.promocode,
-      },
-      output
-    )
-    //console.log('hi', statusOrders)
-    if (statusOrders == `you don't have ticket`) {
-      var dateNow = new Date()
-      var endDate = moment(dateNow).add(1, 'months')
-      var order = {
-        userId: req.decoded.data.email,
-        productId: req.body.promocode,
-        endDate: endDate,
-      }
-      var newOrder = new Order(order)
-      await creatOrders(newOrder, output)
-    }
-    return res.json(output)
-  } else {
-    output.status.message = 'invalid promocode'
-    return res.json(output)
-  }
-}
+// exports.subscribe = async function(req, res) {
+//   var statusOrders = ''
+//   var output = {
+//     status: {
+//       code: 400,
+//       success: false,
+//       message: defaultErrorMessage,
+//     },
+//     data: [],
+//   }
+//   //console.log('req.decoded.data.email', req.decoded.data.email)
+//   //console.log(req.body.promocode)
+//   if (req.body.promocode == 'MWC2016') {
+//     statusOrders = await findOrders(
+//       {
+//         userId: req.decoded.data.email,
+//         productId: req.body.promocode,
+//       },
+//       output
+//     )
+//     //console.log('hi', statusOrders)
+//     if (statusOrders == `you don't have ticket`) {
+//       var dateNow = new Date()
+//       var endDate = moment(dateNow).add(1, 'months')
+//       var order = {
+//         userId: req.decoded.data.email,
+//         productId: req.body.promocode,
+//         endDate: endDate,
+//       }
+//       var newOrder = new Order(order)
+//       await creatOrders(newOrder, output)
+//     }
+//     return res.json(output)
+//   } else {
+//     output.status.message = 'invalid promocode'
+//     return res.json(output)
+//   }
+// }
 
 exports.products = async function(req, res) {
   var output = {
@@ -588,4 +588,33 @@ exports.purchaseHistory = async function(req, res) {
   output.status.message = 'success'
   output.data = decoded
   res.send(output)
+}
+
+exports.fetchSubscribe = async function(req, res) {
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  const token = req.query.token
+  let decoded = await readJwt(token, req)
+  let today = Date.now()
+  const order = await Order.find({
+    userId: decoded.data._id,
+    $or: [
+      { productId: '5a0c040eb29318da40e335ef' },
+      { productId: '59dc6d66af142842d0bc2551' },
+    ],
+    status: 'approved',
+    expiredDate: { $gte: today },
+  })
+  //console.log(order)
+  output.status.code = 200
+  output.status.success = true
+  output.status.message = 'success'
+  output.data = order
+  res.status(200).send(output)
 }

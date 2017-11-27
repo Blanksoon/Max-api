@@ -183,10 +183,10 @@ exports.billingPlans = async function(req, res) {
     description: 'Watch unlimited lives and vods for 1 months : 3.99$',
     merchant_preferences: {
       auto_bill_amount: 'yes',
-      cancel_url: 'http://localhost:3002/subscribe/cancel',
+      cancel_url: 'http://159.203.140.5:3002/subscribe/cancel',
       initial_fail_amount_action: 'continue',
       max_fail_attempts: '1',
-      return_url: 'http://localhost:3002/subscribe/success',
+      return_url: 'http://159.203.140.5:3002/subscribe/success',
     },
     name: 'Monthly',
     payment_definitions: [
@@ -291,7 +291,7 @@ exports.subscribe = async function(req, res) {
       }
     } else {
       if (subscribeProduct) {
-        console.log(subscribeProduct)
+        //console.log(subscribeProduct)
         const order = new Order({
           productId: subscribeProduct._id,
           productName: subscribeProduct.title_en,
@@ -324,10 +324,10 @@ exports.subscribe = async function(req, res) {
         const n = billingAgreement.links[0].href.indexOf('token=')
         const str = 'token='
         const tokenSubscribes = billangUrl.substr(n + str.length)
-        console.log('token', tokenSubscribes)
-        console.log('userId', userId)
-        console.log('subscribeProduct._id', subscribeProduct._id)
-        console.log('expiredDate', expiredDate)
+        // console.log('token', tokenSubscribes)
+        // console.log('userId', userId)
+        // console.log('subscribeProduct._id', subscribeProduct._id)
+        // console.log('expiredDate', expiredDate)
         const saved = await order.save()
         await Order.findOneAndUpdate(
           {
