@@ -346,10 +346,10 @@ exports.successSubscribe = async function(req, res) {
             paymentId: result.id,
             payerId: result.payer.payer_info.payer_id,
           }
-          console.log('jjjjjj', result.agreement_details.next_billing_date)
+          //console.log('jjjjjj', result.agreement_details.next_billing_date)
           order.expiredDate = result.agreement_details.next_billing_date
           await order.save()
-          console.log('hiz')
+          //console.log('hiz')
           res.status(200).send({
             status: {
               code: 200,

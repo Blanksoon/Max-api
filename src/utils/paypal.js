@@ -52,6 +52,7 @@ export async function createPayment(order) {
         console.log(error)
         reject(error)
       } else {
+        console.log(payment)
         payment.links.forEach(link => {
           if (link.rel === 'approval_url') {
             resolve(link.href)
