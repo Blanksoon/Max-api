@@ -72,9 +72,11 @@ const readJwt = (token, req) => {
 
 const queryOrder = query => {
   return new Promise((resolve, reject) => {
+    //console.log('query', query)
     let statusOders = ''
     Order.find(query)
       .then(function(order) {
+        //console.log('order', Object.keys(order).length)
         if (Object.keys(order).length != 0) {
           statusOders = 'you have purchase'
           resolve(order)
@@ -137,9 +139,10 @@ function setData(data) {
 
 async function decodeJwt(token, req, type) {
   var status = {}
-  var today = Date.now()
+  var today = new Date()
   try {
     const decode = await readJwt(token, req)
+    //console.log(decode.data._id)
     let query = {
       userId: decode.data._id,
       expiredDate: { $gte: today },
@@ -155,6 +158,7 @@ async function decodeJwt(token, req, type) {
       status = decode.statusJwt
     } else {
       const order = await queryOrder(query)
+      //console.log(order)
       status = order
     }
   } catch (err) {
@@ -266,30 +270,31 @@ function setDate(notPaidLive) {
 }
 const setDataProduct = (data, exceptionData, type) => {
   return new Promise((resolve, reject) => {
+    //console.log('data', data)
     try {
-      if (type == 'lives') {
-        let i = 0
-        while (i < data.length) {
-          //const result = data.filter(product => product.productId != exceptionData)
-          if (data[i] == null) {
-          } else if (data[i]._id == exceptionData) {
-            data[i].status = 'unenable'
-          }
-          i++
+      //if (type == 'lives') {
+      let i = 0
+      while (i < data.length) {
+        //const result = data.filter(product => product.productId != exceptionData)
+        if (data[i] == null) {
+        } else if (data[i]._id == exceptionData) {
+          data[i].status = 'unenable'
         }
-        resolve('hi')
-      } else {
-        let i = 0
-        while (i < data.length) {
-          //const result = data.filter(product => product.productId != exceptionData)
-          if (data[i] == null) {
-          } else if (data[i].productId == exceptionData) {
-            data[i].status = 'unenable'
-          }
-          i++
-        }
-        resolve('hi')
+        i++
       }
+      resolve('hi')
+      // } else {
+      //   let i = 0
+      //   while (i < data.length) {
+      //     //const result = data.filter(product => product.productId != exceptionData)
+      //     if (data[i] == null) {
+      //     } else if (data[i].productId == exceptionData) {
+      //       data[i].status = 'unenable'
+      //     }
+      //     i++
+      //   }
+      //   resolve('hi')
+      // }
     } catch (err) {
       resolve(err)
     }
@@ -427,7 +432,7 @@ exports.products = async function(req, res) {
   } else {
     const decoded = await decodeJwt(token, req)
     if (decoded == `you have't purchase`) {
-      //console.log('hisx')
+      console.log('hisx')
       output.status.code = 200
       output.status.success = true
       output.status.message = 'success'
@@ -437,12 +442,14 @@ exports.products = async function(req, res) {
     } else if (decoded == `Failed to authenticate token.`) {
       output.status.message = 'Failed to authenticate token.'
     } else {
+      //console.log('gik')
       const product = []
       let i = 0
       while (i < decoded.length) {
         product[i] = decoded[i].productId
         i++
       }
+      console.log(product)
       i = 0
       const notPaidLive = outputvods.data
       //console.log('ff', notPaidLive[1].productId)

@@ -269,7 +269,7 @@ exports.subscribe = async function(req, res) {
   try {
     const decode = await readJwt(token, req)
     const productId = req.params.subscribeId
-    const userId = decode.data._id
+    let userId = decode.data._id
     const email = decode.data.email
     const isoDate = new Date()
     let today = new Date()
@@ -308,7 +308,6 @@ exports.subscribe = async function(req, res) {
           },
           status: 'created',
         })
-        const saved = await order.save()
         const billingAgreementAttributes = {
           name: subscribeProduct.title_en,
           description: subscribeProduct.description,
@@ -329,11 +328,13 @@ exports.subscribe = async function(req, res) {
         console.log('userId', userId)
         console.log('subscribeProduct._id', subscribeProduct._id)
         console.log('expiredDate', expiredDate)
+        const saved = await order.save()
         await Order.findOneAndUpdate(
           {
             userId: userId,
             productId: subscribeProduct._id,
             expiredDate: { $gte: today },
+            status: 'created',
           },
           {
             'paypal.payerId': null,
@@ -381,8 +382,8 @@ exports.successSubscribe = async function(req, res) {
             paymentId: result.id,
             payerId: result.payer.payer_info.payer_id,
           }
-          //console.log('jjjjjj', result.agreement_details.next_billing_date)
-          order.expiredDate = result.agreement_details.next_billing_date
+          //console.log('jjjjjj', result.agreement_details)
+          //order.expiredDate = result.agreement_details.next_billing_date
           await order.save()
           //console.log('hiz')
           // res.status(200).send({
