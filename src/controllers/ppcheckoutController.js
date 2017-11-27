@@ -43,35 +43,36 @@ const readJwtBraintree = (token, req) => {
   })
 }
 
-// const createCustomerBraintree = (data, gateway) => {
-//   return new Promise((resolve, reject) => {
-//     gateway.customer.create(
-//       {
-//         firstName: 'Charity',
-//         lastName: 'Smith',
-//         paymentMethodNonce: nonceFromTheClient,
-//       },
-//       function(err, result) {
-//         if (err) {
-//           console.log('1',err)
-//         }else{
-//           console.log('2',result.success)
-//           console.log('3',result.customer.id)
-//           console.log('4',result.customer.paymentMethods[0].token)
-//resolve
-//}
-//result.success
-// true
+const createCustomerBraintree = (data, gateway) => {
+  return new Promise((resolve, reject) => {
+    gateway.customer.create(
+      {
+        firstName: 'Charity',
+        lastName: 'Smith',
+        paymentMethodNonce: nonceFromTheClient,
+      },
+      function(err, result) {
+        if (err) {
+          console.log('1', err)
+          resolve('hi')
+        } else {
+          console.log('2', result.success)
+          console.log('3', result.customer.id)
+          console.log('4', result.customer.paymentMethods[0].token)
+          resolve('hi')
+        }
+        // result.success
+        // true
 
-//result.customer.id
-// e.g 160923
+        // result.customer.id
+        // e.g 160923
 
-//result.customer.paymentMethods[0].token
-// e.g f28wm
-//       }
-//     )
-//   })
-// }
+        // result.customer.paymentMethods[0].token
+        // e.g f28wm
+      }
+    )
+  })
+}
 
 exports.createPayment = async function(req, res) {
   const token = req.query.token
@@ -291,7 +292,7 @@ exports.subscribe = async function(req, res) {
   try {
     const decode = await readJwt(token, req)
     const productId = req.params.subscribeId
-    const userId = decode.data._id
+    let userId = decode.data._id
     const email = decode.data.email
     const isoDate = new Date()
     let today = new Date()
@@ -330,7 +331,6 @@ exports.subscribe = async function(req, res) {
           },
           status: 'created',
         })
-        const saved = await order.save()
         const billingAgreementAttributes = {
           name: subscribeProduct.title_en,
           description: subscribeProduct.description,
@@ -346,19 +346,23 @@ exports.subscribe = async function(req, res) {
         const billangUrl = billingAgreement.links[0].href
         const n = billingAgreement.links[0].href.indexOf('token=')
         const str = 'token='
-        const tokenSubscribe = billangUrl.substr(n + str.length)
+        const tokenSubscribes = billangUrl.substr(n + str.length)
+        console.log('token', tokenSubscribes)
+        console.log('userId', userId)
+        console.log('subscribeProduct._id', subscribeProduct._id)
+        console.log('expiredDate', expiredDate)
+        const saved = await order.save()
         await Order.findOneAndUpdate(
           {
             userId: userId,
             productId: subscribeProduct._id,
-            expiredDate: expiredDate,
+            expiredDate: { $gte: today },
+            status: 'created',
           },
           {
-            paypal: {
-              payerId: null,
-              paymentId: null,
-              tokenSubscribe: tokenSubscribe,
-            },
+            'paypal.payerId': null,
+            'paypal.paymentId': null,
+            'paypal.tokenSubscribe': tokenSubscribes,
           }
         )
         res.status(200).send({ approvalUrl: billingAgreement.links[0].href })
@@ -401,8 +405,8 @@ exports.successSubscribe = async function(req, res) {
             paymentId: result.id,
             payerId: result.payer.payer_info.payer_id,
           }
-          //console.log('jjjjjj', result.agreement_details.next_billing_date)
-          order.expiredDate = result.agreement_details.next_billing_date
+          //console.log('jjjjjj', result.agreement_details)
+          //order.expiredDate = result.agreement_details.next_billing_date
           await order.save()
           //console.log('hiz')
           // res.status(200).send({
