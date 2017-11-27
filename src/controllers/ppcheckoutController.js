@@ -667,7 +667,6 @@ exports.cancelReleasePayment = async function(req, res) {
   }
 }
 
-<<<<<<< HEAD
 // Web hook
 exports.createWebhook = async function(req, res) {
   const eventTypes = [
@@ -683,7 +682,6 @@ exports.createWebhook = async function(req, res) {
 }
 exports.webhookHandler = async function(req, res) {
   console.log(req)
-=======
 exports.subscribeBraintree = async function(req, res) {
   const token = req.query.token
   try {
@@ -876,5 +874,4 @@ exports.cancelSubscribeBraintree = async function(req, res) {
       data: [],
     })
   }
->>>>>>> 703c6fdb35be2c96d38a9d45bb28b36f398f55f2
 }
