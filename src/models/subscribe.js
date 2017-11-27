@@ -19,6 +19,10 @@ var SubscribeSchema = new Schema({
     type: String,
     default: null,
   },
+  billingPlanIdBraintree: {
+    type: String,
+    default: null,
+  },
   title_en: {
     type: String,
     default: null,

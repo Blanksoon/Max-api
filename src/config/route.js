@@ -127,7 +127,7 @@ module.exports = function(app) {
   app
     .route('/cancel-live-paypal-braintree')
     .post(ppcheckout.cancelReleasePayment)
-
+  app.route('/subscribe-paypal-braintree').post(ppcheckout.subscribeBraintree)
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
   app.route('/fb-login').post(user.fbLogin)
