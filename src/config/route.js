@@ -120,16 +120,16 @@ module.exports = function(app) {
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)
   app.route('/billingplans').post(ppcheckout.billingPlans)
-  app.route('/subscribe').post(ppcheckout.subscribe)
+  app.route('/subscribe/:subscribeId').post(ppcheckout.subscribe)
   app.route('/subscribe/success').get(ppcheckout.successSubscribe)
-  app.route('/client_token').get(ppcheckout.BraintreeToken)
+  app.route('/client_token').get(ppcheckout.braintreeToken)
   app
     .route('/purchase-live-paypal-braintree')
     .post(ppcheckout.createAndSettledPayment)
   app
     .route('/cancel-live-paypal-braintree')
     .post(ppcheckout.cancelReleasePayment)
-
+  app.route('/subscribe-paypal-braintree').post(ppcheckout.subscribeBraintree)
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
   app.route('/fb-login').post(user.fbLogin)
