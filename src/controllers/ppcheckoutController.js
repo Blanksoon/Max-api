@@ -43,35 +43,36 @@ const readJwtBraintree = (token, req) => {
   })
 }
 
-// const createCustomerBraintree = (data, gateway) => {
-//   return new Promise((resolve, reject) => {
-//     gateway.customer.create(
-//       {
-//         firstName: 'Charity',
-//         lastName: 'Smith',
-//         paymentMethodNonce: nonceFromTheClient,
-//       },
-//       function(err, result) {
-//         if (err) {
-//           console.log('1',err)
-//         }else{
-//           console.log('2',result.success)
-//           console.log('3',result.customer.id)
-//           console.log('4',result.customer.paymentMethods[0].token)
-//resolve
-//}
-//result.success
-// true
+const createCustomerBraintree = (data, gateway) => {
+  return new Promise((resolve, reject) => {
+    gateway.customer.create(
+      {
+        firstName: 'Charity',
+        lastName: 'Smith',
+        paymentMethodNonce: nonceFromTheClient,
+      },
+      function(err, result) {
+        if (err) {
+          console.log('1', err)
+          resolve('hi')
+        } else {
+          console.log('2', result.success)
+          console.log('3', result.customer.id)
+          console.log('4', result.customer.paymentMethods[0].token)
+          resolve('hi')
+        }
+        // result.success
+        // true
 
-//result.customer.id
-// e.g 160923
+        // result.customer.id
+        // e.g 160923
 
-//result.customer.paymentMethods[0].token
-// e.g f28wm
-//       }
-//     )
-//   })
-// }
+        // result.customer.paymentMethods[0].token
+        // e.g f28wm
+      }
+    )
+  })
+}
 
 exports.createPayment = async function(req, res) {
   const token = req.query.token
@@ -323,19 +324,21 @@ exports.subscribe = async function(req, res) {
         const billangUrl = billingAgreement.links[0].href
         const n = billingAgreement.links[0].href.indexOf('token=')
         const str = 'token='
-        const tokenSubscribe = billangUrl.substr(n + str.length)
+        const tokenSubscribes = billangUrl.substr(n + str.length)
+        console.log('token', tokenSubscribes)
+        console.log('userId', userId)
+        console.log('subscribeProduct._id', subscribeProduct._id)
+        console.log('expiredDate', expiredDate)
         await Order.findOneAndUpdate(
           {
             userId: userId,
             productId: subscribeProduct._id,
-            expiredDate: expiredDate,
+            expiredDate: { $gte: today },
           },
           {
-            paypal: {
-              payerId: null,
-              paymentId: null,
-              tokenSubscribe: tokenSubscribe,
-            },
+            'paypal.payerId': null,
+            'paypal.paymentId': null,
+            'paypal.tokenSubscribe': tokenSubscribes,
           }
         )
         res.status(200).send({ approvalUrl: billingAgreement.links[0].href })
