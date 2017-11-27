@@ -19,6 +19,14 @@ var SubscribeSchema = new Schema({
     type: String,
     default: null,
   },
+  title_en: {
+    type: String,
+    default: null,
+  },
+  description: {
+    type: String,
+    default: null,
+  },
   versionKey: false,
 })
 

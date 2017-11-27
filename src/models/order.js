@@ -55,6 +55,7 @@ var OrderSchema = new Schema({
   paypal: {
     payerId: String,
     paymentId: String,
+    tokenSubscribe: String,
   },
   versionKey: false,
 })

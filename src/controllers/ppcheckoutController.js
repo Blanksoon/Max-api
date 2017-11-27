@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken'
 import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
+import Subscribe from '../models/subscribe'
+import moment from 'moment'
 import {
   createPayment,
   executePayment,
@@ -66,7 +68,7 @@ exports.createPayment = async function(req, res) {
       })
       const saved = await order.save()
       const approvalUrl = await createPayment(saved)
-      res.redirect(approvalUrl)
+      res.send(approvalUrl)
     } else {
       throw {
         code: 404,
@@ -148,7 +150,7 @@ exports.billingPlans = async function(req, res) {
     description: 'Watch unlimited lives and vods for 1 months : 3.99$',
     merchant_preferences: {
       auto_bill_amount: 'yes',
-      cancel_url: 'http://localhost:30002/subscribe/cancel',
+      cancel_url: 'http://localhost:3002/subscribe/cancel',
       initial_fail_amount_action: 'continue',
       max_fail_attempts: '1',
       return_url: 'http://localhost:3002/subscribe/success',
@@ -221,23 +223,96 @@ exports.billingPlans = async function(req, res) {
 }
 
 exports.subscribe = async function(req, res) {
-  const isoDate = new Date()
-  isoDate.setSeconds(isoDate.getSeconds() + 4)
-  isoDate.toISOString().slice(0, 19) + 'Z'
-  const billingAgreementAttributes = {
-    name: 'Unlimited lives and vods',
-    description: 'Watch unlimited lives and vods for 1 month : 3.99$',
-    start_date: isoDate,
-    plan: {
-      id: 'P-5U1854360P88355135QTIYZI',
+  console.log('hi')
+  const token = req.query.token
+  const output = {
+    status: {
+      code: 400,
+      success: false,
+      message: '',
     },
-    payer: {
-      payment_method: 'paypal',
-    },
+    data: {},
   }
   try {
-    const approval_url = await createBilling(billingAgreementAttributes)
-    res.redirect(approval_url)
+    const decode = await readJwt(token, req)
+    const productId = req.body.productId
+    const userId = decode.data._id
+    const email = decode.data.email
+    const isoDate = new Date()
+    let today = new Date()
+    today = Date.now()
+    isoDate.setSeconds(isoDate.getSeconds() + 4)
+    isoDate.toISOString().slice(0, 19) + 'Z'
+    const subscribeProduct = await Subscribe.findOne({ _id: productId })
+    //const expiredDate = new Date(live.liveToDate)
+    const expiredDate = moment(today)
+      .add(30, 'day')
+      .calendar()
+    if (typeof token === 'undefined' || token === '') {
+      throw {
+        message: 'token is undefiend',
+      }
+    } else if (decode.code == 401) {
+      throw {
+        message: decode.message,
+      }
+    } else {
+      if (subscribeProduct) {
+        console.log(subscribeProduct)
+        const order = new Order({
+          productId: subscribeProduct._id,
+          productName: subscribeProduct.title_en,
+          userId,
+          email,
+          price: subscribeProduct.price,
+          purchaseDate: today,
+          platform: 'paypal',
+          expiredDate: expiredDate,
+          paypal: {
+            payerId: null,
+            paymentId: null,
+            tokenSubscribe: null,
+          },
+          status: 'created',
+        })
+        const saved = await order.save()
+        const billingAgreementAttributes = {
+          name: subscribeProduct.title_en,
+          description: subscribeProduct.description,
+          start_date: isoDate,
+          plan: {
+            id: subscribeProduct.billingPlanId,
+          },
+          payer: {
+            payment_method: 'paypal',
+          },
+        }
+        const billingAgreement = await createBilling(billingAgreementAttributes)
+        const billangUrl = billingAgreement.links[0].href
+        const n = billingAgreement.links[0].href.indexOf('token=')
+        const str = 'token='
+        const tokenSubscribe = billangUrl.substr(n + str.length)
+        await Order.findOneAndUpdate(
+          {
+            userId: userId,
+            productId: subscribeProduct._id,
+            expiredDate: expiredDate,
+          },
+          {
+            paypal: {
+              payerId: null,
+              paymentId: null,
+              tokenSubscribe: tokenSubscribe,
+            },
+          }
+        )
+        res.status(200).send(billingAgreement.links[0].href)
+      } else {
+        throw {
+          message: 'target subscribe not found',
+        }
+      }
+    }
   } catch (error) {
     res.status(200).send({
       status: {
@@ -252,11 +327,49 @@ exports.subscribe = async function(req, res) {
 
 exports.successSubscribe = async function(req, res) {
   const paymentToken = req.query.token
+  //console.log('token', paymentToken)
+  //const orderId = req.params.orderId
+  //console.log('hi')
+  const order = await Order.findOne({
+    'paypal.tokenSubscribe': paymentToken,
+  })
+  //console.log('order', order)
   try {
-    const result = await excuteBilling(paymentToken)
-    res.status(200).send({
-      result,
-    })
+    if (order) {
+      try {
+        const result = await excuteBilling(paymentToken)
+        //console.log('result', result)
+        if (result.state === 'Active') {
+          order.status = 'approved'
+          order.paypal = {
+            tokenSubscribe: result.id,
+            paymentId: result.id,
+            payerId: result.payer.payer_info.payer_id,
+          }
+          console.log('jjjjjj', result.agreement_details.next_billing_date)
+          order.expiredDate = result.agreement_details.next_billing_date
+          await order.save()
+          console.log('hiz')
+          res.status(200).send({
+            status: {
+              code: 200,
+              success: true,
+              message: 'thank you for purchase',
+            },
+            data: [],
+          })
+        }
+      } catch (error) {
+        order.status = 'error'
+        await order.save()
+        throw error.response
+      }
+    } else {
+      throw {
+        code: 404,
+        message: 'order not found',
+      }
+    }
   } catch (error) {
     res.status(200).send({
       status: {
@@ -268,6 +381,7 @@ exports.successSubscribe = async function(req, res) {
     })
   }
 }
+
 exports.BraintreeToken = async function(req, res) {
   const token = req.query.token
   const output = {
@@ -279,7 +393,7 @@ exports.BraintreeToken = async function(req, res) {
     data: {},
   }
   const decode = await readJwtBraintree(token, req)
-  if (typeof token == 'undefined' || token == '') {
+  if (typeof token === 'undefined' || token === '') {
     output.status.message = 'token is undefiend'
     res.send(output)
   } else if (decode.code == 401) {

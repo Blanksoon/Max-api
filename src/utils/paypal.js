@@ -173,14 +173,14 @@ export function createBilling(billingAgreementAttributes) {
         reject(error)
       } else {
         console.log('Create Billing Agreement Response')
-        //console.log(billingAgreement);
+        console.log('billingAgreement', billingAgreement.links[0].href)
         for (var index = 0; index < billingAgreement.links.length; index++) {
           if (billingAgreement.links[index].rel === 'approval_url') {
             var approval_url = billingAgreement.links[index].href
             console.log(
               'For approving subscription via Paypal, first redirect user to'
             )
-            resolve(approval_url)
+            resolve(billingAgreement)
             // console.log('Payment token is')
             // console.log(url.parse(approval_url, true).query.token)
             // See billing_agreements/execute.js to see example for executing agreement
@@ -191,7 +191,6 @@ export function createBilling(billingAgreementAttributes) {
     })
   })
 }
-
 export function excuteBilling(paymentToken) {
   //const paymentToken = req.query.token
 
@@ -204,12 +203,13 @@ export function excuteBilling(paymentToken) {
       billingAgreement
     ) {
       if (error) {
+        console.log('hfjfjjffjjf')
         console.log(error)
         reject(error)
       } else {
         console.log('Billing Agreement Execute Response')
-        console.log(JSON.stringify(billingAgreement))
-        resolve(JSON.stringify(billingAgreement))
+        //console.log(JSON.stringify(billingAgreement))
+        resolve(billingAgreement)
         //res.send(JSON.stringify(billingAgreement))
       }
     })

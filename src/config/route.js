@@ -110,7 +110,7 @@ module.exports = function(app) {
   // Order and Transection Routes
   app.route('/order').post(middleware, order.search)
   app.route('/checksubscribe').post(middleware, order.checkSubScribe)
-  app.route('/subscribe').post(middleware, order.subscribe)
+  //app.route('/subscribe').post(middleware, order.subscribe)
   app.get('/product', order.products)
 
   // Paypal checkout
