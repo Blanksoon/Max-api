@@ -602,12 +602,17 @@ exports.fetchSubscribe = async function(req, res) {
   }
   const token = req.query.token
   let decoded = await readJwt(token, req)
+  if (!decoded.data) {
+    output.status.message = decoded.statusJwt
+    res.status(200).send(output)
+  }
+
   let today = Date.now()
   const order = await Order.find({
     userId: decoded.data._id,
     $or: [
       { productId: '5a0c040eb29318da40e335ef' },
-      { productId: '59dc6d66af142842d0bc2551' },
+      { productId: '5a0c0450b29318da40e335f0' },
     ],
     status: 'approved',
     expiredDate: { $gte: today },
