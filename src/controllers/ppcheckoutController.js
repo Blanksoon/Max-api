@@ -518,7 +518,7 @@ exports.webhookHandler = async function(req, res) {
 //braintree
 exports.subscribeBraintree = async function(req, res) {
   const token = req.query.token
-  const productId = req.params.productId
+  const productId = req.body.productId
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id
@@ -673,7 +673,7 @@ exports.subscribeBraintree = async function(req, res) {
 
 exports.cancelSubscribeBraintree = async function(req, res) {
   const token = req.query.token
-  const productId = req.params.productId
+  const productId = req.body.productId
   let gateway = braintree.connect({
     environment: braintree.Environment.Sandbox,
     merchantId: 'hcd2xp39kgttcpsm',
