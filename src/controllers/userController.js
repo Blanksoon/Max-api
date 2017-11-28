@@ -957,6 +957,7 @@ exports.updateUser = async function(req, res) {
     _id: user._id,
     name: user.name,
     lastname: user.lastname,
+    gender: user.gender,
     country: user.country,
     date_birth: user.date_birth,
   }
