@@ -612,6 +612,7 @@ exports.fetchSubscribe = async function(req, res) {
     $or: [
       { productId: '5a0c040eb29318da40e335ef' },
       { productId: '59dc6d66af142842d0bc2551' },
+      { productId: '5a0c0450b29318da40e335f0' },
     ],
     status: 'approved',
     expiredDate: { $gte: today },
