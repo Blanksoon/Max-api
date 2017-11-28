@@ -953,9 +953,17 @@ exports.updateUser = async function(req, res) {
     },
     { new: true }
   )
-  //console.log('user', user)
+  const userData = {
+    _id: user._id,
+    name: user.name,
+    lastname: user.lastname,
+    country: user.country,
+    date_birth: user.date_birth,
+  }
+  console.log('user', userData)
   output.status.code = 200
   output.status.success = true
   output.status.message = 'successful to update profile'
+  output.data = userData
   res.send(output)
 }
