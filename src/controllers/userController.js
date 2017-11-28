@@ -955,6 +955,7 @@ exports.updateUser = async function(req, res) {
   )
   const userData = {
     _id: user._id,
+    email: user.email,
     name: user.name,
     lastname: user.lastname,
     gender: user.gender,
