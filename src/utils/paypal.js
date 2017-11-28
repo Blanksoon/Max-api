@@ -281,7 +281,6 @@ export function cancelBilling(billingAgreementId) {
     })
   })
 }
-
 export function findTransactions() {
   var billingAgreementId = 'I-LU134TMXS648'
 

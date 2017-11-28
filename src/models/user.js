@@ -40,6 +40,9 @@ var UserSchema = new Schema({
     type: String,
     default: 'active',
   },
+  braintree: {
+    paymentMethod: String,
+  },
   versionKey: false,
 })
 

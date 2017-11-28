@@ -3,6 +3,7 @@ import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
 import Subscribe from '../models/subscribe'
+import User from '../models/user'
 import moment from 'moment'
 import {
   createPayment,
@@ -45,23 +46,27 @@ const readJwtBraintree = (token, req) => {
   })
 }
 
-const createCustomerBraintree = (data, gateway) => {
+const createCustomerBraintree = (nonceFromTheClient, gateway, email) => {
+  console.log('createCustomerBraintree')
   return new Promise((resolve, reject) => {
     gateway.customer.create(
       {
-        firstName: 'Charity',
-        lastName: 'Smith',
+        //firstname: email,
+        email: email,
         paymentMethodNonce: nonceFromTheClient,
       },
       function(err, result) {
         if (err) {
           console.log('1', err)
-          resolve('hi')
-        } else {
+          reject('hi')
+        } else if (result.success) {
           console.log('2', result.success)
           console.log('3', result.customer.id)
           console.log('4', result.customer.paymentMethods[0].token)
-          resolve('hi')
+          resolve(result.customer.paymentMethods[0].token)
+        } else {
+          console.log(result)
+          reject(result)
         }
         // result.success
         // true
@@ -513,23 +518,24 @@ exports.webhookHandler = async function(req, res) {
 //braintree
 exports.subscribeBraintree = async function(req, res) {
   const token = req.query.token
+  const productId = req.params.productId
   try {
     const decode = await readJwt(token, req)
-    const productId = req.body.productId
     const userId = decode.data._id
     const email = decode.data.email
-    const isoDate = new Date()
+    let nonceFromTheClient = req.body.nonceFromTheClient
+    let gateway = braintree.connect({
+      environment: braintree.Environment.Sandbox,
+      merchantId: 'hcd2xp39kgttcpsm',
+      publicKey: 'snd9fsqtb8rwbrbt',
+      privateKey: '9eda331084fe0007bdbda77a783bebf6',
+    })
     let today = new Date()
     today = Date.now()
-    isoDate.setSeconds(isoDate.getSeconds() + 4)
-    isoDate.toISOString().slice(0, 19) + 'Z'
-    const subscribeProduct = await Subscribe.findOne({ _id: productId })
-    //const expiredDate = new Date(live.liveToDate)
     const expiredDate = moment(today)
       .add(30, 'day')
       .calendar()
     if (typeof token === 'undefined' || token === '') {
-      console.log('hi')
       throw {
         message: 'token is undefiend',
       }
@@ -538,61 +544,118 @@ exports.subscribeBraintree = async function(req, res) {
         message: decode.message,
       }
     } else {
-      if (subscribeProduct) {
-        console.log(subscribeProduct)
-        const order = new Order({
-          productId: subscribeProduct._id,
-          productName: subscribeProduct.title_en,
-          userId,
-          email,
-          price: subscribeProduct.price,
-          purchaseDate: today,
-          platform: 'paypal',
-          expiredDate: expiredDate,
-          paypal: {
-            payerId: null,
-            paymentId: null,
-            tokenSubscribe: null,
-          },
-          status: 'created',
-        })
-        const saved = await order.save()
-        let gateway = braintree.connect({
-          environment: braintree.Environment.Sandbox,
-          merchantId: 'hcd2xp39kgttcpsm',
-          publicKey: 'snd9fsqtb8rwbrbt',
-          privateKey: '9eda331084fe0007bdbda77a783bebf6',
-        })
-        gateway.subscription.create(
-          {
-            paymentMethodNonce: 'cf8ae9d7-bf01-0a0a-5e10-a0c28400e6f8',
-            planId: subscribeProduct.billingPlanIdBraintree,
-          },
-          async function(error, result) {
-            if (error) {
-              throw error
-            } else {
-              // await Order.findOneAndUpdate(
-              //   {
-              //     userId: userId,
-              //     productId: subscribeProduct._id,
-              //     expiredDate: expiredDate,
-              //   },
-              //   {
-              //     paypal: {
-              //       payerId: null,
-              //       paymentId: null,
-              //       tokenSubscribe: tokenSubscribe,
-              //     },
-              //   }
-              // )
-              res.status(200).send(result)
+      const customer = await User.findOne({ _id: decode.data._id })
+      if (customer) {
+        if (customer.braintree.paymentMethod === undefined) {
+          const user = await createCustomerBraintree(
+            nonceFromTheClient,
+            gateway,
+            customer.email
+          )
+          customer.braintree.paymentMethod = user
+          await customer.save()
+          const subscribeProduct = await Subscribe.findOne({ _id: productId })
+          if (subscribeProduct) {
+            let order = new Order({
+              productId: subscribeProduct._id,
+              productName: subscribeProduct.title_en,
+              userId,
+              email,
+              price: subscribeProduct.price,
+              purchaseDate: today,
+              platform: 'paypal',
+              expiredDate: expiredDate,
+              paypal: {
+                payerId: null,
+                paymentId: null,
+                tokenSubscribe: null,
+              },
+              status: 'created',
+            })
+            const saved = await order.save()
+            gateway.subscription.create(
+              {
+                paymentMethodToken: user,
+                planId: subscribeProduct.billingPlanIdBraintree,
+              },
+              async function(error, result) {
+                if (error) {
+                  console.log('error', error)
+                  throw error
+                } else {
+                  order.paypal.tokenSubscribe = result.subscription.id
+                  order.paypal.payerId =
+                    result.subscription.transactions[0].customer.id
+                  order.paypal.paymentId =
+                    result.subscription.transactions[0].id
+                  order.status = 'approved'
+                  await order.save()
+                  res.status(200).send(result)
+                }
+              }
+            )
+          } else {
+            throw {
+              message: 'target subscribe not found',
             }
           }
-        )
+        } else {
+          const subscribeProduct = await Subscribe.findOne({ _id: productId })
+          if (subscribeProduct) {
+            let order = new Order({
+              productId: subscribeProduct._id,
+              productName: subscribeProduct.title_en,
+              userId,
+              email,
+              price: subscribeProduct.price,
+              purchaseDate: today,
+              platform: 'paypal',
+              expiredDate: expiredDate,
+              paypal: {
+                payerId: null,
+                paymentId: null,
+                tokenSubscribe: null,
+              },
+              status: 'created',
+            })
+            const saved = await order.save()
+            gateway.subscription.create(
+              {
+                paymentMethodToken: customer.braintree.paymentMethod,
+                planId: subscribeProduct.billingPlanIdBraintree,
+              },
+              async function(error, result) {
+                if (error) {
+                  console.log('error', error)
+                  throw error
+                } else {
+                  order.paypal.SubscribtionId = result.subscription.id
+                  order.paypal.payerId =
+                    result.subscription.transactions[0].customer.id
+                  order.paypal.paymentId =
+                    result.subscription.transactions[0].id
+                  order.status = 'approved'
+                  await order.save()
+                  res.status(200).send({
+                    status: {
+                      code: 200,
+                      success: true,
+                      message: 'thank you for your subscribtion',
+                    },
+                    data: [],
+                  })
+                }
+              }
+            )
+          } else {
+            throw {
+              message: 'target subscribe not found',
+            }
+          }
+        }
       } else {
         throw {
-          message: 'target subscribe not found',
+          message: 'user not found',
         }
       }
     }
@@ -610,16 +673,7 @@ exports.subscribeBraintree = async function(req, res) {
 
 exports.cancelSubscribeBraintree = async function(req, res) {
   const token = req.query.token
-  const productId = req.body.productId
-  const output = {
-    status: {
-      code: 400,
-      success: false,
-      message: '',
-    },
-    data: {},
-  }
-  let defaultErrorMessage = 'data_not_found'
+  const productId = req.params.productId
   let gateway = braintree.connect({
     environment: braintree.Environment.Sandbox,
     merchantId: 'hcd2xp39kgttcpsm',
@@ -631,64 +685,40 @@ exports.cancelSubscribeBraintree = async function(req, res) {
     let today = new Date()
     today = Date.now()
     if (typeof token == 'undefined' || token == '') {
-      output.status.message = 'token is undefiend'
-      res.send(output)
+      throw {
+        message: 'token not found',
+      }
     } else if (decode.code == 401) {
-      output.status.message = decode.message
-      res.send(output)
+      throw {
+        message: decode.message,
+      }
     } else {
-      const result = await Order.findOne({
+      const order = await Order.findOne({
         userId: decode.data._id,
         productId: productId,
         expiredDate: { $gte: today },
         status: 'approved',
       })
-      gateway.subscription.cancel(result.paypal.SubscribtionId, async function(
+      gateway.subscription.cancel(order.paypal.SubscribtionId, async function(
         err,
         result
       ) {
         if (err) {
-          res.status(200).send(err)
-        } else {
-          let message
-          if (result.errors != undefined) {
-            const deepErrors = result.errors.deepErrors()
-            for (var i in deepErrors) {
-              if (deepErrors.hasOwnProperty(i)) {
-                // console.log('codexxx', deepErrors[i].code)
-                // console.log('messagexxx', deepErrors[i].message)
-                message = deepErrors[i].message
-                //console.log('attributexxx', deepErrors[i].attribute)
-              }
-            }
-            output.status.message = message
-            res.status(200).send(output)
-          } else {
-            // console.log(
-            //   'decode.data._id',
-            //   decode.data._id,
-            //   'productId',
-            //   productId
-            // )
-            await Order.findOneAndUpdate(
-              {
-                userId: decode.data._id,
-                expiredDate: { $gte: today },
-                productId: productId,
-                status: 'approved',
-              },
-              {
-                status: 'cancel',
-                paypal: {
-                  paymentId: result.transaction.id,
-                },
-              }
-            )
-            output.status.code = 200
-            output.status.success = true
-            output.status.message = 'cancel transection success'
-            res.status(200).send(output)
+          throw {
+            error: err,
           }
+        } else {
+          order.status = 'cancelled'
+          order.cancelDate = today
+          await order.save()
+          res.status(200).send({
+            status: {
+              code: 200,
+              success: true,
+              message: 'cancelled subscribetion success',
+            },
+            data: [],
+          })
         }
       })
     }
@@ -900,7 +930,10 @@ exports.cancelReleasePayment = async function(req, res) {
         result
       ) {
         if (err) {
-          res.status(200).send(err)
+          throw {
+            message: err,
+          }
+          //res.status(200).send(err)
         } else {
           let message
           if (result.errors != undefined) {
@@ -914,7 +947,10 @@ exports.cancelReleasePayment = async function(req, res) {
               }
             }
             output.status.message = message
-            res.status(200).send(output)
+            //res.status(200).send(output)
+            throw {
+              message: message,
+            }
           } else {
             // console.log(
             //   'decode.data._id',
@@ -930,15 +966,16 @@ exports.cancelReleasePayment = async function(req, res) {
                 status: 'approved',
               },
               {
-                status: 'cancel',
+                status: 'cancelled',
                 paypal: {
                   paymentId: result.transaction.id,
                 },
+                cancelDate: today,
               }
             )
             output.status.code = 200
             output.status.success = true
-            output.status.message = 'cancel transection success'
+            output.status.message = 'cancelled transection success'
             res.status(200).send(output)
           }
         }

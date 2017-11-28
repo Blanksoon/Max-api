@@ -268,6 +268,7 @@ function setDate(notPaidLive) {
     i++
   }
 }
+
 const setDataProduct = (data, exceptionData, type) => {
   return new Promise((resolve, reject) => {
     //console.log('data', data)
@@ -432,7 +433,7 @@ exports.products = async function(req, res) {
   } else {
     const decoded = await decodeJwt(token, req)
     if (decoded == `you have't purchase`) {
-      console.log('hisx')
+      //console.log('hisx')
       output.status.code = 200
       output.status.success = true
       output.status.message = 'success'
