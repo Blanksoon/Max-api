@@ -953,6 +953,7 @@ exports.updateUser = async function(req, res) {
     },
     { new: true }
   )
+  const birthDay = moment(user.date_birth).format('YYYY-MM-DDTHH:MM:SS')
   const userData = {
     _id: user._id,
     email: user.email,
@@ -960,9 +961,9 @@ exports.updateUser = async function(req, res) {
     lastname: user.lastname,
     gender: user.gender,
     country: user.country,
-    date_birth: user.date_birth,
+    date_birth: birthDay,
   }
-  console.log('user', userData)
+  //console.log('user', userData)
   output.status.code = 200
   output.status.success = true
   output.status.message = 'successful to update profile'
