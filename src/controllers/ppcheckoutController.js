@@ -673,7 +673,7 @@ exports.subscribeBraintree = async function(req, res) {
 
 exports.cancelSubscribeBraintree = async function(req, res) {
   const token = req.query.token
-  const productId = req.body.productId
+  const orderId = req.body.orderId
   let gateway = braintree.connect({
     environment: braintree.Environment.Sandbox,
     merchantId: 'hcd2xp39kgttcpsm',
@@ -694,10 +694,7 @@ exports.cancelSubscribeBraintree = async function(req, res) {
       }
     } else {
       const order = await Order.findOne({
-        userId: decode.data._id,
-        productId: productId,
-        expiredDate: { $gte: today },
-        status: 'approved',
+        orderId: orderId,
       })
       gateway.subscription.cancel(order.paypal.SubscribtionId, async function(
         err,
