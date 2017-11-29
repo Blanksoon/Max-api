@@ -411,7 +411,7 @@ exports.products = async function(req, res) {
   let outputvods = await findLives('not-paid', {})
   let subscribes = await Subscribe.find(
     {},
-    { productId: 1, price: 1, status: 1 }
+    { productId: 1, price: 1, status: 1, description: 1, titile_en: 1 }
   )
     .then(async function(subscribe) {
       if (Object.keys(subscribe).length != 0) {
