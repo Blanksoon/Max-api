@@ -31,6 +31,24 @@ var SubscribeSchema = new Schema({
     type: String,
     default: null,
   },
+  billingPlanStaging: {
+    billingPlanId: String,
+  },
+  billingPlanProd: {
+    billingPlanId: String,
+  },
+  billingPlanDev: {
+    billingPlanId: String,
+  },
+  billingPlanBraintreeStaging: {
+    billingPlanIdBraintree: String,
+  },
+  billingPlanBraintreeProd: {
+    billingPlanIdBraintree: String,
+  },
+  billingPlanBraintreeDev: {
+    billingPlanIdBraintree: String,
+  },
   versionKey: false,
 })
 

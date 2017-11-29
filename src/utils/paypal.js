@@ -259,24 +259,12 @@ export function cancelBilling(billingAgreementId) {
       response
     ) {
       if (error) {
-        console.log(error)
+        console.log('errrr', error)
         reject(error)
       } else {
         console.log('Cancel Billing Agreement Response')
         console.log(response)
         resolve('success')
-        // paypal.billingPlan.get(billingAgreementId, function(
-        //   error,
-        //   billingPlan
-        // ) {
-        //   if (error) {
-        //     console.log('kkkkk', error.response)
-        //     reject(error)
-        //   } else {
-        //     console.log(billingPlan.state)
-        //     resolve(billingPlan.state)
-        //   }
-        // })
       }
     })
   })
@@ -302,3 +290,22 @@ export function findTransactions() {
     }
   )
 }
+
+// "billingPlanStaging" : {
+//   "billingPlanId" : "P-4N078115XD64666037V44B2A"
+// },
+// "billingPlanProd" : {
+//   "billingPlanId" : "P-4N078115XD64666037V44B2A"
+// },
+// "billingPlanDev" : {
+//   "billingPlanId" : "P-4N078115XD64666037V44B2A"
+// },
+// "billingPlanBraintreeStaging" : {
+//   "billingPlanIdBraintree" : "qzt2"
+// },
+// "billingPlanBraintreeProd" : {
+//   "billingPlanIdBraintree" : "qzt2"
+// },
+// "billingPlanBraintreeDev" : {
+//   "billingPlanIdBraintree" : "qzt2"
+// },

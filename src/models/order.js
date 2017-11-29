@@ -58,6 +58,9 @@ var OrderSchema = new Schema({
     tokenSubscribe: String,
     SubscribtionId: String,
   },
+  paymentIos: {
+    transactionId: String,
+  },
   versionKey: false,
 })
 
