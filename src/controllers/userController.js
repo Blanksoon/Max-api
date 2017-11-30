@@ -779,8 +779,20 @@ exports.checkOldPassword = async function(req, res) {
     },
     data: [],
   }
-  var statusToken = await verifyToken(token, req)
-  if (bcrypt.compareSync(password, statusToken.password)) {
+  try {
+    var statusToken = await verifyToken(token, req)
+  } catch (error) {
+    res.status.send({
+      status: {
+        code: 500,
+        success: false,
+        message: `can't verify token`,
+      },
+      data: [],
+    })
+  }
+  console.log('statusToken', statusToken)
+  if (bcrypt.compareSync(`${password}`, `${statusToken.password}`)) {
     output.status.code = 200
     output.status.success = true
     output.status.message = 'your password is verify'
