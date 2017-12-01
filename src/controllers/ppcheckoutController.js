@@ -15,6 +15,7 @@ import {
   cancelBilling,
   findTransactions,
 } from '../utils/paypal'
+import { creatAndSettledPayment } from '../utils/braintree'
 import braintree from 'braintree'
 import { braintreeEnv } from '../config/braintree'
 
@@ -36,7 +37,7 @@ const readJwtBraintree = (token, req) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, env.JWT_SECRET, async function(error, decoded) {
       if (error) {
-        resolve({
+        reject({
           code: 401,
           message: `can't verify your token`,
         })
@@ -617,61 +618,6 @@ exports.subscribeBraintree = async function(req, res) {
             message: 'target subscribe not found',
           }
         }
-        //}
-        // } else {
-        //   const subscribeProduct = await Subscribe.findOne({ _id: productId })
-        //   if (subscribeProduct) {
-        //     let order = new Order({
-        //       productId: subscribeProduct._id,
-        //       productName: subscribeProduct.title_en,
-        //       userId,
-        //       email,
-        //       price: subscribeProduct.price,
-        //       purchaseDate: today,
-        //       platform: 'paypal',
-        //       expiredDate: expiredDate,
-        //       paypal: {
-        //         payerId: null,
-        //         paymentId: null,
-        //         tokenSubscribe: null,
-        //       },
-        //       status: 'created',
-        //     })
-        //     const saved = await order.save()
-        //     gateway.subscription.create(
-        //       {
-        //         paymentMethodToken: customer.braintree.paymentMethod,
-        //         planId: subscribeProduct.billingPlanIdBraintree,
-        //       },
-        //       async function(error, result) {
-        //         if (error) {
-        //           console.log('error', error)
-        //           throw error
-        //         } else {
-        //           order.paypal.SubscribtionId = result.subscription.id
-        //           order.paypal.payerId =
-        //             result.subscription.transactions[0].customer.id
-        //           order.paypal.paymentId =
-        //             result.subscription.transactions[0].id
-        //           order.status = 'approved'
-        //           await order.save()
-        //           res.status(200).send({
-        //             status: {
-        //               code: 200,
-        //               success: true,
-        //               message: 'thank you for your subscribtion',
-        //             },
-        //             data: [],
-        //           })
-        //         }
-        //       }
-        //     )
-        //   } else {
-        //     throw {
-        //       message: 'target subscribe not found',
-        //     }
-        //   }
-        // }
       } else {
         throw {
           message: 'user not found',
@@ -791,103 +737,71 @@ exports.braintreeToken = async function(req, res) {
 }
 exports.createAndSettledPayment = async function(req, res) {
   const token = req.query.token
+  const liveId = req.body.liveId
   let defaultErrorMessage = 'data_not_found'
+  const nonceFromTheClient = req.body.paymentMethodNonce
+  const output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: {},
+  }
   try {
-    const decode = await readJwtBraintree(token, req)
-    const userId = decode.data._id
-    const email = decode.data.email
-    const liveId = req.body.liveId
-    const output = {
-      status: {
-        code: 400,
-        success: false,
-        message: defaultErrorMessage,
-      },
-      data: {},
-    }
-    if (typeof token == 'undefined' || token == '') {
-      output.status.message = 'token is undefiend'
-      res.send(output)
-    } else if (decode.code == 401) {
-      output.status.message = decode.message
-      res.send(output)
+    if (token === undefined || token === '') {
+      throw {
+        message: 'token is undefiend',
+      }
     } else {
+      const decode = await readJwtBraintree(token, req)
+      const userId = decode.data._id
+      const email = decode.data.email
       // Verified the product exists
       const live = await Live.findOne({ _id: liveId })
       if (live) {
+        const order = new Order({
+          productId: live.id,
+          productName: live.title_en,
+          userId,
+          email,
+          price: live.price,
+          purchaseDate: new Date(),
+          platform: req.body.platform,
+          expiredDate: expiredDate,
+          status: null,
+        })
         // Expire 1 day after live date
         const expiredDate = new Date(live.liveToDate)
         expiredDate.setDate(expiredDate.getDate() + 1)
-        var nonceFromTheClient = req.body.paymentMethodNonce
-        let gateway = braintree.connect({
-          environment: braintreeEnv(),
-          merchantId: env.MERCHANTID,
-          publicKey: env.PUBLICKEY,
-          privateKey: env.PRIVATEKEY,
-        })
-        gateway.transaction.sale(
-          {
-            amount: live.price,
-            paymentMethodNonce: nonceFromTheClient,
-            options: {
-              submitForSettlement: true,
-            },
-          },
-          function(err, transactionResult) {
-            if (transactionResult.errors != undefined) {
-              output.status.message =
-                'Cannot use a payment_method_nonce more than once.'
-              res.status(200).send(output)
-            } else {
-              gateway.testing.settle(
-                transactionResult.transaction.id,
-                async function(err, settleResult) {
-                  if (settleResult.transaction.status == 'settled') {
-                    const order = new Order({
-                      productId: live.id,
-                      productName: live.title_en,
-                      userId,
-                      email,
-                      price: live.price,
-                      purchaseDate: new Date(),
-                      platform: req.body.platform,
-                      expiredDate: expiredDate,
-                      paypal: {
-                        paymentId: settleResult.transaction.id,
-                      },
-                      status: 'approved',
-                    })
-                    const saved = await order.save()
-                    output.status.code = 200
-                    output.status.success = true
-                    output.status.message = 'thank you for purchase'
-                    console.log('resultxxx', settleResult.transaction.id)
-                    res.status(200).send(output)
-                  } else {
-                    const order = new Order({
-                      productId: live.id,
-                      productName: live.title_en,
-                      userId,
-                      email,
-                      price: live.price,
-                      purchaseDate: new Date(),
-                      platform: req.body.platform,
-                      expiredDate: expiredDate,
-                      status: 'cancel',
-                    })
-                    const saved = await order.save()
-                    output.status.message = err
-                    res.status(200).json(output)
-                  }
-                }
-              )
-            }
-          }
+        const resultTransaction = await creatAndSettledPayment(
+          live,
+          nonceFromTheClient
         )
+        if (resultTransaction === `can't process this transaction`) {
+          order.status = 'error'
+          await order.save()
+          throw {
+            message: `can't process this transaction`,
+          }
+        } else {
+          order.paypal.paymentId = resultTransaction
+          order.status = 'approved'
+          await order.save()
+          res.status(200).send({
+            status: {
+              code: 200,
+              success: true,
+              message: 'thank you for purchase',
+            },
+            data: order,
+          })
+        }
       } else {
-        output.status.code = 404
-        output.status.message = 'Target live not found'
-        res.status(200).send(output)
+        throw {
+          code: 404,
+          message: 'Target live not found',
+        }
       }
     }
   } catch (error) {
@@ -1028,6 +942,15 @@ exports.createPaymentIos = async function(req, res) {
       }
     } else {
       if (live) {
+        const transactionOrder = Order.findOne({
+          'paymentIos.transactionid': transactionId,
+        })
+        if (transactionOrder) {
+          throw {
+            code: 200,
+            message: 'your transaction has already',
+          }
+        }
         // Expire 1 day after live date
         const expiredDate = new Date(live.liveToDate)
         expiredDate.setDate(expiredDate.getDate() + 1)

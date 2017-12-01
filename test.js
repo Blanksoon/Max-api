@@ -41,6 +41,23 @@ console.log('re: ', !re.test('farm@.com'))
 //   )
 // })
 
-var name = 'thammarong kikasemsri'
-var testName = name.split(/[ ]+/)
-console.log(testNam[0])
+//var name = 'thammarong kikasemsri'
+//var testName = name.split(/[ ]+/)
+//console.log(testNam[0])
+
+try {
+  const testPromise = token => {
+    return new Promise((resolve, reject) => {
+      if (token === 1) {
+        resolve(1)
+      } else {
+        reject(2)
+      }
+    })
+  }
+
+  const test = testPromise(2)
+  console.log('test', test)
+} catch (err) {
+  conosle.log('error'.err)
+}
