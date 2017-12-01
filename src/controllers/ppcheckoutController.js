@@ -15,9 +15,10 @@ import {
   cancelBilling,
   findTransactions,
 } from '../utils/paypal'
-import { creatAndSettledPayment } from '../utils/braintree'
+import { creatAndSettledPayment, cancelPayment } from '../utils/braintree'
 import braintree from 'braintree'
 import { braintreeEnv } from '../config/braintree'
+import { randomBytes } from 'crypto'
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -751,6 +752,9 @@ exports.createAndSettledPayment = async function(req, res) {
       // Verified the product exists
       const live = await Live.findOne({ _id: liveId })
       if (live) {
+        // Expire 1 day after live date
+        const expiredDate = new Date(live.liveToDate)
+        expiredDate.setDate(expiredDate.getDate() + 1)
         const order = new Order({
           productId: live.id,
           productName: live.title_en,
@@ -762,9 +766,6 @@ exports.createAndSettledPayment = async function(req, res) {
           expiredDate: expiredDate,
           status: null,
         })
-        // Expire 1 day after live date
-        const expiredDate = new Date(live.liveToDate)
-        expiredDate.setDate(expiredDate.getDate() + 1)
         const resultTransaction = await creatAndSettledPayment(
           live,
           nonceFromTheClient
@@ -809,106 +810,43 @@ exports.createAndSettledPayment = async function(req, res) {
 }
 exports.cancelReleasePayment = async function(req, res) {
   const token = req.query.token
-  const productId = req.body.productId
+  const orderId = req.body.orderId
   const today = Date.now()
-  const output = {
-    status: {
-      code: 400,
-      success: false,
-      message: '',
-    },
-    data: {},
-  }
-  let defaultErrorMessage = 'data_not_found'
-  let gateway = braintree.connect({
-    environment: braintreeEnv(),
-    merchantId: env.MERCHANTID,
-    publicKey: env.PUBLICKEY,
-    privateKey: env.PRIVATEKEY,
-  })
   try {
-    // if (token === undefined || token === '') {
-    //   throw {
-    //     message: 'token is undefiend',
-    //   }
-    // } else {
-    //   const decode = await readJwtBraintree(token, req) //if error reject error.message
-    //   const result = await Order.findOne({
-    //     userId: decode.data._id,
-    //     productId: productId,
-    //     expiredDate: { $gte: today },
-    //     status: 'approved',
-    //   })
-    // }
-    const decode = await readJwtBraintree(token, req)
-    let today = Date.now()
-    if (typeof token == 'undefined' || token == '') {
-      output.status.message = 'token is undefiend'
-      res.send(output)
-    } else if (decode.code == 401) {
-      output.status.message = decode.message
-      res.send(output)
+    if (token === undefined || token === '') {
+      throw {
+        message: 'token is undefiend',
+      }
     } else {
-      const result = await Order.findOne({
-        userId: decode.data._id,
-        productId: productId,
-        expiredDate: { $gte: today },
-        status: 'approved',
+      const decode = await readJwtBraintree(token, req) //if error reject error.message
+      const resultOrder = await Order.findOne({
+        orderId: orderId,
       })
-      gateway.transaction.refund(result.paypal.paymentId, async function(
-        err,
-        result
-      ) {
-        if (err) {
-          throw {
-            message: err,
-          }
-          //res.status(200).send(err)
-        } else {
-          let message
-          if (result.errors != undefined) {
-            const deepErrors = result.errors.deepErrors()
-            for (var i in deepErrors) {
-              if (deepErrors.hasOwnProperty(i)) {
-                // console.log('codexxx', deepErrors[i].code)
-                // console.log('messagexxx', deepErrors[i].message)
-                message = deepErrors[i].message
-                //console.log('attributexxx', deepErrors[i].attribute)
-              }
-            }
-            output.status.message = message
-            //res.status(200).send(output)
-            throw {
-              message: message,
-            }
-          } else {
-            // console.log(
-            //   'decode.data._id',
-            //   decode.data._id,
-            //   'productId',
-            //   productId
-            // )
-            await Order.findOneAndUpdate(
-              {
-                userId: decode.data._id,
-                expiredDate: { $gte: today },
-                productId: productId,
-                status: 'approved',
-              },
-              {
-                status: 'cancelled',
-                paypal: {
-                  paymentId: result.transaction.id,
-                },
-                cancelDate: today,
-              }
-            )
-            output.status.code = 200
-            output.status.success = true
-            output.status.message = 'cancelled transection success'
-            res.status(200).send(output)
-          }
+      if (resultOrder === null) {
+        throw {
+          message: 'order not found',
         }
+      }
+      const paymentId = await cancelPayment(resultOrder.paypal.paymentId) // if error reject error.message
+      await Order.findOneAndUpdate(
+        {
+          orderId: orderId,
+        },
+        {
+          status: 'cancelled',
+          paypal: {
+            paymentId: paymentId,
+          },
+          cancelDate: today,
+        }
+      )
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'cancelled transection success',
+        },
+        data: [],
       })
     }
   } catch (error) {
