@@ -738,23 +738,14 @@ exports.braintreeToken = async function(req, res) {
 exports.createAndSettledPayment = async function(req, res) {
   const token = req.query.token
   const liveId = req.body.liveId
-  let defaultErrorMessage = 'data_not_found'
   const nonceFromTheClient = req.body.paymentMethodNonce
-  const output = {
-    status: {
-      code: 400,
-      success: false,
-      message: defaultErrorMessage,
-    },
-    data: {},
-  }
   try {
     if (token === undefined || token === '') {
       throw {
         message: 'token is undefiend',
       }
     } else {
-      const decode = await readJwtBraintree(token, req)
+      const decode = await readJwtBraintree(token, req) //if error reject error.message
       const userId = decode.data._id
       const email = decode.data.email
       // Verified the product exists
@@ -819,6 +810,7 @@ exports.createAndSettledPayment = async function(req, res) {
 exports.cancelReleasePayment = async function(req, res) {
   const token = req.query.token
   const productId = req.body.productId
+  const today = Date.now()
   const output = {
     status: {
       code: 400,
@@ -835,9 +827,21 @@ exports.cancelReleasePayment = async function(req, res) {
     privateKey: env.PRIVATEKEY,
   })
   try {
+    // if (token === undefined || token === '') {
+    //   throw {
+    //     message: 'token is undefiend',
+    //   }
+    // } else {
+    //   const decode = await readJwtBraintree(token, req) //if error reject error.message
+    //   const result = await Order.findOne({
+    //     userId: decode.data._id,
+    //     productId: productId,
+    //     expiredDate: { $gte: today },
+    //     status: 'approved',
+    //   })
+    // }
     const decode = await readJwtBraintree(token, req)
-    let today = new Date()
-    today = Date.now()
+    let today = Date.now()
     if (typeof token == 'undefined' || token == '') {
       output.status.message = 'token is undefiend'
       res.send(output)
@@ -946,7 +950,6 @@ exports.createPaymentIos = async function(req, res) {
         const transactionOrder = await Order.findOne({
           'paymentIos.transactionId': transactionId,
         })
-        console.log('ssssss', transactionOrder)
         if (transactionOrder != null) {
           throw {
             code: 200,
@@ -1064,6 +1067,15 @@ exports.subscribeIos = async function(req, res) {
     } else {
       const customer = await User.findOne({ _id: decode.data._id })
       if (customer) {
+        const transactionOrder = await Order.findOne({
+          'paymentIos.transactionId': transactionId,
+        })
+        if (transactionOrder != null) {
+          throw {
+            code: 200,
+            message: 'your transaction has already',
+          }
+        }
         const subscribeProduct = await Subscribe.findOne({ _id: productId })
         if (subscribeProduct) {
           let order = new Order({

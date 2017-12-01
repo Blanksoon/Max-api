@@ -42,3 +42,51 @@ export function creatAndSettledPayment(live, nonceFromTheClient) {
     )
   })
 }
+
+export function cancelPayment(paymentId) {
+  return new Promise((resolve, reject) => {
+    gateway.transaction.refund(paymentId, async function(err, result) {
+      if (err) {
+        reject({ message: err })
+      } else {
+        if (result.errors != undefined) {
+          const deepErrors = result.errors.deepErrors()
+          for (var i in deepErrors) {
+            if (deepErrors.hasOwnProperty(i)) {
+              let message = deepErrors[i].message
+            }
+          }
+          reject({
+            message: message,
+          })
+        } else {
+          // console.log(
+          //   'decode.data._id',
+          //   decode.data._id,
+          //   'productId',
+          //   productId
+          // )
+          await Order.findOneAndUpdate(
+            {
+              userId: decode.data._id,
+              expiredDate: { $gte: today },
+              productId: productId,
+              status: 'approved',
+            },
+            {
+              status: 'cancelled',
+              paypal: {
+                paymentId: result.transaction.id,
+              },
+              cancelDate: today,
+            }
+          )
+          output.status.code = 200
+          output.status.success = true
+          output.status.message = 'cancelled transection success'
+          res.status(200).send(output)
+        }
+      }
+    })
+  })
+}
