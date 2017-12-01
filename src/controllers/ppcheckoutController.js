@@ -537,7 +537,7 @@ exports.subscribeBraintree = async function(req, res) {
     const email = decode.data.email
     let nonceFromTheClient = req.body.nonceFromTheClient
     let gateway = braintree.connect({
-      environment: braintreeEnv,
+      environment: braintreeEnv(),
       merchantId: env.MERCHANTID,
       publicKey: env.PUBLICKEY,
       privateKey: env.PRIVATEKEY,
@@ -693,7 +693,7 @@ exports.cancelSubscribeBraintree = async function(req, res) {
   const token = req.query.token
   const orderId = req.body.orderId
   let gateway = braintree.connect({
-    environment: braintreeEnv,
+    environment: braintreeEnv(),
     merchantId: env.MERCHANTID,
     publicKey: env.PUBLICKEY,
     privateKey: env.PRIVATEKEY,
@@ -769,7 +769,7 @@ exports.braintreeToken = async function(req, res) {
   } else {
     let clientToken
     let gateway = braintree.connect({
-      environment: braintreeEnv,
+      environment: braintreeEnv(),
       merchantId: env.MERCHANTID,
       publicKey: env.PUBLICKEY,
       privateKey: env.PRIVATEKEY,
@@ -915,7 +915,7 @@ exports.cancelReleasePayment = async function(req, res) {
   }
   let defaultErrorMessage = 'data_not_found'
   let gateway = braintree.connect({
-    environment: braintreeEnv,
+    environment: braintreeEnv(),
     merchantId: env.MERCHANTID,
     publicKey: env.PUBLICKEY,
     privateKey: env.PRIVATEKEY,
