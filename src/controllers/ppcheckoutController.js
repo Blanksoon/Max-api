@@ -922,6 +922,7 @@ exports.cancelReleasePayment = async function(req, res) {
 
 //ios
 exports.createPaymentIos = async function(req, res) {
+  console.log('ffffff')
   const token = req.query.token
   const transactionId = req.body.transactionId
   try {
@@ -942,10 +943,11 @@ exports.createPaymentIos = async function(req, res) {
       }
     } else {
       if (live) {
-        const transactionOrder = Order.findOne({
-          'paymentIos.transactionid': transactionId,
+        const transactionOrder = await Order.findOne({
+          'paymentIos.transactionId': transactionId,
         })
-        if (transactionOrder) {
+        console.log('ssssss', transactionOrder)
+        if (transactionOrder != null) {
           throw {
             code: 200,
             message: 'your transaction has already',
