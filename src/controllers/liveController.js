@@ -220,11 +220,12 @@ async function decodeJwt(token, req) {
           { productId: '59dc6d66af142842d0bc2551' },
           { productId: '59dc6da4ab8a7442f58390f4' },
           { productId: '59dc6dcb61490e430a0d6ec8' },
-          { productId: '2002' },
+          { productId: '5a0c0450b29318da40e335f0' },
         ],
+        status: 'approved',
       }
       const order = await queryOrder(query)
-      //console.log(order)
+      console.log(order)
       status = order
     }
   } catch (err) {
@@ -301,30 +302,31 @@ exports.lives = async function(req, res) {
     data: [],
   }
   if (token == undefined || token == 'undefined' || token == '') {
-    //outputvods = await findLives('not-paid', {})
-    outputvods = await findLives('paid', {})
+    outputvods = await findLives('not-paid', {})
+    //outputvods = await findLives('paid', {})
     json = setDataOutput(outputvods, output)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
     if (order == `you have't purchase`) {
-      //outputvods = await findLives('not-paid', {})
-      outputvods = await findLives('paid', {})
+      outputvods = await findLives('not-paid', {})
+      //outputvods = await findLives('paid', {})
       json = setDataOutput(outputvods, output)
     } else if (order.length != 0) {
-      //outputvods = await findLives('not-paid', {})
-      outputvods = await findLives('paid', {})
+      //console.log('op')
+      outputvods = await findLives('not-paid', {})
+      //outputvods = await findLives('paid', {})
       const buyLives = await findLives('paid', {})
       const lives = outputvods
       let i = 0
       let subscribe = false
       while (i < order.length) {
-        if (order[i].productId == '2002') {
+        if (order[i].productId === '5a0c0450b29318da40e335f0') {
           subscribe = true
         }
         i++
       }
-      if (subscribe == false) {
+      if (subscribe === false) {
         i = 0
         while (i < order.length) {
           await setDataProduct(lives, order[i].productId, buyLives)

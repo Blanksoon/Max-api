@@ -128,7 +128,7 @@ module.exports = function(app) {
   app.route('/subscribe/success').get(ppcheckout.successSubscribe)
   app.route('/client_token').get(ppcheckout.braintreeToken)
 
-  //braintree
+  //Braintree
   app
     .route('/purchase-live-paypal-braintree')
     .post(ppcheckout.createAndSettledPayment)

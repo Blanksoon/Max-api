@@ -16,6 +16,7 @@ import {
   findTransactions,
 } from '../utils/paypal'
 import braintree from 'braintree'
+import { braintreeEnv } from '../config/braintree'
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -210,7 +211,7 @@ exports.cancelPayment = async function(req, res) {
 
 exports.billingPlans = async function(req, res) {
   var billingPlanAttributes = {
-    description: 'Watch unlimited lives and vods for 1 months : 3.99$',
+    description: 'Watch unlimited vods for 1 months : 0.99$',
     merchant_preferences: {
       auto_bill_amount: 'yes',
       cancel_url: 'http://159.203.140.5:3002/subscribe/cancel',
@@ -218,17 +219,17 @@ exports.billingPlans = async function(req, res) {
       max_fail_attempts: '1',
       return_url: 'http://159.203.140.5:3002/subscribe/success',
     },
-    name: 'Monthly',
+    name: 'daily',
     payment_definitions: [
       {
         amount: {
           currency: 'USD',
-          value: '3.99',
+          value: '0.99',
         },
         cycles: '0',
-        frequency: 'MONTH',
+        frequency: 'Day',
         frequency_interval: '1',
-        name: '1 month subscription',
+        name: '1 day subscription',
         type: 'REGULAR',
       },
     ],
@@ -536,7 +537,7 @@ exports.subscribeBraintree = async function(req, res) {
     const email = decode.data.email
     let nonceFromTheClient = req.body.nonceFromTheClient
     let gateway = braintree.connect({
-      environment: braintree.Environment.Sandbox,
+      environment: braintreeEnv,
       merchantId: env.MERCHANTID,
       publicKey: env.PUBLICKEY,
       privateKey: env.PRIVATEKEY,
@@ -692,7 +693,7 @@ exports.cancelSubscribeBraintree = async function(req, res) {
   const token = req.query.token
   const orderId = req.body.orderId
   let gateway = braintree.connect({
-    environment: braintree.Environment.Sandbox,
+    environment: braintreeEnv,
     merchantId: env.MERCHANTID,
     publicKey: env.PUBLICKEY,
     privateKey: env.PRIVATEKEY,
@@ -768,7 +769,7 @@ exports.braintreeToken = async function(req, res) {
   } else {
     let clientToken
     let gateway = braintree.connect({
-      environment: braintree.Environment.Sandbox,
+      environment: braintreeEnv,
       merchantId: env.MERCHANTID,
       publicKey: env.PUBLICKEY,
       privateKey: env.PRIVATEKEY,
@@ -819,7 +820,7 @@ exports.createAndSettledPayment = async function(req, res) {
         expiredDate.setDate(expiredDate.getDate() + 1)
         var nonceFromTheClient = req.body.paymentMethodNonce
         let gateway = braintree.connect({
-          environment: braintree.Environment.Sandbox,
+          environment: braintreeEnv(),
           merchantId: env.MERCHANTID,
           publicKey: env.PUBLICKEY,
           privateKey: env.PRIVATEKEY,
@@ -914,7 +915,7 @@ exports.cancelReleasePayment = async function(req, res) {
   }
   let defaultErrorMessage = 'data_not_found'
   let gateway = braintree.connect({
-    environment: braintree.Environment.Sandbox,
+    environment: braintreeEnv,
     merchantId: env.MERCHANTID,
     publicKey: env.PUBLICKEY,
     privateKey: env.PRIVATEKEY,
