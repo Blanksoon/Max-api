@@ -1,3 +1,4 @@
+import fs from 'fs'
 import jwt from 'jsonwebtoken'
 import env from '../config/env'
 import Live from '../models/live'
@@ -526,7 +527,9 @@ exports.createWebhook = async function(req, res) {
   }
 }
 exports.webhookHandler = async function(req, res) {
-  console.log(req)
+  const payload = req.body
+  fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
+  res.status(200).send(payload)
 }
 
 //braintree
