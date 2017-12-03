@@ -214,10 +214,9 @@ export function excuteBilling(paymentToken) {
 }
 export function createWebhook(eventTypes) {
   const create_webhook_json = {
-    url: 'http://www.google.com', //`${env.SERVER_IP}:${env.SERVER_PORT}/ppcheckout/webhooks-handler`,
+    url: 'https://beta-api.maxmuaythai.com/ppcheckout/webhooks-handler',
     event_types: eventTypes,
   }
-  console.log(create_webhook_json)
 
   /* return new Promise((resolve, reject) => {
     paypal.notification.webhook.del('98K37835PB985114G', function(
@@ -237,6 +236,28 @@ export function createWebhook(eventTypes) {
       error,
       webhook
     ) {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(webhook)
+      }
+    })
+  })
+}
+export function listWebhook() {
+  return new Promise((resolve, reject) => {
+    paypal.notification.webhook.list(function(error, webhook) {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(webhook)
+      }
+    })
+  })
+}
+export function deleteWebhook(webhookId) {
+  return new Promise((resolve, reject) => {
+    paypal.notification.webhook.delete(webhookId, function(error, webhook) {
       if (error) {
         reject(error)
       } else {
