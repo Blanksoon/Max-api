@@ -984,5 +984,5 @@ exports.updateUser = async function(req, res) {
 }
 exports.wechat = async function(req, res) {
   console.log(req.query)
-  res.send(req.query.echostr)
+  res.send('test1')
 }
