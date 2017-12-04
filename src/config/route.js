@@ -161,4 +161,7 @@ module.exports = function(app) {
   app.post('/update-user', user.updateUser)
   app.get('/purchase-history', order.purchaseHistory)
   //app.post('/test', ppcheckout.findOrder)
+
+  //wechat
+  app.get('/wechat', user.wechat)
 }

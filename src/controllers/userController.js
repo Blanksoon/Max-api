@@ -982,3 +982,6 @@ exports.updateUser = async function(req, res) {
   output.data = userData
   res.send(output)
 }
+exports.wechat = async function(req, res) {
+  res.send(req.query.echostr)
+}

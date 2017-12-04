@@ -807,7 +807,7 @@ exports.createAndSettledPayment = async function(req, res) {
       data: [],
     })
   }
-}
+} //refactor already
 exports.cancelReleasePayment = async function(req, res) {
   const token = req.query.token
   const orderId = req.body.orderId
@@ -860,7 +860,7 @@ exports.cancelReleasePayment = async function(req, res) {
       data: [],
     })
   }
-}
+} //refactor already
 
 //ios
 exports.createPaymentIos = async function(req, res) {
