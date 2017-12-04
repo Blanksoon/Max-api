@@ -124,7 +124,7 @@ module.exports = function(app) {
       .route('/ppcheckout/webhooks/:webhookId')
       .delete(ppcheckout.deleteWebhook)
   }
-  app.route('/ppcheckout/webhooks_handler').post(ppcheckout.webhookHandler)
+  app.route('/ppcheckout/webhooks-handler').post(ppcheckout.webhookHandler)
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)
