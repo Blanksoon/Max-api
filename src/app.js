@@ -1,5 +1,4 @@
 require('babel-polyfill')
-
 const env = require('./config/env')
 const express = require('express')
 const app = express()

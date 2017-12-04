@@ -983,6 +983,6 @@ exports.updateUser = async function(req, res) {
   res.send(output)
 }
 exports.wechat = async function(req, res) {
-  console.log(req.query)
-  res.send('test1')
+  console.log(req)
+  res.send(req.query.echostr)
 }
