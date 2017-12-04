@@ -1,3 +1,4 @@
+import fs from 'fs'
 import jwt from 'jsonwebtoken'
 import env from '../config/env'
 import Live from '../models/live'
@@ -12,6 +13,8 @@ import {
   createBilling,
   excuteBilling,
   createWebhook,
+  listWebhook,
+  deleteWebhook,
   cancelBilling,
   findTransactions,
 } from '../utils/paypal'
@@ -521,12 +524,34 @@ exports.createWebhook = async function(req, res) {
   try {
     const webhook = await createWebhook(eventTypes)
     console.log(webhook)
+    res.status(200).send(webhook)
+  } catch (error) {
+    console.log(error)
+  }
+}
+exports.listWebhook = async function(req, res) {
+  try {
+    const webhook = await listWebhook()
+    console.log(webhook)
+    res.status(200).send(webhook)
+  } catch (error) {
+    console.log(error)
+  }
+}
+exports.deleteWebhook = async function(req, res) {
+  const webhookId = req.params.webhookId
+  try {
+    const webhook = await deleteWebhook(webhookId)
+    console.log(webhook)
+    res.status(200).send(webhook)
   } catch (error) {
     console.log(error)
   }
 }
 exports.webhookHandler = async function(req, res) {
-  console.log(req)
+  const payload = req.body
+  fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
+  res.status(200).send(payload)
 }
 
 //braintree

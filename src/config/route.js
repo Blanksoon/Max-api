@@ -115,8 +115,16 @@ module.exports = function(app) {
   app.get('/subscribe-history', order.fetchSubscribe)
 
   // Paypal checkout
-  app.route('/ppcheckout/webhooks').post(ppcheckout.createWebhook)
-  app.route('/ppcheckout/webhooks_handler').post(ppcheckout.webhookHandler)
+  if (process.env.NODE_ENV === 'dev') {
+    app
+      .route('/ppcheckout/webhooks')
+      .get(ppcheckout.listWebhook)
+      .post(ppcheckout.createWebhook)
+    app
+      .route('/ppcheckout/webhooks/:webhookId')
+      .delete(ppcheckout.deleteWebhook)
+  }
+  app.route('/ppcheckout/webhooks-handler').post(ppcheckout.webhookHandler)
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)

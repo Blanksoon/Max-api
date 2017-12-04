@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
+import moment from 'moment-timezone'
 import { jwplayerUrl } from '../utils/jwplayer'
+
 const Schema = mongoose.Schema
 
 const vodSchema = new Schema({
@@ -81,11 +83,13 @@ const vodSchema = new Schema({
 vodSchema.post('findOne', vod => {
   vod.promoUrl = jwplayerUrl(vod.promoUrl)
   vod.videoUrl = jwplayerUrl(vod.videoUrl)
+  vod.onAirDateStr_en = moment(vod.onAirDate).format('ddd. MMM Do, YYYY')
 })
 vodSchema.post('find', vods => {
   vods.forEach(vod => {
     vod.promoUrl = jwplayerUrl(vod.promoUrl)
     vod.videoUrl = jwplayerUrl(vod.videoUrl)
+    vod.onAirDateStr_en = moment(vod.onAirDate).format('ddd. MMM Do, YYYY')
   })
 })
 module.exports = mongoose.model('Vod', vodSchema)
