@@ -216,25 +216,25 @@ exports.cancelPayment = async function(req, res) {
 
 exports.billingPlans = async function(req, res) {
   var billingPlanAttributes = {
-    description: 'Watch unlimited vods for 1 months : 0.99$',
+    description: 'Watch unlimited lives and vods for 1 months : 9.99$',
     merchant_preferences: {
       auto_bill_amount: 'yes',
-      cancel_url: 'http://159.203.140.5:3002/subscribe/cancel',
+      cancel_url: 'https://beta-api.maxmuaythai.com/subscribe/cancel',
       initial_fail_amount_action: 'continue',
       max_fail_attempts: '1',
-      return_url: 'http://159.203.140.5:3002/subscribe/success',
+      return_url: 'https://beta-api.maxmuaythai.com/subscribe/success',
     },
-    name: 'daily',
+    name: 'Monthly',
     payment_definitions: [
       {
         amount: {
           currency: 'USD',
-          value: '0.99',
+          value: '9.99',
         },
         cycles: '0',
-        frequency: 'Day',
+        frequency: 'MONTH',
         frequency_interval: '1',
-        name: '1 day subscription',
+        name: '1 month subscription',
         type: 'REGULAR',
       },
     ],
