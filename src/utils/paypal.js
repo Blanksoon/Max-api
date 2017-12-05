@@ -19,8 +19,8 @@ export async function createPayment(order) {
       payment_method: 'paypal',
     },
     redirect_urls: {
-      return_url: `${env.SERVER_IP}/ppcheckout/${order.orderId}/success`,
-      cancel_url: `${env.SERVER_IP}/ppcheckout/${order.orderId}/cancel`,
+      return_url: `${env.SERVER_URL}/ppcheckout/${order.orderId}/success`,
+      cancel_url: `${env.SERVER_URL}/ppcheckout/${order.orderId}/cancel`,
     },
     transactions: [
       {
