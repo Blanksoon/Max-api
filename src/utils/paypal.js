@@ -1,6 +1,7 @@
 import paypal from 'paypal-rest-sdk'
 import env from '../config/env'
 import braintree from 'braintree'
+import moment from 'moment'
 
 const mongoose = require('mongoose')
 const Order = mongoose.model('Order')
@@ -13,14 +14,24 @@ export function configure(config) {
   })
 }
 export async function createPayment(order) {
+  let returnUrl = ''
+  let cancelUrl = ''
+  if (process.env.NODE_ENV === 'dev') {
+    returnUrl = `${env.SERVER_URL}/ppcheckout/${order.orderId}/success`
+    cancelUrl = `${env.SERVER_URL}/ppcheckout/${order.orderId}/cancel`
+  } else {
+    returnUrl = `${env.SERVER_URL}/ppcheckout/${order.orderId}/success`
+    cancelUrl = `${env.SERVER_URL}/ppcheckout/${order.orderId}/cancel`
+  }
+  console.log('returnUrl', returnUrl)
   const create_payment_json = {
     intent: 'sale',
     payer: {
       payment_method: 'paypal',
     },
     redirect_urls: {
-      return_url: `${env.SERVER_IP}/ppcheckout/${order.orderId}/success`,
-      cancel_url: `${env.SERVER_IP}/ppcheckout/${order.orderId}/cancel`,
+      return_url: returnUrl,
+      cancel_url: cancelUrl,
     },
     transactions: [
       {
@@ -48,7 +59,7 @@ export async function createPayment(order) {
         console.log(error)
         reject(error)
       } else {
-        console.log(payment)
+        console.log('payment', payment)
         payment.links.forEach(link => {
           if (link.rel === 'approval_url') {
             resolve(link.href)
@@ -166,11 +177,11 @@ export function createBilling(billingAgreementAttributes) {
       billingAgreement
     ) {
       if (error) {
-        console.log(error)
+        //console.log('aaaaaaaaaaaaaaaaaaaaaaaa', error.response)
         reject(error)
       } else {
         console.log('Create Billing Agreement Response')
-        console.log('billingAgreement', billingAgreement.links[0].href)
+        console.log('billingAgreement', billingAgreement)
         for (var index = 0; index < billingAgreement.links.length; index++) {
           if (billingAgreement.links[index].rel === 'approval_url') {
             var approval_url = billingAgreement.links[index].href
@@ -265,43 +276,53 @@ export function cancelBilling(billingAgreementId) {
     })
   })
 }
-export function findTransactions() {
-  var billingAgreementId = 'I-LU134TMXS648'
-
-  var start_date = '2017-11-27'
-  var end_date = '2017-11-29'
-
-  paypal.billingAgreement.searchTransactions(
-    billingAgreementId,
-    start_date,
-    end_date,
-    function(error, results) {
+export function findTransactions(paymentId) {
+  return new Promise((resolve, reject) => {
+    //   var billingAgreementId = paymentId
+    //   paypal.billingAgreement.get(billingAgreementId, function(error, order) {
+    //     if (error) {
+    //       console.log(error)
+    //       reject(error)
+    //     } else {
+    //       console.log('Get Order Response')
+    //       console.log(JSON.stringify(order))
+    //       resolve(order)
+    //     }
+    //   })
+    var billingPlanId = 'P-2DK32454ME855742YFKZNZSQ'
+    paypal.billingPlan.get(billingPlanId, function(error, order) {
       if (error) {
         console.log(error)
-        throw error
+        reject(error)
       } else {
-        console.log('Billing Agreement Transactions Search Response')
-        console.log(results)
+        console.log('Get Order Response')
+        console.log(JSON.stringify(order))
+        resolve(order)
       }
-    }
-  )
+    })
+  })
 }
-
-// "billingPlanStaging" : {
-//   "billingPlanId" : "P-4N078115XD64666037V44B2A"
-// },
-// "billingPlanProd" : {
-//   "billingPlanId" : "P-4N078115XD64666037V44B2A"
-// },
-// "billingPlanDev" : {
-//   "billingPlanId" : "P-4N078115XD64666037V44B2A"
-// },
-// "billingPlanBraintreeStaging" : {
-//   "billingPlanIdBraintree" : "qzt2"
-// },
-// "billingPlanBraintreeProd" : {
-//   "billingPlanIdBraintree" : "qzt2"
-// },
-// "billingPlanBraintreeDev" : {
-//   "billingPlanIdBraintree" : "qzt2"
-// },
+export function createNeworderSubscribe(paymentId) {
+  return new Promise(async (resolve, reject) => {
+    const order = await Order.findOne({
+      'paypal.paymentId': paymentId,
+      status: 'approved',
+    })
+      .then(async function(orderData) {
+        const newOrder = order
+        order.status = 'expired'
+        await order.save()
+        const today = Date.now()
+        let expiredDate = moment(today)
+          .add(1, 'M')
+          .calendar()
+        newOrder.purchaseDate = today
+        newOrder.expiredDate = expiredDate
+        await newOrder.save()
+        resolve(newOrder)
+      })
+      .catch(function(err) {
+        reject(err)
+      })
+  })
+}

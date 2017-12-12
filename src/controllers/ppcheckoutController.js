@@ -17,6 +17,7 @@ import {
   deleteWebhook,
   cancelBilling,
   findTransactions,
+  createNeworderSubscribe,
 } from '../utils/paypal'
 import { creatAndSettledPayment, cancelPayment } from '../utils/braintree'
 import braintree from 'braintree'
@@ -219,10 +220,10 @@ exports.billingPlans = async function(req, res) {
     description: 'Watch unlimited lives and vods for 1 months : 9.99$',
     merchant_preferences: {
       auto_bill_amount: 'yes',
-      cancel_url: 'https://beta-api.maxmuaythai.com/subscribe/cancel',
+      cancel_url: env.SERVER_URL + '/subscribe/cancel',
       initial_fail_amount_action: 'continue',
       max_fail_attempts: '1',
-      return_url: 'https://beta-api.maxmuaythai.com/subscribe/success',
+      return_url: env.SERVER_URL + '/subscribe/success',
     },
     name: 'Monthly',
     payment_definitions: [
@@ -292,7 +293,7 @@ exports.billingPlans = async function(req, res) {
 }
 
 exports.subscribe = async function(req, res) {
-  console.log('hi')
+  //console.log('hi')
   const token = req.query.token
   const output = {
     status: {
@@ -315,9 +316,12 @@ exports.subscribe = async function(req, res) {
     isoDate.toISOString().slice(0, 19) + 'Z'
     const subscribeProduct = await Subscribe.findOne({ _id: productId })
     //const expiredDate = new Date(live.liveToDate)
-    const expiredDate = moment(today)
-      .add(30, 'day')
+    let expiredDate = moment(today)
+      .add(1, 'M')
       .calendar()
+    // expiredDate = moment(expiredDate)
+    //   .subtract(1, 'days')
+    //   .calendar()
     if (typeof token === 'undefined' || token === '') {
       throw {
         message: 'token is undefiend',
@@ -345,6 +349,7 @@ exports.subscribe = async function(req, res) {
           },
           status: 'created',
         })
+        // console.log('sssssssssss', env.BILLINGPLAN)
         if (env.BILLINGPLAN === 'billingPlanStaging') {
           billingId = subscribeProduct.billingPlanStaging.billingPlanId
         } else if (env.BILLINGPLAN === 'billingPlanProd') {
@@ -352,7 +357,7 @@ exports.subscribe = async function(req, res) {
         } else {
           billingId = subscribeProduct.billingPlanDev.billingPlanId
         }
-        console.log('billingId', billingId)
+        //console.log('billingId', billingId)
         const billingAgreementAttributes = {
           name: subscribeProduct.title_en,
           description: subscribeProduct.description,
@@ -365,7 +370,8 @@ exports.subscribe = async function(req, res) {
           },
         }
         const billingAgreement = await createBilling(billingAgreementAttributes)
-        console.log('billingAgreement', billingAgreement)
+        //console.log('11111111111111111111', billingAgreement)
+        //console.log('22222222222222222222', billingAgreement.plan)
         const billangUrl = billingAgreement.links[0].href
         const n = billingAgreement.links[0].href.indexOf('token=')
         const str = 'token='
@@ -396,7 +402,7 @@ exports.subscribe = async function(req, res) {
       }
     }
   } catch (error) {
-    console.log('error', error.response)
+    //console.log('error', error.response)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -421,13 +427,14 @@ exports.successSubscribe = async function(req, res) {
     if (order) {
       try {
         const result = await excuteBilling(paymentToken)
-        console.log('result', result)
+        //console.log('result', result.plan)
         if (result.state === 'Active') {
           order.status = 'approved'
           order.paypal = {
             tokenSubscribe: result.id,
             paymentId: result.id,
             payerId: result.payer.payer_info.payer_id,
+            testOrder: result,
           }
           //console.log('jjjjjj', result.agreement_details)
           //order.expiredDate = result.agreement_details.next_billing_date
@@ -515,6 +522,16 @@ exports.cancelSubscribe = async function(req, res) {
   }
 }
 
+exports.getSelfSubscribe = async function(req, res) {
+  const paymentId = req.query.paymentId
+  try {
+    const order = await findTransactions(paymentId)
+    res.status(200).send(order)
+  } catch (error) {
+    res.status(200).send(error)
+  }
+}
+
 // Web hook
 exports.createWebhook = async function(req, res) {
   const eventTypes = [
@@ -551,6 +568,11 @@ exports.deleteWebhook = async function(req, res) {
 exports.webhookHandler = async function(req, res) {
   const payload = req.body
   fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
+  // if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
+  //   const newOrder = await createNeworderSubscribe(
+  //     req.body.resource.billing_agreement_id
+  //   )
+  // }
   res.status(200).send(payload)
 }
 
