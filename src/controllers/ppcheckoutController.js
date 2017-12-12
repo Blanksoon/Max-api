@@ -568,11 +568,15 @@ exports.deleteWebhook = async function(req, res) {
 exports.webhookHandler = async function(req, res) {
   const payload = req.body
   fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
-  // if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
-  //   const newOrder = await createNeworderSubscribe(
-  //     req.body.resource.billing_agreement_id
-  //   )
-  // }
+  if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
+    try {
+      const newOrder = await createNeworderSubscribe(
+        req.body.resource.billing_agreement_id
+      )
+    } catch (err) {
+      console.log('error in webhook', err)
+    }
+  }
   res.status(200).send(payload)
 }
 
