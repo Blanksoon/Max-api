@@ -304,11 +304,13 @@ export function findTransactions(paymentId) {
 }
 export function createNeworderSubscribe(paymentId) {
   return new Promise(async (resolve, reject) => {
-    const order = await Order.findOne({
+    console.log('paymentId', paymentId)
+    let order = await Order.findOne({
       'paypal.paymentId': paymentId,
       status: 'approved',
     })
       .then(async function(orderData) {
+        console.log('order', order)
         const newOrder = order
         order.status = 'expired'
         await order.save()

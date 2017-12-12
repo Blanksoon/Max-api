@@ -567,7 +567,6 @@ exports.deleteWebhook = async function(req, res) {
 }
 exports.webhookHandler = async function(req, res) {
   const payload = req.body
-  console.log('payload', payload)
   fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
   if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
     try {
