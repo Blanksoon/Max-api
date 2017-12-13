@@ -238,6 +238,52 @@ async function findVods(status, query) {
   return returnVods
 }
 
+async function findAllVods() {
+  const vods = await Vod.find({})
+  return vods.length
+}
+
+async function findVodsOndemand(status, query, index, limit) {
+  if (query == null) {
+    query = {}
+  }
+  var statusOrder = ''
+  var dataVods = {
+    error: 'none',
+    data: [],
+  }
+  var returnVods = {}
+  if (status == 'not-paid') {
+    statusOrder = 'not-paid'
+  } else if (status == 'feature-vod') {
+    statusOrder = 'feature-vod'
+  } else if (status == 'feature-vod-paid') {
+    statusOrder = 'feature-vod-paid'
+  } else {
+    statusOrder = 'paid'
+  }
+  index = parseInt(index)
+  returnVods = await Vod.find(query)
+    .limit(limit)
+    .skip(index)
+    .sort({ onAirDate: -1 })
+    .then(function(vods) {
+      if (Object.keys(vods).length != 0) {
+        console.log('vods', vods.length)
+        dataVods.data = setData(vods, statusOrder)
+        return dataVods
+      } else {
+        dataVods.error = 'data not found'
+        return dataVods
+      }
+    })
+    .catch(function(err) {
+      dataVods.error = err
+      return dataVods
+    })
+  return returnVods
+}
+
 async function decodeJwt(token, req) {
   var status = ''
   var today = Date.now()
@@ -631,4 +677,136 @@ exports.getProgramName = function(req, res) {
     ],
   }
   return res.json(output)
+}
+
+exports.vodsOndemand = async function(req, res) {
+  var token = req.query.token
+  var searchName = req.query.search
+  var limit = 4
+  var index = req.query.index
+  var allVods = await findAllVods()
+  console.log(allVods)
+  var outputvods = {}
+  var json = {}
+  var order = ''
+  var output = {
+    status: {
+      code: 400,
+      success: false,
+      message: defaultErrorMessage,
+    },
+    data: [],
+  }
+  var progName = req.query.progname
+  if (
+    //Search vod
+    searchName != 'undefined' &&
+    searchName != '' &&
+    searchName != undefined
+  ) {
+    if (token == undefined || token == '' || token == 'undefined') {
+      outputvods = await findVodsOndemand(
+        'not-paid',
+        {
+          programName_en: { $regex: '.*' + searchName + '.*' },
+        },
+        index,
+        limit
+      )
+      json = setDataOutput(outputvods, output)
+      return res.json(json)
+    } else {
+      order = await decodeJwt(token, req)
+      if (order == 'you have purchase') {
+        outputvods = await findVodsOndemand(
+          'paid',
+          {
+            programName_en: { $regex: '.*' + searchName + '.*' },
+          },
+          index,
+          limit
+        )
+        json = setDataOutput(outputvods, output)
+      } else if (order == `you have't purchase`) {
+        outputvods = await findVodsOndemand(
+          'not-paid',
+          {
+            programName_en: { $regex: '.*' + searchName + '.*' },
+          },
+          index,
+          limit
+        )
+        json = setDataOutput(outputvods, output)
+      } else {
+        outputvods = { err: order }
+        json = setDataOutput(outputvods, output)
+      }
+      return res.json(json)
+    }
+  } else if (
+    //Filter program
+    progName != 'undefined' &&
+    progName != '' &&
+    progName != undefined
+  ) {
+    if (token == undefined || token == '' || token == 'undefined') {
+      outputvods = await findVodsOndemand(
+        'not-paid',
+        {
+          programName_en: progName,
+        },
+        index,
+        limit
+      )
+      json = setDataOutput(outputvods, output)
+      return res.json(json)
+    } else {
+      order = await decodeJwt(token, req)
+      if (order == 'you have purchase') {
+        outputvods = await findVodsOndemand(
+          'paid',
+          {
+            programName_en: progName,
+          },
+          index,
+          limit
+        )
+        json = setDataOutput(outputvods, output)
+      } else if (order == `you have't purchase`) {
+        outputvods = await findVodsOndemand(
+          'not-paid',
+          {
+            programName_en: progName,
+          },
+          index,
+          limit
+        )
+        json = setDataOutput(outputvods, output)
+      } else {
+        outputvods = { err: order }
+        json = setDataOutput(outputvods, output)
+      }
+      return res.json(json)
+    }
+  } else if (token == undefined || token == '' || token == 'undefined') {
+    //Find all vod
+    outputvods = await findVodsOndemand('not-paid', {}, index, limit)
+    json = setDataOutput(outputvods, output)
+    json.numberOfVods = allVods
+    console.log('json', json)
+    return res.json(json)
+  } else {
+    order = await decodeJwt(token, req)
+    if (order == 'you have purchase') {
+      outputvods = await findVodsOndemand('paid', {}, index, limit)
+      json = setDataOutput(outputvods, output)
+    } else if (order == `you have't purchase`) {
+      outputvods = await findVodsOndemand('not-paid', {}, index, limit)
+      json = setDataOutput(outputvods, output)
+    } else {
+      outputvods = { err: order }
+      json = setDataOutput(outputvods, output)
+    }
+    return res.json(json)
+  }
 }

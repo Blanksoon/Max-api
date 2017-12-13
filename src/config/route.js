@@ -82,6 +82,7 @@ module.exports = function(app) {
   app.post('/insert-vod', vod.insertValue)
   app.get('/vods-feature', vod.featureVods)
   app.route('/vods').get(vod.vods)
+  app.route('/vods-ondemand').get(vod.vodsOndemand)
   // .get(vod.search)
   //.post(middleware, vod.create)
 
