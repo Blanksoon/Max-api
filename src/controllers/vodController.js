@@ -714,6 +714,7 @@ exports.vodsOndemand = async function(req, res) {
         limit
       )
       json = setDataOutput(outputvods, output)
+      json.numberOfVods = allVods
       return res.json(json)
     } else {
       order = await decodeJwt(token, req)
@@ -741,6 +742,7 @@ exports.vodsOndemand = async function(req, res) {
         outputvods = { err: order }
         json = setDataOutput(outputvods, output)
       }
+      json.numberOfVods = allVods
       return res.json(json)
     }
   } else if (
@@ -759,6 +761,7 @@ exports.vodsOndemand = async function(req, res) {
         limit
       )
       json = setDataOutput(outputvods, output)
+      json.numberOfVods = allVods
       return res.json(json)
     } else {
       order = await decodeJwt(token, req)
@@ -786,6 +789,7 @@ exports.vodsOndemand = async function(req, res) {
         outputvods = { err: order }
         json = setDataOutput(outputvods, output)
       }
+      json.numberOfVods = allVods
       return res.json(json)
     }
   } else if (token == undefined || token == '' || token == 'undefined') {
@@ -793,7 +797,6 @@ exports.vodsOndemand = async function(req, res) {
     outputvods = await findVodsOndemand('not-paid', {}, index, limit)
     json = setDataOutput(outputvods, output)
     json.numberOfVods = allVods
-    console.log('json', json)
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
@@ -807,6 +810,7 @@ exports.vodsOndemand = async function(req, res) {
       outputvods = { err: order }
       json = setDataOutput(outputvods, output)
     }
+    json.numberOfVods = allVods
     return res.json(json)
   }
 }
