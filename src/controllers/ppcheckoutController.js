@@ -570,7 +570,6 @@ exports.webhookHandler = async function(req, res) {
   fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
   if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
     try {
-      console.log('hi')
       const newOrder = await createNeworderSubscribe(
         req.body.resource.billing_agreement_id
       )

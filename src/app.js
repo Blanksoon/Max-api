@@ -4,7 +4,9 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
-
+// const keyPublishable = env.PUBLISHABLE_KEY
+// const keySecret = env.SECRET_KEY
+// const stripe = require('stripe')(keySecret)
 // Global import
 const mongoose = require('mongoose')
 const Vod = require('./models/vod')

@@ -238,8 +238,8 @@ async function findVods(status, query) {
   return returnVods
 }
 
-async function findAllVods() {
-  const vods = await Vod.find({})
+async function findAllVods(query) {
+  const vods = await Vod.find(query)
   return vods.length
 }
 
@@ -684,7 +684,7 @@ exports.vodsOndemand = async function(req, res) {
   var searchName = req.query.search
   var limit = 4
   var index = req.query.index
-  var allVods = await findAllVods()
+  var allVods = await findAllVods({})
   console.log(allVods)
   var outputvods = {}
   var json = {}
@@ -751,6 +751,10 @@ exports.vodsOndemand = async function(req, res) {
     progName != '' &&
     progName != undefined
   ) {
+    allVods = await findAllVods({
+      programName_en: progName,
+    })
+    console.log('progName', progName)
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVodsOndemand(
         'not-paid',
