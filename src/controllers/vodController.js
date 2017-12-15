@@ -298,7 +298,11 @@ async function decodeJwt(token, req) {
       const query = {
         userId: decode.data._id,
         expiredDate: { $gte: today },
-        $or: [{ productId: '2001' }, { productId: '2002' }],
+        $or: [
+          { productId: '5a0c040eb29318da40e335ef' },
+          { productId: '5a0c0450b29318da40e335f0' },
+        ],
+        status: 'approved',
       }
       //const query = { userId: decode.data.email }
       const order = await queryOrder(query)
