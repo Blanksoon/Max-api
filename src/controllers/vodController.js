@@ -33,7 +33,7 @@ const queryOrder = query => {
     let statusOders = ''
     Order.find(query)
       .then(function(order) {
-        //console.log('order', order)
+        console.log('order', order)
         if (Object.keys(order).length != 0) {
           statusOders = 'you have purchase'
           resolve(statusOders)
@@ -302,7 +302,7 @@ async function decodeJwt(token, req) {
       }
       //const query = { userId: decode.data.email }
       const order = await queryOrder(query)
-      //console.log('ordersss', order)
+      console.log('ordersss', order)
       status = order
     }
   } catch (err) {
