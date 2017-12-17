@@ -763,7 +763,7 @@ exports.fbLogin = async function(req, res) {
   else {
     var response = await socialAuthen[providerName](providerData)
 
-    //console.log('response', response)
+    console.log('response', response)
     return res.json(response)
   }
 }
