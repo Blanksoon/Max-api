@@ -763,7 +763,7 @@ exports.fbLogin = async function(req, res) {
   else {
     var response = await socialAuthen[providerName](providerData)
 
-    console.log('response', response)
+    //console.log('response', response)
     return res.json(response)
   }
 }
@@ -865,7 +865,7 @@ exports.forgotPassword = async function(req, res) {
         output.data = { email: userEmail }
         text =
           'Change your password from ' +
-          stagingUrl +
+          env.FRONTEND_URL +
           '/changePassword?token=' +
           token
         const statusEmail = await email(text, output, subject)

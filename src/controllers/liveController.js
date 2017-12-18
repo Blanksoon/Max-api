@@ -225,7 +225,7 @@ async function decodeJwt(token, req) {
         status: 'approved',
       }
       const order = await queryOrder(query)
-      console.log('11111111111111', order)
+      //console.log('11111111111111', order)
       status = order
     }
   } catch (err) {
