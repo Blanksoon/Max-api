@@ -579,6 +579,14 @@ exports.webhookHandler = async function(req, res) {
   }
   res.status(200).send(payload)
 }
+exports.stripeWebhookHandler = async function(req, res) {
+  const payload = req
+  console.log(req)
+  fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
+    flag: 'a',
+  })
+  res.status(200).send(payload)
+}
 
 //braintree
 exports.subscribeBraintree = async function(req, res) {
