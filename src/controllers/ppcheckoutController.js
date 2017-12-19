@@ -581,7 +581,7 @@ exports.webhookHandler = async function(req, res) {
 }
 exports.stripeWebhookHandler = async function(req, res) {
   const payload = req.body
-  console.log(req)
+  console.log(req.body)
   fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
     flag: 'a',
   })
