@@ -942,7 +942,7 @@ exports.profileUser = async function(req, res) {
 }
 
 exports.updateUser = async function(req, res) {
-  console.log('hi', req.body)
+  //console.log('hi', req.body)
   const output = {
     status: {
       code: 400,

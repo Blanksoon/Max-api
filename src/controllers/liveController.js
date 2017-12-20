@@ -289,7 +289,7 @@ exports.insertValue = function(req, res) {
 }
 
 exports.lives = async function(req, res) {
-  console.log('hi')
+  //console.log('hi')
   var token = req.query.token
   var outputvods = {}
   var json = {}

@@ -62,6 +62,9 @@ var OrderSchema = new Schema({
   paymentIos: {
     transactionId: String,
   },
+  stripe: {
+    paymentId: String,
+  },
   versionKey: false,
 })
 
