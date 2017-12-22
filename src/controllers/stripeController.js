@@ -447,7 +447,7 @@ exports.subscribeCreditCard = async function(req, res) {
     })
     const order = await newOrder.save()
     res.send({
-      data: transaction,
+      //data: transaction,
       url: env.FRONTEND_URL + '/getticket',
     })
   } catch (error) {
