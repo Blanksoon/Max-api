@@ -24,6 +24,7 @@ export function createTransaction(customerId, sourceId) {
       },
       function(err, source) {
         if (err) {
+          console.log('nnnnnnnnnnnnnnnnnnn', err)
           reject(err)
         } else {
           resolve(source)
@@ -51,5 +52,42 @@ export function chargeTransaction(sourceId, customerId, amount) {
         }
       }
     )
+  })
+}
+
+export function createSource(amount) {
+  return new Promise((resolve, reject) => {
+    stripe.sources.create(
+      {
+        type: 'alipay',
+        amount: amount,
+        currency: 'usd',
+        owner: {
+          email: 'maxmuaythai@gmail.com',
+        },
+        redirect: {
+          return_url: env.SERVER_URL + '/stripe/confirm-transaction',
+        },
+      },
+      function(err, source) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(source)
+        }
+      }
+    )
+  })
+}
+
+export function retrieveSource(sourceId) {
+  return new Promise((resolve, reject) => {
+    stripe.sources.retrieve(sourceId, function(err, source) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(source)
+      }
+    })
   })
 }
