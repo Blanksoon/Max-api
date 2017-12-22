@@ -1,4 +1,5 @@
 import env from '../config/env'
+import { resolve } from 'url'
 // import stripe from 'stripe'
 // stripe(env.KEYSECRET)
 const stripe = require('stripe')(env.KEYSECRET)
@@ -24,7 +25,7 @@ export function createTransaction(customerId, sourceId) {
       },
       function(err, source) {
         if (err) {
-          console.log('nnnnnnnnnnnnnnnnnnn', err)
+          //console.log('nnnnnnnnnnnnnnnnnnn', err)
           reject(err)
         } else {
           resolve(source)
@@ -91,3 +92,100 @@ export function retrieveSource(sourceId) {
     })
   })
 }
+
+export function subscibeCreditCard(customerId, planId, sourceId) {
+  return new Promise((resolve, reject) => {
+    stripe.subscriptions.create(
+      {
+        customer: customerId,
+        source: sourceId,
+        items: [
+          {
+            plan: planId,
+          },
+        ],
+      },
+      function(err, source) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(source)
+        }
+      }
+    )
+  })
+}
+
+export function retrieveCustomer(customerId) {
+  return new Promise((resolve, reject) => {
+    stripe.customers.retrieve(req.body.customer, function(err, source) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(source)
+      }
+    })
+  })
+}
+
+// export function checkStatusCreditcard(sources, creditcard) {
+//   return new Promise((resolve, reject) => {
+//     let i = 0
+//     const status = false
+//     while (i < customer.sources.data.length) {
+//       if (
+//         sources[i].last4 === creditcard.last4 &&
+//         sources[i].exp_month === creditcard.exp_month &&
+//         sources[i].exp_year === creditcard.exp_year
+//       ) {
+//         if (i === 0) {
+//           return resolve({
+//             message: 'ready',
+//             data: {},
+//           })
+//         } else {
+//           return resolve({
+//             message: 'unready',
+//             data: sources[i],
+//           })
+//         }
+//       } else {
+//         if (i === customer.sources.data.length - 1) {
+//           return resolve({
+//             message: 'nocredit',
+//             data: {},
+//           })
+//         }
+//         i++
+//       }
+//     }
+//   })
+// }
+
+// export function checkDefaultSource(customerId, creditcard) {
+//   return new Promise(async (resolve, reject) => {
+//     const customer = await retrieveCustomer(customerId)
+//     console.log('11111', customer)
+//     const sources = customer.data.sources.data
+//     const statusCreditcard = await checkStatusCreditcard(sources, creditcard)
+//     resolve(statusCreditcard)
+//   })
+// }
+
+// export function updateDefaultSource(customerId, sourceId) {
+//   return new Promise((resolve, reject) => {
+//     stripe.customers.update(
+//       customerId,
+//       {
+//         default_source: sourceId,
+//       },
+//       function(err, source) {
+//         if (err) {
+//           reject(err)
+//         } else {
+//           resolve(source)
+//         }
+//       }
+//     )
+//   })
+// }

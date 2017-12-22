@@ -49,6 +49,9 @@ var SubscribeSchema = new Schema({
   billingPlanBraintreeDev: {
     billingPlanIdBraintree: String,
   },
+  stripePlanId: {
+    planId: String,
+  },
   versionKey: false,
 })
 

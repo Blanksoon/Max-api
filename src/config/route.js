@@ -181,5 +181,6 @@ module.exports = function(app) {
   //stripe
   app.get('/stripe/creditcard', stripe.payPerViewCreditCard)
   app.get('/stripe/alipay', stripe.payPerViewAlipay)
+  app.get('/stripe/subscribe/creditcard', stripe.subscribeCreditCard)
   app.get('/stripe/confirm-transaction', stripe.confirmTransaction)
 }

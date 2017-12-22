@@ -11,6 +11,9 @@ import {
   chargeTransaction,
   createSource,
   retrieveSource,
+  checkDefaultSource,
+  subscibeCreditCard,
+  updateDefaultSource,
 } from '../utils/stripe'
 
 const decryptJwt = (token, req) => {
@@ -42,30 +45,20 @@ const checkStatusLive = liveId => {
   })
 }
 
-// const createOrder = (live, userId, email) => {
-//   return new Promise(async (resolve, reject) => {
-//     console.log('888888888')
-//     const expiredDate = new Date(live.liveToDate)
-//     expiredDate.setDate(expiredDate.getDate() + 1)
-//     const newOrder = new Order({
-//       productId: live.id,
-//       productName: live.title_en,
-//       userId,
-//       email,
-//       price: live.price,
-//       purchaseDate: new Date(),
-//       platform: 'creditcard',
-//       expiredDate: expiredDate,
-//       status: 'created',
-//     })
-//     console.log('fjfjfjfjfjfjfjfj')
-//     await newOrder.save().then(function(order) {
-//       resolve(order)
-//     })
-// console.log('order', order)
-// resolve(order)
-//   })
-// }
+const checkStatusSubscribe = subscribeId => {
+  return new Promise(async (resolve, reject) => {
+    Subscribe.findOne({ _id: subscribeId }, function(err, subscribe) {
+      if (subscribe) {
+        resolve(subscribe)
+      } else {
+        reject({
+          code: 404,
+          message: 'Target subscribe not found',
+        })
+      }
+    })
+  })
+}
 
 //stripe
 exports.payPerViewCreditCard = async function(req, res) {
@@ -251,5 +244,205 @@ exports.confirmTransaction = async function(req, res) {
     // })
     console.log('4')
     res.redirect(env.FRONTEND_URL + '/error')
+  }
+}
+
+exports.subCreditCard = async function(req, res) {
+  // const token = req.query.token
+  // const subscribeId = req.query.subscribeId
+  // const creditcard = req.body.creditcard
+  // const sourceId = req.query.sourceId
+  // try {
+  //   const decode = await decryptJwt(token, req)
+  //   const subscribe = await checkStatusSubscribe(subscribeId)
+  //   const userId = decode.data._id
+  //   const email = decode.data.email
+  //   // Check customerid stripe
+  //   const user = await User.findOne({ _id: userId })
+  //   //console.log('sourceId', sourceId)
+  //   if (user.stripe.customerId === undefined) {
+  //     // user has no customerid in stripe
+  //     const stripeUser = await createCustomer(email)
+  //     user.stripe.customerId = stripeUser.id
+  //     await user.save()
+  //   }
+  //   const defaultSource = await checkDefaultSource(
+  //     user.stripe.customerId,
+  //     creditcard
+  //   )
+  //   if (defaultSource.message === 'ready') {
+  //     const transaction = await subscibePlan(
+  //       user.stripe.customerId,
+  //       subscribe.stripe.planId
+  //     )
+  //     if (transaction.status === 'active') {
+  //       const expiredDate = transaction.current_period_end
+  //       const newOrder = new Order({
+  //         productId: subscribe.id,
+  //         productName: subscribe.title_en,
+  //         userId,
+  //         email,
+  //         price: subscribe.price,
+  //         purchaseDate: new Date(),
+  //         platform: 'creditcard',
+  //         expiredDate: expiredDate,
+  //         status: 'approved',
+  //         stripe: {
+  //           paymentId: transaction.id,
+  //         },
+  //       })
+  //       res.send({
+  //         url: env.FRONTEND_URL + '/getticket',
+  //       })
+  //     } else {
+  //       res.send({
+  //         url: env.FRONTEND_URL + '/error',
+  //       })
+  //     }
+  //   } else if (defaultSource.message === 'unready') {
+  //     const source = await updateDefaultSource(
+  //       user.stripe.customerId,
+  //       defaultSource.data.id
+  //     ) //check
+  //     const transaction = await subscibePlan(
+  //       user.stripe.customerId,
+  //       subscribe.stripe.planId
+  //     )
+  //     if (transaction.status === 'active') {
+  //       const expiredDate = transaction.current_period_end
+  //       const newOrder = new Order({
+  //         productId: subscribe.id,
+  //         productName: subscribe.title_en,
+  //         userId,
+  //         email,
+  //         price: subscribe.price,
+  //         purchaseDate: new Date(),
+  //         platform: 'creditcard',
+  //         expiredDate: expiredDate,
+  //         status: 'approved',
+  //         stripe: {
+  //           paymentId: transaction.id,
+  //         },
+  //       })
+  //       res.send({
+  //         url: env.FRONTEND_URL + '/getticket',
+  //       })
+  //     } else {
+  //       res.send({
+  //         url: env.FRONTEND_URL + '/error',
+  //       })
+  //     }
+  //   } else {
+  //     const Transaction = await createTransaction(
+  //       user.stripe.customerId,
+  //       sourceId
+  //     )
+  //   }
+  // const transaction = await createTransaction(
+  //   user.stripe.customerId,
+  //   sourceId.id
+  // )
+  // const expiredDate = new Date(live.liveToDate)
+  // expiredDate.setDate(expiredDate.getDate() + 1)
+  // const newOrder = new Order({
+  //   productId: live.id,
+  //   productName: live.title_en,
+  //   userId,
+  //   email,
+  //   price: live.price,
+  //   purchaseDate: new Date(),
+  //   platform: 'alipay',
+  //   expiredDate: expiredDate,
+  //   status: 'created',
+  //   stripe: {
+  //     paymentId: transaction.id,
+  //   },
+  // })
+  // const order = await newOrder.save()
+  // const successTransaction = await chargeTransaction(
+  //   transaction.id,
+  //   user.stripe.customerId,
+  //   live.price * 100
+  // )
+  // if (successTransaction.status === 'succeeded') {
+  //   order.stripe.paymentId = successTransaction.id
+  //   order.status = 'approved'
+  //   await order.save()
+  //   res.send({
+  //     url: env.FRONTEND_URL + '/getticket',
+  //   })
+  // } else {
+  //   res.send({
+  //     url: env.FRONTEND_URL + '/error',
+  //   })
+  // }
+  //res.status(200).send({ url: transaction.redirect.url })
+  // } catch (error) {
+  //   res.status(200).send({
+  //     status: {
+  //       code: error.code || 500,
+  //       success: false,
+  //       message: error.message,
+  //     },
+  //     data: [],
+  //   })
+  // }
+} //not use
+
+exports.subscribeCreditCard = async function(req, res) {
+  const token = req.query.token
+  const subscribeId = req.query.subscribeId
+  const sourceId = req.query.sourceId
+  try {
+    const decode = await decryptJwt(token, req)
+    const subscribe = await checkStatusSubscribe(subscribeId)
+    const userId = decode.data._id
+    const email = decode.data.email
+    // Check customerid stripe
+    const user = await User.findOne({ _id: userId })
+    //console.log('sourceId', sourceId)
+    if (user.stripe.customerId === undefined) {
+      // user has no customerid in stripe
+      const stripeUser = await createCustomer(email)
+      user.stripe.customerId = stripeUser.id
+      await user.save()
+    }
+    //console.log('subscribe', subscribe)
+    const transaction = await subscibeCreditCard(
+      user.stripe.customerId,
+      subscribe.stripePlanId.planId,
+      sourceId
+    )
+    const expiredDate = new Date(transaction.current_period_end * 1000)
+    //console.log('expiredDate', expiredDate)
+    //console.log('moment', moment(expiredDate).format('MMMM Do YYYY, h:mm:ss a'))
+    const newOrder = new Order({
+      productId: subscribe.id,
+      productName: subscribe.title_en,
+      userId,
+      email,
+      price: subscribe.price,
+      purchaseDate: new Date(),
+      platform: 'creditcard',
+      expiredDate: expiredDate,
+      status: 'approved',
+      stripe: {
+        paymentId: transaction.id,
+      },
+    })
+    const order = await newOrder.save()
+    res.send({
+      data: transaction,
+      url: env.FRONTEND_URL + '/getticket',
+    })
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
   }
 }
