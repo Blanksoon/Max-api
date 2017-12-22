@@ -128,6 +128,18 @@ export function retrieveCustomer(customerId) {
   })
 }
 
+export function cancelSubscribe(planId) {
+  return new Promise((resolve, reject) => {
+    stripe.subscriptions.del(planId, function(err, confirmation) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(confirmation)
+      }
+    })
+  })
+}
+
 // export function checkStatusCreditcard(sources, creditcard) {
 //   return new Promise((resolve, reject) => {
 //     let i = 0

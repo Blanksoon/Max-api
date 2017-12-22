@@ -14,6 +14,7 @@ import {
   checkDefaultSource,
   subscibeCreditCard,
   updateDefaultSource,
+  cancelSubscribe,
 } from '../utils/stripe'
 
 const decryptJwt = (token, req) => {
@@ -60,6 +61,20 @@ const checkStatusSubscribe = subscribeId => {
   })
 }
 
+const queryOrder = orderId => {
+  return new Promise(async (resolve, reject) => {
+    Order.findOne({ _id: orderId }, function(err, order) {
+      if (order) {
+        resolve(order)
+      } else {
+        reject({
+          code: 404,
+          message: 'order not found',
+        })
+      }
+    })
+  })
+}
 //stripe
 exports.payPerViewCreditCard = async function(req, res) {
   console.log('token', req.query.token)
@@ -435,6 +450,38 @@ exports.subscribeCreditCard = async function(req, res) {
       data: transaction,
       url: env.FRONTEND_URL + '/getticket',
     })
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.cancelSubscribeTion = async function(req, res) {
+  //console.log('hi', req.query.orderId)
+  const orderId = req.query.orderId
+  try {
+    const order = await queryOrder(orderId)
+    const subsrcibe = await cancelSubscribe(order.stripe.paymentId)
+    //console.log(subsrcibe)
+    order.cancelDate = Date.now()
+    order.status = 'canceled'
+    await order.save()
+    //console.log('hhhhhh')
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success for cancel subscribe',
+      },
+      data: [],
+    })
+    //res.send(subsrcibe)
   } catch (error) {
     res.status(200).send({
       status: {
