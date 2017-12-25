@@ -146,7 +146,7 @@ exports.payPerViewCreditCard = async function(req, res) {
 }
 
 exports.payPerViewAlipay = async function(req, res) {
-  //console.log('token', req.query.token)
+  console.log('token', req.query.token)
   //console.log('liveId', req.query.liveId)
   //console.log('sourceId', req.query.sourceId)
   const token = req.query.token
@@ -206,8 +206,10 @@ exports.payPerViewAlipay = async function(req, res) {
     //     url: env.FRONTEND_URL + '/error',
     //   })
     // }
+    console.log('123', transaction.redirect.url)
     res.status(200).send({ url: transaction.redirect.url })
   } catch (error) {
+    console.log(error)
     res.status(200).send({
       status: {
         code: error.code || 500,

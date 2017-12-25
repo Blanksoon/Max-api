@@ -41,7 +41,7 @@ export function chargeTransaction(sourceId, customerId, amount) {
       {
         amount: amount,
         description: 'Max muay thai',
-        currency: 'usd',
+        currency: 'sgd',
         source: sourceId,
         customer: customerId,
       },
@@ -62,7 +62,7 @@ export function createSource(amount) {
       {
         type: 'alipay',
         amount: amount,
-        currency: 'usd',
+        currency: 'sgd',
         owner: {
           email: 'maxmuaythai@gmail.com',
         },
