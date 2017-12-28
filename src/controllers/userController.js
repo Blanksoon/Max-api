@@ -606,18 +606,19 @@ exports.delete = function(req, res) {
 
 exports.sendEmail = function(req, res) {
   var transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    host: 'smtp.sparkpostmail.com',
+    port: 587,
     auth: {
-      user: 'topscores@gmail.com', // Your email id
-      pass: 'pr0visi0n', // Your password
+      user: 'SMTP_Injection', // Your email id
+      pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
     },
   })
 
   var text = 'Hello world from'
   var mailOptions = {
-    from: '<farm1771@gmail.com>', // sender address
-    to: 'topscores@gmail.com', // list of receivers
-    subject: 'Email Example', // Subject line
+    from: `<${req.body.userEmail.email}>`, // sender address
+    to: 'contact@maxmuaythai.com', // list of receivers
+    subject: 'Question from customer', // Subject line
     text:
       'From E-mail: ' +
       req.body.userEmail.email +

@@ -81,9 +81,45 @@ export function createSource(amount) {
   })
 }
 
+export function createSourceSubscribe(amount) {
+  return new Promise((resolve, reject) => {
+    stripe.sources.create(
+      {
+        type: 'alipay',
+        //amount: amount,
+        currency: 'sgd',
+        redirect: {
+          return_url: env.SERVER_URL + '/stripe/confirm-subscribe-alipay',
+        },
+        usage: 'reusable',
+      },
+      function(err, source) {
+        if (err) {
+          console.log('333333', err)
+          reject(err)
+        } else {
+          resolve(source)
+        }
+      }
+    )
+  })
+}
+
 export function retrieveSource(sourceId) {
   return new Promise((resolve, reject) => {
     stripe.sources.retrieve(sourceId, function(err, source) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(source)
+      }
+    })
+  })
+}
+
+export function retrieveCustomer(customerId) {
+  return new Promise((resolve, reject) => {
+    stripe.customers.retrieve(req.body.customer, function(err, source) {
       if (err) {
         reject(err)
       } else {
@@ -113,18 +149,6 @@ export function subscibeCreditCard(customerId, planId, sourceId) {
         }
       }
     )
-  })
-}
-
-export function retrieveCustomer(customerId) {
-  return new Promise((resolve, reject) => {
-    stripe.customers.retrieve(req.body.customer, function(err, source) {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(source)
-      }
-    })
   })
 }
 

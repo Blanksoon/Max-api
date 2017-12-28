@@ -265,6 +265,26 @@ function setDate(notPaidLive) {
       notPaidLive[i].startTime = '19.20'
       notPaidLive[i].endTime = '22.00'
     }
+    if (i == 4) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
+    if (i == 5) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
+    if (i == 6) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
+    if (i == 7) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
+    if (i == 8) {
+      notPaidLive[i].startTime = '19.20'
+      notPaidLive[i].endTime = '22.00'
+    }
     i++
   }
 }
