@@ -15,6 +15,7 @@ import {
   subscibeCreditCard,
   updateDefaultSource,
   cancelSubscribe,
+  createSourceSubscribe,
 } from '../utils/stripe'
 
 const decryptJwt = (token, req) => {
@@ -116,10 +117,18 @@ exports.payPerViewCreditCard = async function(req, res) {
       status: 'created',
     })
     const order = await newOrder.save()
+    let price = 0
+    if (live.price === 1.99) {
+      price = 298
+    } else if (live.price === 4.99) {
+      price = 698
+    } else {
+      price = 1498
+    }
     const successTransaction = await chargeTransaction(
       transaction.id,
       user.stripe.customerId,
-      live.price * 100
+      price
     )
     if (successTransaction.status === 'succeeded') {
       order.stripe.paymentId = successTransaction.id
@@ -134,6 +143,7 @@ exports.payPerViewCreditCard = async function(req, res) {
       })
     }
   } catch (error) {
+    console.log(err)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -151,11 +161,19 @@ exports.payPerViewAlipay = async function(req, res) {
   //console.log('sourceId', req.query.sourceId)
   const token = req.query.token
   const liveId = req.query.liveId
+  let price = 0
   try {
     const decode = await decryptJwt(token, req)
     //console.log('111111111', liveId)
     const live = await checkStatusLive(liveId)
-    const sourceId = await createSource(live.price * 100)
+    if (live.price === 1.99) {
+      price = 298
+    } else if (live.price === 4.99) {
+      price = 698
+    } else {
+      price = 1498
+    }
+    const sourceId = await createSource(price)
     //console.log('ccccccccccccc', sourceId)
     const userId = decode.data._id
     const email = decode.data.email
@@ -222,6 +240,7 @@ exports.payPerViewAlipay = async function(req, res) {
 }
 
 exports.confirmTransaction = async function(req, res) {
+  console.log(req.query)
   try {
     const stautsTransaction = await retrieveSource(req.query.source)
     if (stautsTransaction.status === 'chargeable') {
@@ -462,6 +481,79 @@ exports.subscribeCreditCard = async function(req, res) {
       data: [],
     })
   }
+}
+
+exports.subscribeAlipay = async function(req, res) {
+  const token = req.query.token
+  const subscribeId = req.query.subscribeId
+  try {
+    const decode = await decryptJwt(token, req)
+    const subscribe = await checkStatusSubscribe(subscribeId)
+    const userId = decode.data._id
+    const email = decode.data.email
+    // Check customerid stripe
+    const user = await User.findOne({ _id: userId })
+    //console.log('sourceId', sourceId)
+    if (user.stripe.customerId === undefined) {
+      // user has no customerid in stripe
+      const stripeUser = await createCustomer(email)
+      user.stripe.customerId = stripeUser.id
+      await user.save()
+    }
+    const sourceId = await createSourceSubscribe(subscribe.price * 100)
+    // const transaction = await createTransaction(
+    //   user.stripe.customerId,
+    //   sourceId.id
+    // )
+    //console.log('subscribe', subscribe)
+    //const source = await createSourceSubscribe(subscribe.price * 100)
+    //console.log('1111111111', source)
+    // const transaction = await subscibeCreditCard(
+    //   user.stripe.customerId,
+    //   subscribe.stripePlanId.planId,
+    //   source.id
+    // )
+    // console.log('2222222222', transaction)
+    // const expiredDate = new Date(transaction.current_period_end * 1000)
+    //console.log('expiredDate', expiredDate)
+    //console.log('moment', moment(expiredDate).format('MMMM Do YYYY, h:mm:ss a'))
+    // const newOrder = new Order({
+    //   productId: subscribe.id,
+    //   productName: subscribe.title_en,
+    //   userId,
+    //   email,
+    //   price: subscribe.price,
+    //   purchaseDate: new Date(),
+    //   platform: 'alipay',
+    //   expiredDate: new Date(),
+    //   status: 'create',
+    //   stripe: {
+    //     paymentId: transaction.id,
+    //   },
+    // })
+    // const order = await newOrder.save()
+    res.send({
+      //data: transaction,
+      url: sourceId.redirect.url,
+    })
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.confirmSubscribeAlipay = async function(req, res) {
+  //console.log(req)
+  console.log('body', req.body)
+  console.log('query', req.query)
+  console.log('params', req.params)
+  res.status(200).send('hi')
 }
 
 exports.cancelSubscribeTion = async function(req, res) {

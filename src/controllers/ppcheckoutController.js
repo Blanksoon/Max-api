@@ -354,6 +354,7 @@ exports.subscribe = async function(req, res) {
           billingId = subscribeProduct.billingPlanStaging.billingPlanId
         } else if (env.BILLINGPLAN === 'billingPlanProd') {
           billingId = subscribeProduct.billingPlanProd.billingPlanId
+          console.log('111111111', billingId)
         } else {
           billingId = subscribeProduct.billingPlanDev.billingPlanId
         }
@@ -402,7 +403,7 @@ exports.subscribe = async function(req, res) {
       }
     }
   } catch (error) {
-    //console.log('error', error.response)
+    console.log('error', error)
     res.status(200).send({
       status: {
         code: error.code || 500,
