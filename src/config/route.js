@@ -69,6 +69,7 @@ module.exports = function(app) {
   const order = require('../controllers/orderController')
   const live = require('../controllers/liveController')
   const ppcheckout = require('../controllers/ppcheckoutController')
+  const stripe = require('../controllers/stripeController')
 
   app.all('/*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -125,6 +126,7 @@ module.exports = function(app) {
       .route('/ppcheckout/webhooks/:webhookId')
       .delete(ppcheckout.deleteWebhook)
     app.route('/get-self-subscribe').get(ppcheckout.getSelfSubscribe)
+    app.route('/stripe/webhooks-handler').post(ppcheckout.stripeWebhookHandler)
   }
 
   app.route('/ppcheckout/webhooks-handler').post(ppcheckout.webhookHandler)
@@ -175,4 +177,11 @@ module.exports = function(app) {
 
   //wechat
   app.get('/wechat', user.wechat)
+
+  //stripe
+  app.get('/stripe/creditcard', stripe.payPerViewCreditCard)
+  app.get('/stripe/alipay', stripe.payPerViewAlipay)
+  app.get('/stripe/subscribe/creditcard', stripe.subscribeCreditCard)
+  app.get('/stripe/confirm-transaction', stripe.confirmTransaction)
+  app.get('/stripe/cancel-subscribe', stripe.cancelSubscribeTion)
 }

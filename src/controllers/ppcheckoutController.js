@@ -579,6 +579,16 @@ exports.webhookHandler = async function(req, res) {
   }
   res.status(200).send(payload)
 }
+exports.stripeWebhookHandler = async function(req, res) {
+  const payload = req.body
+  // console.log('body.......', req.body)
+  // console.log('params......', req.params)
+  // console.log('query......', req.query)
+  fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
+    flag: 'a',
+  })
+  res.status(200).send(payload)
+}
 
 //braintree
 exports.subscribeBraintree = async function(req, res) {
@@ -1035,6 +1045,7 @@ exports.cancelPaymentIos = async function(req, res) {
 exports.subscribeIos = async function(req, res) {
   const token = req.query.token
   const productId = req.body.productId
+  const transactionDate = req.body.transactionDate
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id

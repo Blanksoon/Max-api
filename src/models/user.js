@@ -43,6 +43,9 @@ var UserSchema = new Schema({
   braintree: {
     paymentMethod: String,
   },
+  stripe: {
+    customerId: String,
+  },
   versionKey: false,
 })
 

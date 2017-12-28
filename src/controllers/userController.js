@@ -739,7 +739,7 @@ exports.activateLocalUser = async function(req, res) {
     await activateUser(query, output)
     return res.json(output)
   } else {
-    console.log('unauthorize')
+    //console.log('unauthorize')
     output.status.message = 'unauthorized your token'
     return res.json(output)
   }
@@ -791,7 +791,7 @@ exports.checkOldPassword = async function(req, res) {
       data: [],
     })
   }
-  console.log('statusToken', statusToken)
+  //console.log('statusToken', statusToken)
   if (bcrypt.compareSync(`${password}`, `${statusToken.password}`)) {
     output.status.code = 200
     output.status.success = true
@@ -937,12 +937,12 @@ exports.profileUser = async function(req, res) {
       console.log('err', err)
       output.status.message = err
     })
-  console.log('output', output)
+  //console.log('output', output)
   return res.json(output)
 }
 
 exports.updateUser = async function(req, res) {
-  console.log('hi', req.body)
+  //console.log('hi', req.body)
   const output = {
     status: {
       code: 400,
