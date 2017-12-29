@@ -375,7 +375,7 @@ exports.livesById = async function(req, res) {
       let i = 0
       let subscribe = false
       while (i < order.length) {
-        if (order[i].productId == '2002') {
+        if (order[i].productName === 'subscribe lives and vods') {
           subscribe = true
         }
         i++
@@ -389,6 +389,7 @@ exports.livesById = async function(req, res) {
         json = setDataOutput(lives, output)
       } else {
         outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
+        console.log(outputvods)
         json = setDataOutput(outputvods, output)
       }
     } else {
