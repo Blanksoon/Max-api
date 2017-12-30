@@ -41,6 +41,27 @@ export function chargeTransaction(sourceId, customerId, amount) {
       {
         amount: amount,
         description: 'Max muay thai',
+        currency: 'usd',
+        source: sourceId,
+        customer: customerId,
+      },
+      function(err, source) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(source)
+        }
+      }
+    )
+  })
+}
+
+export function chargeTransactionAlipay(sourceId, customerId, amount) {
+  return new Promise((resolve, reject) => {
+    stripe.charges.create(
+      {
+        amount: amount,
+        description: 'Max muay thai',
         currency: 'sgd',
         source: sourceId,
         customer: customerId,
