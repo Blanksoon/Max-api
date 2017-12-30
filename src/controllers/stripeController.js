@@ -8,6 +8,7 @@ import moment from 'moment'
 import {
   createCustomer,
   createTransaction,
+  chargeTransactionAlipay,
   chargeTransaction,
   createSource,
   retrieveSource,
@@ -117,18 +118,18 @@ exports.payPerViewCreditCard = async function(req, res) {
       status: 'created',
     })
     const order = await newOrder.save()
-    let price = 0
-    if (live.price === 1.99) {
-      price = 298
-    } else if (live.price === 4.99) {
-      price = 698
-    } else {
-      price = 1498
-    }
+    // let price = 0
+    // if (live.price === 1.99) {
+    //   price = 298
+    // } else if (live.price === 4.99) {
+    //   price = 698
+    // } else {
+    //   price = 1498
+    // }
     const successTransaction = await chargeTransaction(
       transaction.id,
       user.stripe.customerId,
-      price
+      live.price * 100
     )
     if (successTransaction.status === 'succeeded') {
       order.stripe.paymentId = successTransaction.id
@@ -143,7 +144,7 @@ exports.payPerViewCreditCard = async function(req, res) {
       })
     }
   } catch (error) {
-    console.log(err)
+    console.log(error)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -247,7 +248,7 @@ exports.confirmTransaction = async function(req, res) {
       // console.log('id', stautsTransaction.id)
       // console.log('customer', stautsTransaction.customer)
       // console.log('amount', stautsTransaction.amount)
-      const transaction = await chargeTransaction(
+      const transaction = await chargeTransactionAlipay(
         stautsTransaction.id,
         stautsTransaction.customer,
         stautsTransaction.amount
