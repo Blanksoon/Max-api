@@ -156,67 +156,66 @@ socialAuthen['facebook'] = async function(providerData) {
       }
     }
 
-    if (Object.keys(checkNewUser).length != 0) {
-      var transporter = nodemailer.createTransport({
-        host: 'smtp.sparkpostmail.com',
-        port: 587,
-        //service: 'Gmail',
-        auth: {
-          user: 'SMTP_Injection', // Your email id
-          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-        },
-      })
-      var mailOptions = {
-        from: '<no-reply@maxmuaythai.com>', // sender address
-        to: `${checkNewUser.email}`, // list of receivers
-        subject: 'Promotion code for Max Muay Thai', // Subject line
-        text:
-          'Your promotion code for watch live and video in Max Muay Thai: ' +
-          'MWC2016',
-        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-      }
-      var statuEmail = await transporter
-        .sendMail(mailOptions)
-        .then(function(info) {
-          data = {
-            status: {
-              code: 200,
-              success: true,
-              message: defaultSuccessMessage,
-            },
-            data: {
-              token: token,
-              email: facebookData.email,
-            },
-          }
-          return data
-        })
-        .catch(function(err) {
-          return {
-            status: {
-              code: 400,
-              success: false,
-              message: `can't send email`,
-            },
-            data: {},
-          }
-        })
-      return statuEmail
-    } else {
-      token = await jwt.sign({ data: user }, env.JWT_SECRET, {
-        expiresIn: env.JWT_TOKEN_LIFETIME,
-      })
-      return {
-        status: {
-          code: 200,
-          success: true,
-          message: defaultSuccessMessage,
-        },
-        data: {
-          token: token,
-          email: facebookData.email,
-        },
-      }
+    // if (Object.keys(checkNewUser).length != 0) {
+    //   var transporter = nodemailer.createTransport({
+    //     host: 'smtp.sparkpostmail.com',
+    //     port: 587,
+    //     //service: 'Gmail',
+    //     auth: {
+    //       user: 'SMTP_Injection', // Your email id
+    //       pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+    //     },
+    //   })
+    //   var mailOptions = {
+    //     from: '<no-reply@maxmuaythai.com>', // sender address
+    //     to: `${checkNewUser.email}`, // list of receivers
+    //     subject: 'Promotion code for Max Muay Thai', // Subject line
+    //     text:
+    //       'Your promotion code for watch live and video in Max Muay Thai: ' +
+    //       'MWC2016',
+    //     // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+    //   }
+    //   var statuEmail = await transporter
+    //     .sendMail(mailOptions)
+    //     .then(function(info) {
+    //       data = {
+    //         status: {
+    //           code: 200,
+    //           success: true,
+    //           message: defaultSuccessMessage,
+    //         },
+    //         data: {
+    //           token: token,
+    //           email: facebookData.email,
+    //         },
+    //       }
+    //       return data
+    //     })
+    //     .catch(function(err) {
+    //       return {
+    //         status: {
+    //           code: 400,
+    //           success: false,
+    //           message: `can't send email`,
+    //         },
+    //         data: {},
+    //       }
+    //     })
+    //   return statuEmail
+    // } else {
+    token = await jwt.sign({ data: user }, env.JWT_SECRET, {
+      expiresIn: env.JWT_TOKEN_LIFETIME,
+    })
+    return {
+      status: {
+        code: 200,
+        success: true,
+        message: defaultSuccessMessage,
+      },
+      data: {
+        token: token,
+        email: facebookData.email,
+      },
     }
   } catch (err) {
     return {
@@ -232,6 +231,9 @@ socialAuthen['facebook'] = async function(providerData) {
 
 const email = (text, output, subject) => {
   return new Promise((resolve, reject) => {
+    console.log('send email to', output.data.email)
+    console.log('subject', subject)
+    console.log('text', text)
     var transporter = nodemailer.createTransport({
       host: 'smtp.sparkpostmail.com',
       port: 587,
@@ -248,16 +250,16 @@ const email = (text, output, subject) => {
       // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
     }
     transporter.sendMail(mailOptions, function(error, info) {
-      //console.log('senemail', output)
+      console.log('info', info)
       if (error) {
-        //console.log('error', error)
+        console.log('error', error)
         output.status.code = '400'
         output.status.success = false
         output.status.message = 'Cannot send email'
         output.data = {}
         resolve('false')
       } else {
-        //console.log('hhiiiiiii')
+        console.log('hhiiiiiii')
         resolve('success')
       }
     })
@@ -983,6 +985,7 @@ exports.updateUser = async function(req, res) {
   output.data = userData
   res.send(output)
 }
+
 exports.wechat = async function(req, res) {
   console.log(req)
   res.send(req.query.echostr)

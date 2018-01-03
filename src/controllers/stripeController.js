@@ -135,12 +135,26 @@ exports.payPerViewCreditCard = async function(req, res) {
       order.stripe.paymentId = successTransaction.id
       order.status = 'approved'
       await order.save()
-      res.send({
-        url: env.FRONTEND_URL + '/getticket',
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success for purchase',
+        },
+        data: {
+          url: env.FRONTEND_URL + '/getticket',
+        },
       })
     } else {
-      res.send({
-        url: env.FRONTEND_URL + '/error',
+      res.status(200).send({
+        status: {
+          code: 500,
+          success: true,
+          message: successTransaction.status,
+        },
+        data: {
+          url: env.FRONTEND_URL + '/error',
+        },
       })
     }
   } catch (error) {
@@ -468,9 +482,16 @@ exports.subscribeCreditCard = async function(req, res) {
       },
     })
     const order = await newOrder.save()
-    res.send({
-      //data: transaction,
-      url: env.FRONTEND_URL + '/getticket',
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success for subscribe credit card',
+      },
+      data: {
+        //data: transaction,
+        url: env.FRONTEND_URL + '/getticket',
+      },
     })
   } catch (error) {
     res.status(200).send({
