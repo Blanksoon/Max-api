@@ -186,4 +186,6 @@ module.exports = function(app) {
   app.get('/stripe/cancel-subscribe', stripe.cancelSubscribeTion)
   app.get('/stripe/subscibe/alipay', stripe.subscribeAlipay)
   app.get('/stripe/confirm-subscribe-alipay', stripe.confirmSubscribeAlipay)
+
+  app.get('/test/email', user.testSendEmail)
 }

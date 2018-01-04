@@ -927,16 +927,30 @@ exports.cancelReleasePayment = async function(req, res) {
 //ios
 exports.createPaymentIos = async function(req, res) {
   console.log('ffffff')
+  console.log(Date.now())
   const token = req.query.token
   const transactionId = req.body.transactionId
+  const transactionDate = req.body.transactionDate
+  const key = req.body.key
+  console.log('transactionDate: ', transactionDate)
+  console.log('key: ', key)
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id
     const email = decode.data.email
     const liveId = req.body.liveId
-
+    if (key !== env.IOSKEY) {
+      throw {
+        message: `key is invalid`,
+      }
+    }
+    if (liveId === undefined) {
+      throw {
+        message: 'liveId not found',
+      }
+    }
     // Verified the product exists
-    const live = await Live.findOne({ _id: liveId })
+    const live = await Live.findOne({ _id: liveId }, function(err, live) {})
     if (typeof token == 'undefined' || token == '') {
       throw {
         message: 'token is undefiend',
@@ -959,13 +973,17 @@ exports.createPaymentIos = async function(req, res) {
         // Expire 1 day after live date
         const expiredDate = new Date(live.liveToDate)
         expiredDate.setDate(expiredDate.getDate() + 1)
+        let purchaseDate = new Date()
+        if (transactionDate !== undefined && transactionDate.length !== 0) {
+          purchaseDate = transactionDate
+        }
         const order = new Order({
           productId: live.id,
           productName: live.title_en,
           userId,
           email,
           price: live.price,
-          purchaseDate: new Date(),
+          purchaseDate: purchaseDate,
           platform: 'ios',
           expiredDate: expiredDate,
           status: 'approved',
@@ -1047,14 +1065,23 @@ exports.subscribeIos = async function(req, res) {
   const token = req.query.token
   const productId = req.body.productId
   const transactionDate = req.body.transactionDate
+  const key = req.body.key
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id
     const email = decode.data.email
     let transactionId = req.body.transactionId
-    let today = new Date()
-    today = Date.now()
-    const expiredDate = moment(today)
+    let purchaseDate = new Date()
+    if (transactionDate !== undefined && transactionDate.length !== 0) {
+      purchaseDate = transactionDate
+    }
+    if (key !== env.IOSKEY) {
+      throw {
+        message: `key is invalid`,
+      }
+    }
+    console.log('purchaseDate', purchaseDate)
+    const expiredDate = moment(purchaseDate)
       .add(30, 'day')
       .calendar()
     if (typeof token === 'undefined' || token === '') {
@@ -1085,7 +1112,7 @@ exports.subscribeIos = async function(req, res) {
             userId,
             email,
             price: subscribeProduct.price,
-            purchaseDate: today,
+            purchaseDate: purchaseDate,
             platform: 'ios',
             expiredDate: expiredDate,
             status: 'approved',
@@ -1098,7 +1125,7 @@ exports.subscribeIos = async function(req, res) {
             status: {
               code: 200,
               success: true,
-              message: 'thank you for your subscribtion',
+              message: 'thank you for your subscription',
             },
             data: saved,
           })
