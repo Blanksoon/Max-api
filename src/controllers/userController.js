@@ -156,67 +156,66 @@ socialAuthen['facebook'] = async function(providerData) {
       }
     }
 
-    if (Object.keys(checkNewUser).length != 0) {
-      var transporter = nodemailer.createTransport({
-        host: 'smtp.sparkpostmail.com',
-        port: 587,
-        //service: 'Gmail',
-        auth: {
-          user: 'SMTP_Injection', // Your email id
-          pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
-        },
-      })
-      var mailOptions = {
-        from: '<no-reply@maxmuaythai.com>', // sender address
-        to: `${checkNewUser.email}`, // list of receivers
-        subject: 'Promotion code for Max Muay Thai', // Subject line
-        text:
-          'Your promotion code for watch live and video in Max Muay Thai: ' +
-          'MWC2016',
-        // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
-      }
-      var statuEmail = await transporter
-        .sendMail(mailOptions)
-        .then(function(info) {
-          data = {
-            status: {
-              code: 200,
-              success: true,
-              message: defaultSuccessMessage,
-            },
-            data: {
-              token: token,
-              email: facebookData.email,
-            },
-          }
-          return data
-        })
-        .catch(function(err) {
-          return {
-            status: {
-              code: 400,
-              success: false,
-              message: `can't send email`,
-            },
-            data: {},
-          }
-        })
-      return statuEmail
-    } else {
-      token = await jwt.sign({ data: user }, env.JWT_SECRET, {
-        expiresIn: env.JWT_TOKEN_LIFETIME,
-      })
-      return {
-        status: {
-          code: 200,
-          success: true,
-          message: defaultSuccessMessage,
-        },
-        data: {
-          token: token,
-          email: facebookData.email,
-        },
-      }
+    // if (Object.keys(checkNewUser).length != 0) {
+    //   var transporter = nodemailer.createTransport({
+    //     host: 'smtp.sparkpostmail.com',
+    //     port: 587,
+    //     //service: 'Gmail',
+    //     auth: {
+    //       user: 'SMTP_Injection', // Your email id
+    //       pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+    //     },
+    //   })
+    //   var mailOptions = {
+    //     from: '<no-reply@maxmuaythai.com>', // sender address
+    //     to: `${checkNewUser.email}`, // list of receivers
+    //     subject: 'Promotion code for Max Muay Thai', // Subject line
+    //     text:
+    //       'Your promotion code for watch live and video in Max Muay Thai: ' +
+    //       'MWC2016',
+    //     // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
+    //   }
+    //   var statuEmail = await transporter
+    //     .sendMail(mailOptions)
+    //     .then(function(info) {
+    //       data = {
+    //         status: {
+    //           code: 200,
+    //           success: true,
+    //           message: defaultSuccessMessage,
+    //         },
+    //         data: {
+    //           token: token,
+    //           email: facebookData.email,
+    //         },
+    //       }
+    //       return data
+    //     })
+    //     .catch(function(err) {
+    //       return {
+    //         status: {
+    //           code: 400,
+    //           success: false,
+    //           message: `can't send email`,
+    //         },
+    //         data: {},
+    //       }
+    //     })
+    //   return statuEmail
+    // } else {
+    token = await jwt.sign({ data: user }, env.JWT_SECRET, {
+      expiresIn: env.JWT_TOKEN_LIFETIME,
+    })
+    return {
+      status: {
+        code: 200,
+        success: true,
+        message: defaultSuccessMessage,
+      },
+      data: {
+        token: token,
+        email: facebookData.email,
+      },
     }
   } catch (err) {
     return {
@@ -230,7 +229,7 @@ socialAuthen['facebook'] = async function(providerData) {
   }
 }
 
-const email = (text, output, subject) => {
+const emailWithOnlyText = (text, output, subject) => {
   return new Promise((resolve, reject) => {
     var transporter = nodemailer.createTransport({
       host: 'smtp.sparkpostmail.com',
@@ -240,24 +239,83 @@ const email = (text, output, subject) => {
         pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
       },
     })
+
     var mailOptions = {
       from: '<no-reply@maxmuaythai.com>', // sender address
       to: `${output.data.email}`, // list of receivers
       subject: `${subject}`, // Subject line
       text: `${text}`,
-      // html: '<b>Hello world ✔</b>' // You can choose to send an HTML body instead
     }
     transporter.sendMail(mailOptions, function(error, info) {
-      //console.log('senemail', output)
+      console.log('info', info)
       if (error) {
-        //console.log('error', error)
+        console.log('error', error)
         output.status.code = '400'
         output.status.success = false
         output.status.message = 'Cannot send email'
         output.data = {}
         resolve('false')
       } else {
-        //console.log('hhiiiiiii')
+        console.log('hhiiiiiii')
+        resolve('success')
+      }
+    })
+  })
+}
+
+const email = (text, output, subject, link, line1, MessageOnButton) => {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      host: 'smtp.sparkpostmail.com',
+      port: 587,
+      auth: {
+        user: 'SMTP_Injection', // Your email id
+        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+      },
+    })
+
+    var mailOptions = {
+      from: '<no-reply@maxmuaythai.com>', // sender address
+      to: `${output.data.email}`, // list of receivers
+      subject: `${subject}`, // Subject line
+      //text: `${text}`,
+      html:
+        `<p>Hello ` +
+        output.data.email +
+        `</p>
+              <p>` +
+        line1 +
+        `</p>
+              <a href=` +
+        link +
+        `>
+              <button 
+              style="
+              background-color: #B81111;
+              border: 1px solid #B81111;
+              color: #FFFFFF;
+              padding: 8px 10%;
+              text-align: center;
+              text-decoration: none;
+              display: inline-block;
+              font-weight: 700;
+              "
+              >` +
+        MessageOnButton +
+        `</button>
+              </a>`, // You can choose to send an HTML body instead
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      console.log('info', info)
+      if (error) {
+        console.log('error', error)
+        output.status.code = '400'
+        output.status.success = false
+        output.status.message = 'Cannot send email'
+        output.data = {}
+        resolve('false')
+      } else {
+        console.log('hhiiiiiii')
         resolve('success')
       }
     })
@@ -330,7 +388,7 @@ const changePasswordUser = (query, output, text, subject, newPassword) => {
     User.findOneAndUpdate(query, { $set: { password: newPassword } })
       .then(async function(user) {
         output.data = query
-        await email(text, output, subject)
+        await emailWithOnlyText(text, output, subject)
         output.status.code = 200
         output.status.success = true
         output.status.message = 'successful to change password'
@@ -663,12 +721,15 @@ exports.localRegister = async function(req, res) {
     if (response != 400) {
       //console.log('token in email', output.data.token)
       res.json(output)
-      ;(text =
+      text =
         'Activate Account please enter link ' +
         env.FRONTEND_URL +
         '/verify?token=' +
-        output.data.token),
-        await email(text, output, subject)
+        output.data.token
+      const link = `${env.FRONTEND_URL}/verify?token=${output.data.token}`
+      const line1 = `Thank you for your register. please activate your account`
+      const MessageOnButton = `Activate Now`
+      await email(text, output, subject, link, line1, MessageOnButton)
     } else {
       return res.json(output)
     }
@@ -869,7 +930,17 @@ exports.forgotPassword = async function(req, res) {
           env.FRONTEND_URL +
           '/changePassword?token=' +
           token
-        const statusEmail = await email(text, output, subject)
+        const link = `${env.FRONTEND_URL}/changePassword?token=${token}`
+        const line1 = `You can change your password from`
+        const MessageOnButton = `Change Password`
+        const statusEmail = await email(
+          text,
+          output,
+          subject,
+          link,
+          line1,
+          MessageOnButton
+        )
         if (statusEmail === 'success') {
           output.status.code = 200
           output.status.success = true
@@ -983,7 +1054,52 @@ exports.updateUser = async function(req, res) {
   output.data = userData
   res.send(output)
 }
+
 exports.wechat = async function(req, res) {
   console.log(req)
   res.send(req.query.echostr)
+}
+
+exports.testSendEmail = async function(req, res) {
+  var transporter = nodemailer.createTransport({
+    host: 'smtp.sparkpostmail.com',
+    port: 587,
+    auth: {
+      user: 'SMTP_Injection', // Your email id
+      pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+    },
+  })
+  var mailOptions = {
+    from: `<no-reply@maxmuaythai.com>`, // sender address
+    to: 'farm1771@gmail.com', // list of receivers
+    subject: 'test send html', // Subject line
+    //text: 'test',
+
+    html: `<p>Hello farm1771@gmail.com,</p>
+           <p>Thank you for your register</p>
+           <p>Please Activate Account</p>
+           <a href="http://www.google.com/">
+           <button 
+           style="
+            background-color: #B81111;
+            border: 1px solid #B81111;
+            color: #FFFFFF;
+            padding: 8px 10%;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 700;
+           "
+           >Activate</button>
+           </a>`, // You can choose to send an HTML body instead
+  }
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      console.log(error)
+      res.json({ yo: 'error' })
+    } else {
+      //console.log('Message sent: ' + info.response)
+      res.json({ yo: 'success' })
+    }
+  })
 }

@@ -245,6 +245,7 @@ async function prepareData(data, vodUrl) {
   return outputPrepareData
 }
 
+//unsolved
 function setDate(notPaidLive) {
   let i = 0
   while (i < notPaidLive.length) {
