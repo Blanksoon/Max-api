@@ -153,6 +153,7 @@ async function decodeJwt(token, req, type) {
       query = {
         userId: decode.data._id,
         expiredDate: { $gte: today },
+        status: { $ne: 'created' },
       }
     }
     if (decode.statusJwt == 'Failed to authenticate token.') {
