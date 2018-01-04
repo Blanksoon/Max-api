@@ -140,16 +140,17 @@ function setData(data) {
 async function decodeJwt(token, req, type) {
   var status = {}
   var today = new Date()
+  let query = {}
   try {
     const decode = await readJwt(token, req)
     //console.log(decode.data._id)
-    let query = {
+    query = {
       userId: decode.data._id,
       expiredDate: { $gte: today },
       status: 'approved',
     }
-    if (type == 'purchase') {
-      let query = {
+    if (type === 'purchase') {
+      query = {
         userId: decode.data._id,
         expiredDate: { $gte: today },
       }
@@ -157,6 +158,7 @@ async function decodeJwt(token, req, type) {
     if (decode.statusJwt == 'Failed to authenticate token.') {
       status = decode.statusJwt
     } else {
+      //console.log('1111111111', query)
       const order = await queryOrder(query)
       //console.log(order)
       status = order
