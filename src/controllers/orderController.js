@@ -252,43 +252,8 @@ async function prepareData(data, vodUrl) {
 function setDate(notPaidLive) {
   let i = 0
   while (i < notPaidLive.length) {
-    //console.log('a')
-    if (i == 0) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 1) {
-      notPaidLive[i].startTime = '20.00'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 2) {
-      notPaidLive[i].startTime = '14.00'
-      notPaidLive[i].endTime = '16.00'
-    }
-    if (i == 3) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 4) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 5) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 6) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 7) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
-    if (i == 8) {
-      notPaidLive[i].startTime = '19.20'
-      notPaidLive[i].endTime = '22.00'
-    }
+    notPaidLive[i].startTime = notPaidLive[i].startTime.substring(0, 5)
+    notPaidLive[i].endTime = notPaidLive[i].endTime.substring(0, 5)
     i++
   }
 }
