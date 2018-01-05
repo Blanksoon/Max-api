@@ -1,6 +1,8 @@
 import env from '../config/env'
 import { resolve } from 'url'
 import _ from 'lodash'
+const mongoose = require('mongoose')
+const Order = mongoose.model('Order')
 // import stripe from 'stripe'
 // stripe(env.KEYSECRET)
 const stripe = require('stripe')(env.KEYSECRET)
