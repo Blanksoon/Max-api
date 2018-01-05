@@ -629,7 +629,7 @@ exports.stripeWebhookHandler = async function(req, res) {
         req.body.data.object.lines.data.id
       )
     } catch (err) {
-      res.send(200).send(err)
+      res.status(200).send(err)
       console.log('error in webhook', err)
     }
   }
