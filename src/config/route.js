@@ -126,9 +126,9 @@ module.exports = function(app) {
       .route('/ppcheckout/webhooks/:webhookId')
       .delete(ppcheckout.deleteWebhook)
     app.route('/get-self-subscribe').get(ppcheckout.getSelfSubscribe)
-    app.route('/stripe/webhooks-handler').post(ppcheckout.stripeWebhookHandler)
   }
 
+  app.route('/stripe/webhooks-handler').post(stripe.stripeWebhookHandler)
   app.route('/ppcheckout/webhooks-handler').post(ppcheckout.webhookHandler)
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)

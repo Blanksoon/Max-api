@@ -17,6 +17,7 @@ import {
   updateDefaultSource,
   cancelSubscribe,
   createSourceSubscribe,
+  createNeworderSubscribe,
 } from '../utils/stripe'
 
 const decryptJwt = (token, req) => {
@@ -482,6 +483,7 @@ exports.subscribeCreditCard = async function(req, res) {
       },
     })
     const order = await newOrder.save()
+    //console.log('2000000000000')
     res.status(200).send({
       status: {
         code: 200,
@@ -494,6 +496,7 @@ exports.subscribeCreditCard = async function(req, res) {
       },
     })
   } catch (error) {
+    console.log(error)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -608,4 +611,26 @@ exports.cancelSubscribeTion = async function(req, res) {
       data: [],
     })
   }
+}
+
+exports.stripeWebhookHandler = async function(req, res) {
+  const payload = req.body
+  console.log('hi')
+  // console.log('body.......', req.body)
+  // console.log('params......', req.params)
+  // console.log('query......', req.query)
+  fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
+    flag: 'a',
+  })
+  if (req.body.type === 'invoice.payment_succeeded') {
+    try {
+      const newOrder = await createNeworderSubscribe(
+        req.body.data.object.lines.data.id
+      )
+    } catch (err) {
+      res.send(200).send(err)
+      console.log('error in webhook', err)
+    }
+  }
+  res.status(200).send(payload)
 }
