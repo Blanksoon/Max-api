@@ -617,7 +617,7 @@ exports.cancelSubscribeTion = async function(req, res) {
 exports.stripeWebhookHandler = async function(req, res) {
   const payload = req.body
   console.log('hi')
-  // console.log('body.......', req.body)
+  console.log('body.......', req.body.data.object.lines.data.id)
   // console.log('params......', req.params)
   // console.log('query......', req.query)
   fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
