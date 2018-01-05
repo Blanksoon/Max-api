@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import fs from 'fs'
 import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
