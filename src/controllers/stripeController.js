@@ -242,7 +242,16 @@ exports.payPerViewAlipay = async function(req, res) {
     //   })
     // }
     console.log('123', transaction.redirect.url)
-    res.status(200).send({ url: transaction.redirect.url })
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'pay by alipay success',
+      },
+      data: {
+        url: transaction.redirect.url,
+      },
+    })
   } catch (error) {
     console.log(error)
     res.status(200).send({
