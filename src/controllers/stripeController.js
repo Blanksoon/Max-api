@@ -476,6 +476,8 @@ exports.subscribeCreditCard = async function(req, res) {
       sourceId
     )
     const expiredDate = new Date(transaction.current_period_end * 1000)
+    console.log('expiredDate', expiredDate)
+    console.log('transaction.current.time', transaction.current_period_end)
     //console.log('expiredDate', expiredDate)
     //console.log('moment', moment(expiredDate).format('MMMM Do YYYY, h:mm:ss a'))
     const newOrder = new Order({
@@ -625,22 +627,23 @@ exports.cancelSubscribeTion = async function(req, res) {
 
 exports.stripeWebhookHandler = async function(req, res) {
   const payload = req.body
-  console.log('hi')
-  console.log('body.......', req.body.data.object.lines.data.id)
+ // console.log('body.......', req.body.data.object.lines.data.id)
   // console.log('params......', req.params)
   // console.log('query......', req.query)
   fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
     flag: 'a',
   })
-  // if (req.body.type === 'invoice.payment_succeeded') {
-  //   try {
-  //     const newOrder = await createNeworderSubscribe(
-  //       req.body.data.object.lines.data.id
-  //     )
-  //   } catch (err) {
-  //     res.status(200).send(err)
-  //     console.log('error in webhook', err)
-  //   }
-  // }
+   if (req.body.type === 'invoice.payment_succeeded') {
+     try {
+	console.log('hi',req.body)
+	console.log('body.......', new Date(req.body.data.object.period_end*1000))
+       const newOrder = await createNeworderSubscribe(
+        req.body.data.object.subscription
+       )
+     } catch (err) {
+       res.status(200).send(err)
+       console.log('error in webhook', err)
+     }
+   }
   res.status(200).send(payload)
 }
