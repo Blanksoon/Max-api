@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import fs from 'fs'
 import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
@@ -17,6 +18,7 @@ import {
   updateDefaultSource,
   cancelSubscribe,
   createSourceSubscribe,
+  createNeworderSubscribe,
 } from '../utils/stripe'
 
 const decryptJwt = (token, req) => {
@@ -240,7 +242,16 @@ exports.payPerViewAlipay = async function(req, res) {
     //   })
     // }
     console.log('123', transaction.redirect.url)
-    res.status(200).send({ url: transaction.redirect.url })
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'pay by alipay success',
+      },
+      data: {
+        url: transaction.redirect.url,
+      },
+    })
   } catch (error) {
     console.log(error)
     res.status(200).send({
@@ -465,6 +476,8 @@ exports.subscribeCreditCard = async function(req, res) {
       sourceId
     )
     const expiredDate = new Date(transaction.current_period_end * 1000)
+    console.log('expiredDate', expiredDate)
+    console.log('transaction.current.time', transaction.current_period_end)
     //console.log('expiredDate', expiredDate)
     //console.log('moment', moment(expiredDate).format('MMMM Do YYYY, h:mm:ss a'))
     const newOrder = new Order({
@@ -482,6 +495,7 @@ exports.subscribeCreditCard = async function(req, res) {
       },
     })
     const order = await newOrder.save()
+    //console.log('2000000000000')
     res.status(200).send({
       status: {
         code: 200,
@@ -494,6 +508,7 @@ exports.subscribeCreditCard = async function(req, res) {
       },
     })
   } catch (error) {
+    console.log(error)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -608,4 +623,30 @@ exports.cancelSubscribeTion = async function(req, res) {
       data: [],
     })
   }
+}
+
+exports.stripeWebhookHandler = async function(req, res) {
+  const payload = req.body
+  // console.log('body.......', req.body.data.object.lines.data.id)
+  // console.log('params......', req.params)
+  // console.log('query......', req.query)
+  fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
+    flag: 'a',
+  })
+  if (req.body.type === 'invoice.payment_succeeded') {
+    try {
+      console.log('hi', req.body)
+      console.log(
+        'body.......',
+        new Date(req.body.data.object.period_end * 1000)
+      )
+      const newOrder = await createNeworderSubscribe(
+        req.body.data.object.subscription
+      )
+    } catch (err) {
+      res.status(200).send(err)
+      console.log('error in webhook', err)
+    }
+  }
+  res.status(200).send(payload)
 }

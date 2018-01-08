@@ -576,18 +576,9 @@ exports.webhookHandler = async function(req, res) {
       )
     } catch (err) {
       console.log('error in webhook', err)
+      res.send(200).send(err)
     }
   }
-  res.status(200).send(payload)
-}
-exports.stripeWebhookHandler = async function(req, res) {
-  const payload = req.body
-  // console.log('body.......', req.body)
-  // console.log('params......', req.params)
-  // console.log('query......', req.query)
-  fs.writeFileSync('./stripewebhook.txt', JSON.stringify(payload), {
-    flag: 'a',
-  })
   res.status(200).send(payload)
 }
 

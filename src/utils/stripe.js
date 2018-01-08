@@ -1,5 +1,9 @@
 import env from '../config/env'
 import { resolve } from 'url'
+import _ from 'lodash'
+import moment from 'moment'
+const mongoose = require('mongoose')
+const Order = mongoose.model('Order')
 // import stripe from 'stripe'
 // stripe(env.KEYSECRET)
 const stripe = require('stripe')(env.KEYSECRET)
@@ -182,6 +186,52 @@ export function cancelSubscribe(planId) {
         resolve(confirmation)
       }
     })
+  })
+}
+
+export function createNeworderSubscribe(paymentId) {
+  return new Promise(async (resolve, reject) => {
+    console.log('paymentId', paymentId)
+    let order = await Order.findOne({
+      'stripe.paymentId': paymentId,
+      status: 'approved',
+    })
+      .then(async function(orderData) {
+        const today = Date.now()
+        if (orderData.expiredDate >= today) {
+          resolve(orderData)
+        } else {
+          const data = orderData.toObject()
+          const orders = _.omit(data, ['_id'])
+          const oldOrder = orderData
+          oldOrder.status = 'expired'
+          await oldOrder.save() //old order
+          let expiredDate = moment(today) // new order
+            .add(1, 'M')
+            .calendar()
+          const newOrder = new Order({
+            productId: orders.productId,
+            productName: orders.productName,
+            userId: orders.userId,
+            email: orders.email,
+            price: orders.price,
+            purchaseDate: new Date(),
+            platform: orders.platform,
+            expiredDate: expiredDate,
+            status: 'approved',
+            stripe: orders.stripe,
+            cancelDate: null,
+            orderId: orders.orderId,
+            paymentIos: orders.paymetIos,
+          })
+          await newOrder.save()
+          resolve(newOrder)
+        }
+      })
+      .catch(function(err) {
+        // console.log('err', err)
+        reject(err)
+      })
   })
 }
 

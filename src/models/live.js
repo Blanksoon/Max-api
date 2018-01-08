@@ -95,6 +95,7 @@ const liveSchema = new Schema({
   liveFromDate: Date,
   liveToDate: Date,
   liveDateStr_en: String,
+  liveDateStr_th: String,
 })
 
 function addLeadingZero(n) {
@@ -142,6 +143,12 @@ function addLiveDate(live) {
       .tz(live.liveFromDate, 'Asia/Bangkok')
       .format('ddd. MMM Do, YYYY')
 
+    live.liveDateStr_th = moment
+      .tz(live.liveFromDate, 'Asia/Bangkok')
+      .locale('th')
+      .format('ddd. MMM Do, YYYY')
+
+    live.liveDateStr_th += ` (${liveFromTime} - ${liveToTime} GMT+7)`
     live.liveDateStr_en += ` (${liveFromTime} - ${liveToTime} GMT+7)`
   }
 }
