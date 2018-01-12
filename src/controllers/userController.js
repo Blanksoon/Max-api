@@ -745,6 +745,7 @@ exports.localLogin = async function(req, res) {
       code: 400,
       success: false,
       message: defaultErrorMessage,
+      //message_th: 'มีข้อผิดพลาด',
     },
     data: [],
   }
@@ -755,6 +756,7 @@ exports.localLogin = async function(req, res) {
       if (bcrypt.compareSync(req.body.provider_data.password, user.password)) {
         if (user.status == 'inactive') {
           output.status.message = 'You are not activate'
+          //output.status.message_th = 'คุณยังไม่ได้ทำการยืนยันตัวตน'
         } else {
           var token = jwt.sign({ data: user }, env.JWT_SECRET, {
             expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
@@ -771,11 +773,13 @@ exports.localLogin = async function(req, res) {
         output.status.code = 400
         output.status.success = false
         output.status.message = 'Password is invalid'
+        //output.status.message_th = 'รหัสผ่านไม่ถูกต้อง'
       }
     } else {
       output.status.code = 400
       output.status.success = false
       output.status.message = 'Email is invalid'
+      //output.status.message_th = 'อีเมล์ไม่ถูกต้อง'
     }
     return res.json(output)
   })
