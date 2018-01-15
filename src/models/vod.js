@@ -84,12 +84,18 @@ vodSchema.post('findOne', vod => {
   vod.promoUrl = jwplayerUrl(vod.promoUrl)
   vod.videoUrl = jwplayerUrl(vod.videoUrl)
   vod.onAirDateStr_en = moment(vod.onAirDate).format('ddd. MMM Do, YYYY')
+  vod.onAirDateStr_th = moment(vod.onAirDate)
+    .locale('th')
+    .format('ddd. MMM Do, YYYY')
 })
 vodSchema.post('find', vods => {
   vods.forEach(vod => {
     vod.promoUrl = jwplayerUrl(vod.promoUrl)
     vod.videoUrl = jwplayerUrl(vod.videoUrl)
     vod.onAirDateStr_en = moment(vod.onAirDate).format('ddd. MMM Do, YYYY')
+    vod.onAirDateStr_th = moment(vod.onAirDate)
+      .locale('th')
+      .format('ddd. MMM Do, YYYY')
   })
 })
 module.exports = mongoose.model('Vod', vodSchema)
