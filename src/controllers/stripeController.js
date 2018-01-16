@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import fs from 'fs'
 import env from '../config/env'
 import Live from '../models/live'
+import Package from '../models/package'
 import Order from '../models/order'
 import Subscribe from '../models/subscribe'
 import User from '../models/user'
@@ -44,6 +45,21 @@ const checkStatusLive = liveId => {
         reject({
           code: 404,
           message: 'Target live not found',
+        })
+      }
+    })
+  })
+}
+
+const checkStatusPackage = packageId => {
+  return new Promise(async (resolve, reject) => {
+    Package.findOne({ _id: packageId }, function(err, packageList) {
+      if (packageList) {
+        resolve(packageList)
+      } else {
+        reject({
+          code: 404,
+          message: 'Target package not found',
         })
       }
     })
@@ -131,7 +147,8 @@ exports.payPerViewCreditCard = async function(req, res) {
     const successTransaction = await chargeTransaction(
       transaction.id,
       user.stripe.customerId,
-      live.price * 100
+      live.price * 100,
+      live.title_en
     )
     if (successTransaction.status === 'succeeded') {
       order.stripe.paymentId = successTransaction.id
@@ -159,6 +176,170 @@ exports.payPerViewCreditCard = async function(req, res) {
         },
       })
     }
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.payPerViewPackageCreditCard = async function(req, res) {
+  console.log('token', req.query.token)
+  console.log('packageId', req.query.packageId)
+  console.log('sourceId', req.query.sourceId)
+  const token = req.query.token
+  const packageId = req.query.packageId
+  const sourceId = req.query.sourceId
+  try {
+    const decode = await decryptJwt(token, req)
+    const packageProduct = await checkStatusPackage(packageId)
+    const userId = decode.data._id
+    const email = decode.data.email
+    // Check customerid stripe
+    const user = await User.findOne({ _id: userId })
+    if (user.stripe.customerId === undefined) {
+      // user has no customerid in stripe
+      const stripeUser = await createCustomer(email)
+      user.stripe.customerId = stripeUser.id
+      await user.save()
+    }
+    const transaction = await createTransaction(
+      user.stripe.customerId,
+      sourceId
+    )
+    const today = Date.now()
+    const expiredDate = moment(today)
+      .add(30, 'days')
+      .format('MMMM DD YYYY H:mm:ss')
+    const newOrder = new Order({
+      productId: packageProduct.id,
+      productName: packageProduct.title_en,
+      userId,
+      email,
+      price: packageProduct.price,
+      purchaseDate: new Date(),
+      platform: 'creditcard',
+      expiredDate: expiredDate,
+      status: 'created',
+    })
+    const order = await newOrder.save()
+
+    const successTransaction = await chargeTransaction(
+      transaction.id,
+      user.stripe.customerId,
+      packageProduct.price * 100,
+      packageProduct.title_en
+    )
+    if (successTransaction.status === 'succeeded') {
+      order.stripe.paymentId = successTransaction.id
+      order.status = 'approved'
+      await order.save()
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success for purchase',
+        },
+        data: {
+          url: env.FRONTEND_URL + '/getticket',
+        },
+      })
+    } else {
+      res.status(200).send({
+        status: {
+          code: 500,
+          success: true,
+          message: successTransaction.status,
+        },
+        data: {
+          url: env.FRONTEND_URL + '/error',
+        },
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.payPerViewPackageAlipay = async function(req, res) {
+  console.log('token', req.query.token)
+  //console.log('liveId', req.query.liveId)
+  //console.log('sourceId', req.query.sourceId)
+  const token = req.query.token
+  const packageId = req.query.packageId
+  let price = 0
+  try {
+    const decode = await decryptJwt(token, req)
+    //console.log('111111111', liveId)
+    const packageProduct = await checkStatusPackage(packageId)
+    if (packageProduct.price === 1.99) {
+      price = 298
+    } else if (packageProduct.price === 4.99) {
+      price = 698
+    } else {
+      price = 1498
+    }
+    const sourceId = await createSource(price)
+    //console.log('ccccccccccccc', sourceId)
+    const userId = decode.data._id
+    const email = decode.data.email
+    // Check customerid stripe
+    const user = await User.findOne({ _id: userId })
+    //console.log('sourceId', sourceId)
+    if (user.stripe.customerId === undefined) {
+      // user has no customerid in stripe
+      const stripeUser = await createCustomer(email)
+      user.stripe.customerId = stripeUser.id
+      await user.save()
+    }
+    const transaction = await createTransaction(
+      user.stripe.customerId,
+      sourceId.id
+    )
+    const today = Date.now()
+    const expiredDate = moment(today)
+      .add(30, 'days')
+      .format('MMMM DD YYYY H:mm:ss')
+    const newOrder = new Order({
+      productId: packageProduct.id,
+      productName: packageProduct.title_en,
+      userId,
+      email,
+      price: packageProduct.price,
+      purchaseDate: new Date(),
+      platform: 'alipay',
+      expiredDate: expiredDate,
+      status: 'created',
+      stripe: {
+        paymentId: transaction.id,
+      },
+    })
+    const order = await newOrder.save()
+    console.log('123', transaction.redirect.url)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'pay by alipay success',
+      },
+      data: {
+        url: transaction.redirect.url,
+      },
+    })
   } catch (error) {
     console.log(error)
     res.status(200).send({
@@ -273,10 +454,20 @@ exports.confirmTransaction = async function(req, res) {
       // console.log('id', stautsTransaction.id)
       // console.log('customer', stautsTransaction.customer)
       // console.log('amount', stautsTransaction.amount)
+      const beforeChargeOrder = await Order.findOne({
+        'stripe.paymentId': stautsTransaction.id,
+      })
+      let desc = ''
+      if (beforeChargeOrder.productName !== undefined) {
+        desc = beforeChargeOrder.productName
+      } else {
+        desc = beforeChargeOrder.title_en
+      }
       const transaction = await chargeTransactionAlipay(
         stautsTransaction.id,
         stautsTransaction.customer,
-        stautsTransaction.amount
+        stautsTransaction.amount,
+        desc
       )
       if (transaction.status === 'succeeded') {
         const order = await Order.findOne({
@@ -601,7 +792,7 @@ exports.cancelSubscribeTion = async function(req, res) {
     const subsrcibe = await cancelSubscribe(order.stripe.paymentId)
     //console.log(subsrcibe)
     order.cancelDate = Date.now()
-    order.status = 'canceled'
+    order.status = 'cancelled'
     await order.save()
     //console.log('hhhhhh')
     res.status(200).send({

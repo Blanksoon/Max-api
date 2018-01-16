@@ -130,6 +130,9 @@ module.exports = function(app) {
 
   app.route('/stripe/webhooks-handler').post(stripe.stripeWebhookHandler)
   app.route('/ppcheckout/webhooks-handler').post(ppcheckout.webhookHandler)
+  app
+    .route('/ppcheckout/package/:packageId')
+    .post(ppcheckout.createPaymentPackage)
   app.route('/ppcheckout/:liveId').post(ppcheckout.createPayment)
   app.route('/ppcheckout/:orderId/success').get(ppcheckout.executePayment)
   app.route('/ppcheckout/:orderId/cancel').get(ppcheckout.cancelPayment)
@@ -180,6 +183,8 @@ module.exports = function(app) {
 
   //stripe
   app.get('/stripe/creditcard', stripe.payPerViewCreditCard)
+  app.get('/stripe/package/creditcard', stripe.payPerViewPackageCreditCard)
+  app.get('/stripe/package/alipay', stripe.payPerViewPackageAlipay)
   app.get('/stripe/alipay', stripe.payPerViewAlipay)
   app.get('/stripe/subscribe/creditcard', stripe.subscribeCreditCard)
   app.get('/stripe/confirm-transaction', stripe.confirmTransaction)

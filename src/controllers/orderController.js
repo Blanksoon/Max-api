@@ -401,7 +401,7 @@ exports.products = async function(req, res) {
   const token = req.query.token
   let packageProduct = await Package.find({})
     .then(async function(packageList) {
-      console.log('11111', packageList)
+      //console.log('11111', packageList)
       if (Object.keys(packageList).length != 0) {
         return packageList
       } else {

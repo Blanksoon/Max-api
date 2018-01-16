@@ -686,7 +686,7 @@ exports.getProgramName = function(req, res) {
 exports.vodsOndemand = async function(req, res) {
   var token = req.query.token
   var searchName = req.query.search
-  var limit = 4
+  var limit = 16
   var index = req.query.index
   var allVods = await findAllVods({})
   console.log(allVods)

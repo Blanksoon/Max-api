@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import env from '../config/env'
 import Live from '../models/live'
 import Order from '../models/order'
+import Package from '../models/package'
 import Subscribe from '../models/subscribe'
 import User from '../models/user'
 import moment from 'moment'
@@ -85,6 +86,54 @@ const createCustomerBraintree = (nonceFromTheClient, gateway, email) => {
       }
     )
   })
+}
+
+exports.createPaymentPackage = async function(req, res) {
+  const token = req.query.token
+  try {
+    const decode = await readJwt(token, req)
+    const userId = decode.data._id
+    const email = decode.data.email
+    const packageId = req.params.packageId
+
+    // Verified the product exists
+    const packageProduct = await Package.findOne({ _id: packageId })
+    if (packageProduct) {
+      // Expire 30 day after purchase
+      const today = Date.now()
+      const expiredDate = moment(today)
+        .add(30, 'days')
+        .format('MMMM DD YYYY H:mm:ss')
+      const order = new Order({
+        productId: packageProduct.id,
+        productName: packageProduct.title_en,
+        userId,
+        email,
+        price: packageProduct.price,
+        purchaseDate: new Date(),
+        platform: 'paypal',
+        expiredDate: expiredDate,
+        status: 'created',
+      })
+      const saved = await order.save()
+      const approvalUrl = await createPayment(saved)
+      res.send({ approvalUrl: approvalUrl })
+    } else {
+      throw {
+        code: 404,
+        message: 'Target package not found',
+      }
+    }
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
 }
 
 exports.createPayment = async function(req, res) {
@@ -354,7 +403,7 @@ exports.subscribe = async function(req, res) {
           billingId = subscribeProduct.billingPlanStaging.billingPlanId
         } else if (env.BILLINGPLAN === 'billingPlanProd') {
           billingId = subscribeProduct.billingPlanProd.billingPlanId
-          console.log('111111111', billingId)
+          //console.log('111111111', billingId)
         } else {
           billingId = subscribeProduct.billingPlanDev.billingPlanId
         }
