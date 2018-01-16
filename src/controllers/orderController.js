@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
   Order = mongoose.model('Order'),
   Live = mongoose.model('Live'),
   Subscribe = mongoose.model('Subscribe'),
+  Package = mongoose.model('Package'),
   jwt = require('jsonwebtoken'),
   fetch = require('node-fetch')
 
@@ -257,7 +258,7 @@ function setDate(notPaidLive) {
   }
 }
 
-const setDataProduct = (data, exceptionData, type) => {
+const setDataProduct = (data, exceptionData) => {
   return new Promise((resolve, reject) => {
     //console.log('data', data)
     try {
@@ -384,6 +385,7 @@ exports.checkSubScribe = async function(req, res) {
 // }
 
 exports.products = async function(req, res) {
+  console.log('hi')
   var output = {
     status: {
       code: 400,
@@ -393,9 +395,22 @@ exports.products = async function(req, res) {
     data: {
       lives: [],
       subscribe: [],
+      package: [],
     },
   }
   const token = req.query.token
+  let packageProduct = await Package.find({})
+    .then(async function(packageList) {
+      //console.log('11111', packageList)
+      if (Object.keys(packageList).length != 0) {
+        return packageList
+      } else {
+        return []
+      }
+    })
+    .catch(function(err) {
+      return err
+    })
   let outputvods = await findLives('not-paid', {})
   let subscribes = await Subscribe.find(
     {},
@@ -428,6 +443,7 @@ exports.products = async function(req, res) {
       await setDate(outputvods.data)
       output.data.lives = outputvods.data
       output.data.subscribe = subscribes
+      output.data.package = packageProduct
     } else if (decoded == `Failed to authenticate token.`) {
       output.status.message = 'Failed to authenticate token.'
     } else {
@@ -438,33 +454,40 @@ exports.products = async function(req, res) {
         product[i] = decoded[i].productId
         i++
       }
-      console.log(product)
+      //console.log(product)
       i = 0
       const notPaidLive = outputvods.data
       //console.log('ff', notPaidLive[1].productId)
       while (i < product.length) {
-        await setDataProduct(notPaidLive, product[i], 'lives')
+        await setDataProduct(notPaidLive, product[i])
         i++
       }
       await setDate(notPaidLive)
 
       //const resultLive = notPaidLive.filter(product => product != null)
       output.data.lives = notPaidLive
-      const notPaidSubscribe = subscribes
       i = 0
+      const notPaidSubscribe = subscribes
       //console.log(product)
       while (i < product.length) {
-        await setDataProduct(notPaidSubscribe, product[i], 'subscribe')
+        await setDataProduct(notPaidSubscribe, product[i])
         i++
       }
+      output.data.subscribe = notPaidSubscribe
       i = 0
+      const notPaidPackage = packageProduct
+      console.log('packageProduct', packageProduct)
+      while (i < product.length) {
+        await setDataProduct(notPaidPackage, product[i])
+        i++
+      }
       // const resultSubscribe = notPaidSubscribe.filter(
       //   product => product != null
       // )
+      output.data.package = notPaidPackage
       output.status.code = 200
       output.status.success = true
       output.status.message = 'success'
-      output.data.subscribe = notPaidSubscribe
     }
   }
   res.send(output)

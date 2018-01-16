@@ -39,12 +39,12 @@ export function createTransaction(customerId, sourceId) {
   })
 }
 
-export function chargeTransaction(sourceId, customerId, amount) {
+export function chargeTransaction(sourceId, customerId, amount, description) {
   return new Promise((resolve, reject) => {
     stripe.charges.create(
       {
         amount: amount,
-        description: 'Max muay thai',
+        description: description,
         currency: 'usd',
         source: sourceId,
         customer: customerId,
@@ -60,12 +60,17 @@ export function chargeTransaction(sourceId, customerId, amount) {
   })
 }
 
-export function chargeTransactionAlipay(sourceId, customerId, amount) {
+export function chargeTransactionAlipay(
+  sourceId,
+  customerId,
+  amount,
+  description
+) {
   return new Promise((resolve, reject) => {
     stripe.charges.create(
       {
         amount: amount,
-        description: 'Max muay thai',
+        description: description,
         currency: 'sgd',
         source: sourceId,
         customer: customerId,
