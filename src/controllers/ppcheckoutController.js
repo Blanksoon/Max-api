@@ -910,6 +910,80 @@ exports.createAndSettledPayment = async function(req, res) {
     })
   }
 } //refactor already
+exports.createAndSettledPaymentPackage = async function(req, res) {
+  const token = req.query.token
+  const packageId = req.body.packageId
+  const nonceFromTheClient = req.body.paymentMethodNonce
+  try {
+    if (token === undefined || token === '') {
+      throw {
+        message: 'token is undefiend',
+      }
+    } else {
+      const decode = await readJwtBraintree(token, req) //if error reject error.message
+      const userId = decode.data._id
+      const email = decode.data.email
+      // Verified the product exists
+      const packageProduct = await Package.findOne({ _id: packageId })
+      if (packageProduct) {
+        // Expire 1 day after live date
+        const today = Date.now()
+        const expiredDate = moment(today)
+          .add(30, 'days')
+          .format('MMMM DD YYYY H:mm:ss')
+        const order = new Order({
+          productId: packageProduct.id,
+          productName: packageProduct.title_en,
+          userId,
+          email,
+          price: packageProduct.price,
+          purchaseDate: new Date(),
+          platform: req.body.platform,
+          expiredDate: expiredDate,
+          status: null,
+        })
+        const resultTransaction = await creatAndSettledPayment(
+          packageProduct,
+          nonceFromTheClient
+        )
+        if (resultTransaction === `can't process this transaction`) {
+          order.status = 'error'
+          await order.save()
+          throw {
+            message: `can't process this transaction`,
+          }
+        } else {
+          order.paypal.paymentId = resultTransaction
+          order.status = 'approved'
+          await order.save()
+          res.status(200).send({
+            status: {
+              code: 200,
+              success: true,
+              message: 'thank you for purchase',
+            },
+            data: order,
+          })
+        }
+      } else {
+        throw {
+          code: 404,
+          message: 'Target package not found',
+        }
+      }
+    }
+  } catch (error) {
+    console.log('error', error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+} //refactor already
 exports.cancelReleasePayment = async function(req, res) {
   const token = req.query.token
   const orderId = req.body.orderId

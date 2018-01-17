@@ -155,6 +155,9 @@ module.exports = function(app) {
   app
     .route('/cancel-subcribe-paypal-braintree')
     .post(ppcheckout.cancelSubscribeBraintree)
+  app
+    .route('/purchase-package-paypal-braintree')
+    .post(ppcheckout.createAndSettledPaymentPackage)
 
   //Ios
   app.route('/purchase-live-ios').post(ppcheckout.createPaymentIos)
