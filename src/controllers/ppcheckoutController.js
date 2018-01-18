@@ -102,7 +102,7 @@ exports.createPaymentPackage = async function(req, res) {
       // Expire 30 day after purchase
       const today = Date.now()
       const expiredDate = moment(today)
-        .add(30, 'days')
+        .add(1, 'month')
         .format('MMMM DD YYYY H:mm:ss')
       const order = new Order({
         productId: packageProduct.id,
@@ -649,7 +649,7 @@ exports.subscribeBraintree = async function(req, res) {
     let today = new Date()
     today = Date.now()
     const expiredDate = moment(today)
-      .add(30, 'day')
+      .add(1, 'month')
       .calendar()
     if (typeof token === 'undefined' || token === '') {
       throw {
@@ -929,7 +929,7 @@ exports.createAndSettledPaymentPackage = async function(req, res) {
         // Expire 1 day after live date
         const today = Date.now()
         const expiredDate = moment(today)
-          .add(30, 'days')
+          .add(1, 'month')
           .format('MMMM DD YYYY H:mm:ss')
         const order = new Order({
           productId: packageProduct.id,
@@ -1152,8 +1152,8 @@ exports.cancelPaymentIos = async function(req, res) {
         orderId: orderId,
       })
       result.status = 'cancelled'
-      const saved = await result.save()
       result.cancelDate = Date.now()
+      const saved = await result.save()
       res.status(200).send({
         status: {
           code: 200,
@@ -1196,7 +1196,7 @@ exports.subscribeIos = async function(req, res) {
     }
     console.log('purchaseDate', purchaseDate)
     const expiredDate = moment(purchaseDate)
-      .add(30, 'day')
+      .add(1, 'month')
       .calendar()
     if (typeof token === 'undefined' || token === '') {
       throw {
@@ -1291,7 +1291,276 @@ exports.cancelSubscribeIos = async function(req, res) {
         status: {
           code: 200,
           success: true,
+          message: 'cancel subscribe success',
+        },
+        data: saved,
+      })
+    }
+  } catch (error) {
+    console.log('error', error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+//android
+exports.createPaymentAndroid = async function(req, res) {
+  const token = req.query.token
+  const transactionId = req.body.transactionId
+  const transactionDate = req.body.transactionDate
+  const key = req.body.key
+  console.log('transactionDate: ', transactionDate)
+  console.log('key: ', key)
+  try {
+    const decode = await readJwt(token, req)
+    const userId = decode.data._id
+    const email = decode.data.email
+    const liveId = req.body.liveId
+    if (key !== env.ANDROIDKEY) {
+      throw {
+        message: `key is invalid`,
+      }
+    }
+    if (liveId === undefined) {
+      throw {
+        message: 'liveId not found',
+      }
+    }
+    // Verified the product exists
+    const live = await Live.findOne({ _id: liveId }, function(err, live) {})
+    if (typeof token == 'undefined' || token == '') {
+      throw {
+        message: 'token is undefiend',
+      }
+    } else if (decode.code == 401) {
+      throw {
+        message: decode.message,
+      }
+    } else {
+      if (live) {
+        const transactionOrder = await Order.findOne({
+          'paymentAndroid.transactionId': transactionId,
+        })
+        if (transactionOrder != null) {
+          throw {
+            code: 200,
+            message: 'your transaction has already',
+          }
+        }
+        // Expire 1 day after live date
+        const expiredDate = new Date(live.liveToDate)
+        expiredDate.setDate(expiredDate.getDate() + 1)
+        let purchaseDate = new Date()
+        if (transactionDate !== undefined && transactionDate.length !== 0) {
+          purchaseDate = transactionDate
+        }
+        const order = new Order({
+          productId: live.id,
+          productName: live.title_en,
+          userId,
+          email,
+          price: live.price,
+          purchaseDate: purchaseDate,
+          platform: 'ios',
+          expiredDate: expiredDate,
+          status: 'approved',
+          paymentAndroid: {
+            transactionId: transactionId,
+          },
+        })
+        const saved = await order.save()
+        res.send({
+          status: {
+            code: 200,
+            success: true,
+            message: 'Thank you for purchase',
+          },
+          data: saved,
+        })
+      } else {
+        throw {
+          code: 404,
+          message: 'Target live not found',
+        }
+      }
+    }
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+exports.cancelPaymentAndroid = async function(req, res) {
+  const token = req.query.token
+  const orderId = req.body.orderId
+  try {
+    const decode = await readJwtBraintree(token, req)
+    let today = new Date()
+    today = Date.now()
+    if (typeof token == 'undefined' || token == '') {
+      throw {
+        message: 'token is undefiend',
+      }
+    } else if (decode.code == 401) {
+      throw {
+        message: decode.message,
+      }
+    } else {
+      const result = await Order.findOne({
+        orderId: orderId,
+      })
+      result.status = 'cancelled'
+      result.cancelDate = Date.now()
+      const saved = await result.save()
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
           message: 'cancel live success',
+        },
+        data: saved,
+      })
+    }
+  } catch (error) {
+    console.log('error', error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+exports.subscribeAndroid = async function(req, res) {
+  const token = req.query.token
+  const productId = req.body.productId
+  const transactionDate = req.body.transactionDate
+  const key = req.body.key
+  try {
+    const decode = await readJwt(token, req)
+    const userId = decode.data._id
+    const email = decode.data.email
+    let transactionId = req.body.transactionId
+    let purchaseDate = new Date()
+    if (transactionDate !== undefined && transactionDate.length !== 0) {
+      purchaseDate = transactionDate
+    }
+    if (key !== env.ANDROIDKEY) {
+      throw {
+        message: `key is invalid`,
+      }
+    }
+    console.log('purchaseDate', purchaseDate)
+    let expiredDate = moment(purchaseDate)
+      .add(1, 'month')
+      .calendar()
+    if (typeof token === 'undefined' || token === '') {
+      throw {
+        message: 'token is undefiend',
+      }
+    } else if (decode.code == 401) {
+      throw {
+        message: decode.message,
+      }
+    } else {
+      const customer = await User.findOne({ _id: decode.data._id })
+      if (customer) {
+        const transactionOrder = await Order.findOne({
+          'paymentAndroid.transactionId': transactionId,
+        })
+        if (transactionOrder != null) {
+          throw {
+            code: 200,
+            message: 'your transaction has already',
+          }
+        }
+        const subscribeProduct = await Subscribe.findOne({ _id: productId })
+        if (subscribeProduct) {
+          let order = new Order({
+            productId: subscribeProduct._id,
+            productName: subscribeProduct.title_en,
+            userId,
+            email,
+            price: subscribeProduct.price,
+            purchaseDate: purchaseDate,
+            platform: 'ios',
+            expiredDate: expiredDate,
+            status: 'approved',
+            paymentAndroid: {
+              transactionId: transactionId,
+            },
+          })
+          const saved = await order.save()
+          res.status(200).send({
+            status: {
+              code: 200,
+              success: true,
+              message: 'thank you for your subscription',
+            },
+            data: saved,
+          })
+        } else {
+          throw {
+            message: 'target subscribe not found',
+          }
+        }
+      } else {
+        throw {
+          message: 'user not found',
+        }
+      }
+    }
+  } catch (error) {
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+exports.cancelSubscribeAndroid = async function(req, res) {
+  const token = req.query.token
+  const orderId = req.body.orderId
+  try {
+    const decode = await readJwtBraintree(token, req)
+    let today = new Date()
+    today = Date.now()
+    if (typeof token == 'undefined' || token == '') {
+      throw {
+        message: 'token is undefiend',
+      }
+    } else if (decode.code == 401) {
+      throw {
+        message: decode.message,
+      }
+    } else {
+      const result = await Order.findOne({
+        orderId: orderId,
+      })
+      result.status = 'cancelled'
+      result.cancelDate = Date.now()
+      const saved = await result.save()
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'cancel subsribe success',
         },
         data: saved,
       })

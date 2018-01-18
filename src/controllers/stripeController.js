@@ -215,7 +215,7 @@ exports.payPerViewPackageCreditCard = async function(req, res) {
     )
     const today = Date.now()
     const expiredDate = moment(today)
-      .add(30, 'days')
+      .add(1, 'month')
       .format('MMMM DD YYYY H:mm:ss')
     const newOrder = new Order({
       productId: packageProduct.id,
@@ -312,7 +312,7 @@ exports.payPerViewPackageAlipay = async function(req, res) {
     )
     const today = Date.now()
     const expiredDate = moment(today)
-      .add(30, 'days')
+      .add(1, 'month')
       .format('MMMM DD YYYY H:mm:ss')
     const newOrder = new Order({
       productId: packageProduct.id,

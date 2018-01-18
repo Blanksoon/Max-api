@@ -165,6 +165,12 @@ module.exports = function(app) {
   app.route('/purchase-sub-ios').post(ppcheckout.subscribeIos)
   app.route('/cancel-sub-ios').post(ppcheckout.cancelSubscribeIos)
 
+  //Android
+  app.route('/purchase-live-android').post(ppcheckout.createPaymentAndroid)
+  app.route('/cancel-live-android').post(ppcheckout.cancelPaymentAndroid)
+  app.route('/purchase-sub-android').post(ppcheckout.subscribeAndroid)
+  app.route('/cancel-sub-android').post(ppcheckout.cancelSubscribeAndroid)
+
   // Login and Validate Token Routes
   app.route('/login').post(user.login)
   app.route('/fb-login').post(user.fbLogin)

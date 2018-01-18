@@ -385,7 +385,6 @@ exports.checkSubScribe = async function(req, res) {
 // }
 
 exports.products = async function(req, res) {
-  console.log('hi')
   var output = {
     status: {
       code: 400,
@@ -433,6 +432,7 @@ exports.products = async function(req, res) {
     output.status.message = 'success'
     output.data.lives = outputvods.data
     output.data.subscribe = subscribes
+    output.data.package = packageProduct
   } else {
     const decoded = await decodeJwt(token, req)
     if (decoded == `you have't purchase`) {
@@ -476,7 +476,6 @@ exports.products = async function(req, res) {
       output.data.subscribe = notPaidSubscribe
       i = 0
       const notPaidPackage = packageProduct
-      console.log('packageProduct', packageProduct)
       while (i < product.length) {
         await setDataProduct(notPaidPackage, product[i])
         i++
