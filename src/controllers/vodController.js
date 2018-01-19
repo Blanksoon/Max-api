@@ -301,6 +301,8 @@ async function decodeJwt(token, req) {
         $or: [
           { productId: '5a0c040eb29318da40e335ef' },
           { productId: '5a0c0450b29318da40e335f0' },
+          { productId: '5a5c2e9ce356edd4d27f88aa' },
+          { productId: '5a5c2ed0e356edd4d27f88ab' },
         ],
         status: 'approved',
       }
