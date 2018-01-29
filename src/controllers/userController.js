@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import fetch from 'node-fetch'
 import env from '../config/env'
 import User from '../models/user'
+import Order from '../models/order'
 import moment from 'moment'
 
 const defaultSuccessMessage = 'success'
@@ -110,6 +111,8 @@ socialAuthen['facebook'] = async function(providerData) {
       checkNewUser = new User(createObject)
       try {
         user = await new_user.save()
+        await promotionForNewCustomer(user)
+        //console.log('user', user)
       } catch (err) {
         return {
           status: {
@@ -229,6 +232,84 @@ socialAuthen['facebook'] = async function(providerData) {
   }
 }
 
+const sendEmailPromotion = (text, email, subject) => {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      host: 'smtp.sparkpostmail.com',
+      port: 587,
+      auth: {
+        user: 'SMTP_Injection', // Your email id
+        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+      },
+    })
+
+    var mailOptions = {
+      from: '<no-reply@maxmuaythai.com>', // sender address
+      to: `${email}`, // list of receivers
+      subject: `${subject}`, // Subject line
+      text: `${text}`,
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.log('error', error)
+        output.status.code = '400'
+        output.status.success = false
+        output.status.message = 'Cannot send email'
+        output.data = {}
+        resolve('false')
+      } else {
+        resolve('success')
+      }
+    })
+  })
+}
+
+const promotionForNewCustomer = customer => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = customer
+      //console.log('user', user)
+      const packageOrder = await Order.findOne({ userId: user._id })
+      //console.log('packageOrder', packageOrder)
+      if (packageOrder !== null) {
+        //console.log('1')
+        return resolve('have order')
+      }
+      const today = Date.now()
+      const expiredDate = moment(today)
+        .add(1, 'month')
+        .format('MMMM DD YYYY H:mm:ss')
+      const newOrder = new Order({
+        productId: '5a5c2ed0e356edd4d27f88ab',
+        productName: 'package lives and vods',
+        userId: user._id,
+        email: user.email,
+        price: '0',
+        purchaseDate: new Date(),
+        platform: 'creditcard',
+        expiredDate: expiredDate,
+        status: 'approved',
+      })
+      const expiredDateText = moment(expiredDate).format('DD MMMM YYYY')
+      //console.log(newOrder)
+      await newOrder.save()
+      const result = await sendEmailPromotion(
+        `This's promotion for new our customer, you can watch until ${expiredDateText}`,
+        user.email,
+        'watch live and vod for free 1 month'
+      )
+      if (result === 'success') {
+        return resolve('success')
+      } else {
+        throw 'error'
+      }
+    } catch (error) {
+      console.log(error)
+      return resolve('error')
+    }
+  })
+}
+
 const emailWithOnlyText = (text, output, subject) => {
   return new Promise((resolve, reject) => {
     var transporter = nodemailer.createTransport({
@@ -256,7 +337,7 @@ const emailWithOnlyText = (text, output, subject) => {
         output.data = {}
         resolve('false')
       } else {
-        console.log('hhiiiiiii')
+        console.log('send email success')
         resolve('success')
       }
     })
@@ -315,7 +396,7 @@ const email = (text, output, subject, link, line1, MessageOnButton) => {
         output.data = {}
         resolve('false')
       } else {
-        console.log('hhiiiiiii')
+        console.log('send active email success')
         resolve('success')
       }
     })
@@ -375,7 +456,7 @@ const activateUser = (query, output) => {
   return new Promise((resolve, reject) => {
     User.findOneAndUpdate(query, { $set: { status: 'active' } })
       .then(function(user) {
-        resolve('success')
+        resolve(user)
       })
       .catch(function(err) {
         resolve('false')
@@ -787,7 +868,7 @@ exports.localLogin = async function(req, res) {
 
 exports.activateLocalUser = async function(req, res) {
   var token = req.query.token
-  //console.log('token', token)
+  console.log('token', token)
   var decode = {}
   var query = {}
   var statusToken = ''
@@ -802,8 +883,21 @@ exports.activateLocalUser = async function(req, res) {
   statusToken = await verifyToken(token, req)
   if (statusToken.status == 'authorize') {
     query = { email: statusToken.email }
-    await activateUser(query, output)
-    return res.json(output)
+    const user = await activateUser(query, output)
+    if (user === 'false') {
+      output.status.message = `can't find customer`
+      return res.json(output)
+    }
+    const result = await promotionForNewCustomer(user)
+    if (result === 'success') {
+      return res.json(output)
+    } else if (result === 'have order') {
+      output.status.message = `you have order`
+      return res.json(output)
+    } else {
+      output.status.message = `can't assign promotin into customer`
+      return res.json(output)
+    }
   } else {
     //console.log('unauthorize')
     output.status.message = 'unauthorized your token'
