@@ -6,6 +6,7 @@ import Package from '../models/package'
 import Order from '../models/order'
 import Subscribe from '../models/subscribe'
 import User from '../models/user'
+import nodemailer from 'nodemailer'
 import moment from 'moment'
 import {
   createCustomer,
@@ -21,6 +22,38 @@ import {
   createSourceSubscribe,
   createNeworderSubscribe,
 } from '../utils/stripe'
+
+const sendEmail = (text, email, subject) => {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      host: 'smtp.sparkpostmail.com',
+      port: 587,
+      auth: {
+        user: 'SMTP_Injection', // Your email id
+        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+      },
+    })
+
+    var mailOptions = {
+      from: '<no-reply@maxmuaythai.com>', // sender address
+      to: `${email}`, // list of receivers
+      subject: `${subject}`, // Subject line
+      text: `${text}`,
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.log('error', error)
+        output.status.code = '400'
+        output.status.success = false
+        output.status.message = 'Cannot send email'
+        output.data = {}
+        resolve('false')
+      } else {
+        resolve('success')
+      }
+    })
+  })
+}
 
 const decryptJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -97,9 +130,9 @@ const queryOrder = orderId => {
 }
 //stripe
 exports.payPerViewCreditCard = async function(req, res) {
-  console.log('token', req.query.token)
-  console.log('liveId', req.query.liveId)
-  console.log('sourceId', req.query.sourceId)
+  //console.log('token', req.query.token)
+  //console.log('liveId', req.query.liveId)
+  //console.log('sourceId', req.query.sourceId)
   const token = req.query.token
   const liveId = req.query.liveId
   const sourceId = req.query.sourceId
@@ -154,6 +187,14 @@ exports.payPerViewCreditCard = async function(req, res) {
       order.stripe.paymentId = successTransaction.id
       order.status = 'approved'
       await order.save()
+      const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
+      await sendEmail(
+        `Thank you for purchase ${
+          order.productName
+        }, you can watch until ${expiredDateText}`,
+        order.email,
+        'Thank you for purchase Max Muay Thai'
+      )
       res.status(200).send({
         status: {
           code: 200,
@@ -190,9 +231,9 @@ exports.payPerViewCreditCard = async function(req, res) {
 }
 
 exports.payPerViewPackageCreditCard = async function(req, res) {
-  console.log('token', req.query.token)
-  console.log('packageId', req.query.packageId)
-  console.log('sourceId', req.query.sourceId)
+  //console.log('token', req.query.token)
+  //console.log('packageId', req.query.packageId)
+  //console.log('sourceId', req.query.sourceId)
   const token = req.query.token
   const packageId = req.query.packageId
   const sourceId = req.query.sourceId
@@ -240,6 +281,14 @@ exports.payPerViewPackageCreditCard = async function(req, res) {
       order.stripe.paymentId = successTransaction.id
       order.status = 'approved'
       await order.save()
+      const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
+      await sendEmail(
+        `Thank you for purchase ${
+          order.productName
+        }, you can watch until ${expiredDateText}`,
+        order.email,
+        'Thank you for purchase Max Muay Thai'
+      )
       res.status(200).send({
         status: {
           code: 200,
@@ -475,8 +524,15 @@ exports.confirmTransaction = async function(req, res) {
         })
         order.stripe.paymentId = transaction.id
         order.status = 'approved'
+        const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
         await order.save()
-        console.log('1')
+        await sendEmail(
+          `Thank you for purchase ${
+            order.productName
+          }, you can watch until ${expiredDateText}`,
+          order.email,
+          'Thank you for purchase Max Muay Thai'
+        )
         res.redirect(env.FRONTEND_URL + '/getticket')
       } else {
         console.log('2')
@@ -667,8 +723,8 @@ exports.subscribeCreditCard = async function(req, res) {
       sourceId
     )
     const expiredDate = new Date(transaction.current_period_end * 1000)
-    console.log('expiredDate', expiredDate)
-    console.log('transaction.current.time', transaction.current_period_end)
+    //console.log('expiredDate', expiredDate)
+    //console.log('transaction.current.time', transaction.current_period_end)
     //console.log('expiredDate', expiredDate)
     //console.log('moment', moment(expiredDate).format('MMMM Do YYYY, h:mm:ss a'))
     const newOrder = new Order({
@@ -686,6 +742,14 @@ exports.subscribeCreditCard = async function(req, res) {
       },
     })
     const order = await newOrder.save()
+    // const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
+    // await sendEmail(
+    //   `Thank you for purchase ${
+    //     order.productName
+    //   }, you can watch until ${expiredDateText}`,
+    //   order.email,
+    //   'Thank you for purchase Max Muay Thai'
+    // )
     //console.log('2000000000000')
     res.status(200).send({
       status: {
@@ -795,6 +859,11 @@ exports.cancelSubscribeTion = async function(req, res) {
     order.status = 'cancelled'
     await order.save()
     //console.log('hhhhhh')
+    await sendEmail(
+      `Your order id is ${order.orderId}. it was cancel successful.`,
+      order.email,
+      `Success for cancel ${order.productName} Max Muay Thai`
+    )
     res.status(200).send({
       status: {
         code: 200,

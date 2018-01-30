@@ -6,6 +6,7 @@ import Order from '../models/order'
 import Package from '../models/package'
 import Subscribe from '../models/subscribe'
 import User from '../models/user'
+import nodemailer from 'nodemailer'
 import moment from 'moment'
 import {
   createPayment,
@@ -24,6 +25,38 @@ import { creatAndSettledPayment, cancelPayment } from '../utils/braintree'
 import braintree from 'braintree'
 import { braintreeEnv } from '../config/braintree'
 import { randomBytes } from 'crypto'
+
+const sendEmail = (text, email, subject) => {
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      host: 'smtp.sparkpostmail.com',
+      port: 587,
+      auth: {
+        user: 'SMTP_Injection', // Your email id
+        pass: '7d8a0c8c8bd72b3745065171f7cffb7c85990c6e', // Your password
+      },
+    })
+
+    var mailOptions = {
+      from: '<no-reply@maxmuaythai.com>', // sender address
+      to: `${email}`, // list of receivers
+      subject: `${subject}`, // Subject line
+      text: `${text}`,
+    }
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.log('error', error)
+        output.status.code = '400'
+        output.status.success = false
+        output.status.message = 'Cannot send email'
+        output.data = {}
+        resolve('false')
+      } else {
+        resolve('success')
+      }
+    })
+  })
+}
 
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
@@ -204,7 +237,7 @@ exports.executePayment = async function(req, res) {
     if (order) {
       try {
         const payment = await executePayment(payerId, paymentId, order.price)
-        console.log('payment', payment)
+        //console.log('payment', payment)
         if (payment.state === 'approved') {
           order.status = 'approved'
           order.paypal = {
@@ -212,6 +245,16 @@ exports.executePayment = async function(req, res) {
             paymentId,
           }
           await order.save()
+          const expiredDateText = moment(order.expiredDate).format(
+            'DD MMMM YYYY'
+          )
+          await sendEmail(
+            `Thank you for purchase ${
+              order.productName
+            }, you can watch until ${expiredDateText}`,
+            order.email,
+            'Thank you for purchase Max Muay Thai'
+          )
           res.redirect(`${env.FRONTEND_URL}/getticket`)
         }
       } catch (error) {
@@ -254,8 +297,13 @@ exports.cancelPayment = async function(req, res) {
   })
   try {
     if (order) {
-      order.status = 'canceled'
+      order.status = 'cancelled'
       await order.save()
+      await sendEmail(
+        `Your order id is ${order.orderId}. it was cancel successful.`,
+        order.email,
+        `Success for cancel ${order.productName} Max Muay Thai`
+      )
       res.redirect(`${env.FRONTEND_URL}`)
     }
   } catch (error) {
@@ -465,6 +513,7 @@ exports.subscribe = async function(req, res) {
 }
 
 exports.successSubscribe = async function(req, res) {
+  console.log('hi')
   const paymentToken = req.query.token
   //console.log('token', paymentToken)
   //const orderId = req.params.orderId
@@ -489,6 +538,16 @@ exports.successSubscribe = async function(req, res) {
           //console.log('jjjjjj', result.agreement_details)
           //order.expiredDate = result.agreement_details.next_billing_date
           await order.save()
+          const expiredDateText = moment(order.expiredDate).format(
+            'DD MMMM YYYY'
+          )
+          await sendEmail(
+            `Thank you for purchase ${
+              order.productName
+            }, you can watch until ${expiredDateText}`,
+            order.email,
+            'Thank you for purchase Max Muay Thai'
+          )
           //console.log('hiz')
           // res.status(200).send({
           //   status: {
@@ -524,6 +583,7 @@ exports.successSubscribe = async function(req, res) {
 }
 
 exports.cancelSubscribe = async function(req, res) {
+  console.log('hi')
   // await findTransactions()
   // res.sendStatus(200)
   const orderId = req.params.orderId
@@ -540,7 +600,7 @@ exports.cancelSubscribe = async function(req, res) {
       console.log(data)
       if (data === 'success') {
         order.cancelDate = Date.now()
-        order.status = 'cancel'
+        order.status = 'cancelled'
         await order.save()
         res.status(200).send({
           status: {
@@ -550,6 +610,11 @@ exports.cancelSubscribe = async function(req, res) {
           },
           data: [],
         })
+        await sendEmail(
+          `Your order id is ${order.orderId}. it was cancel successful.`,
+          order.email,
+          `Success for cancel ${order.productName} Max Muay Thai`
+        )
       } else {
         throw {
           data,
@@ -561,6 +626,7 @@ exports.cancelSubscribe = async function(req, res) {
       }
     }
   } catch (error) {
+    console.log(error)
     res.status(200).send({
       status: {
         code: error.code || 500,
@@ -1040,14 +1106,14 @@ exports.cancelReleasePayment = async function(req, res) {
 
 //ios
 exports.createPaymentIos = async function(req, res) {
-  console.log('ffffff')
-  console.log(Date.now())
+  //console.log('ffffff')
+  //console.log(Date.now())
   const token = req.query.token
   const transactionId = req.body.transactionId
   const transactionDate = req.body.transactionDate
   const key = req.body.key
-  console.log('transactionDate: ', transactionDate)
-  console.log('key: ', key)
+  //console.log('transactionDate: ', transactionDate)
+  //console.log('key: ', key)
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id
@@ -1106,6 +1172,14 @@ exports.createPaymentIos = async function(req, res) {
           },
         })
         const saved = await order.save()
+        const expiredDateText = moment(saved.expiredDate).format('DD MMMM YYYY')
+        await sendEmail(
+          `Thank you for purchase ${
+            saved.productName
+          }, you can watch until ${expiredDateText}`,
+          saved.email,
+          'Thank you for purchase Max Muay Thai'
+        )
         res.send({
           status: {
             code: 200,
@@ -1154,6 +1228,11 @@ exports.cancelPaymentIos = async function(req, res) {
       result.status = 'cancelled'
       result.cancelDate = Date.now()
       const saved = await result.save()
+      await sendEmail(
+        `Your order id is ${saved.orderId}. it was cancel successful.`,
+        saved.email,
+        `Success for cancel ${saved.productName} Max Muay Thai`
+      )
       res.status(200).send({
         status: {
           code: 200,
@@ -1194,7 +1273,7 @@ exports.subscribeIos = async function(req, res) {
         message: `key is invalid`,
       }
     }
-    console.log('purchaseDate', purchaseDate)
+    //console.log('purchaseDate', purchaseDate)
     const expiredDate = moment(purchaseDate)
       .add(1, 'month')
       .calendar()
@@ -1235,6 +1314,16 @@ exports.subscribeIos = async function(req, res) {
             },
           })
           const saved = await order.save()
+          const expiredDateText = moment(saved.expiredDate).format(
+            'DD MMMM YYYY'
+          )
+          await sendEmail(
+            `Thank you for purchase ${
+              saved.productName
+            }, you can watch until ${expiredDateText}`,
+            saved.email,
+            'Thank you for purchase Max Muay Thai'
+          )
           res.status(200).send({
             status: {
               code: 200,
@@ -1287,6 +1376,11 @@ exports.cancelSubscribeIos = async function(req, res) {
       result.status = 'cancelled'
       result.cancelDate = Date.now()
       const saved = await result.save()
+      await sendEmail(
+        `Your order id is ${saved.orderId}. it was cancel successful.`,
+        saved.email,
+        `Success for cancel ${saved.productName} Max Muay Thai`
+      )
       res.status(200).send({
         status: {
           code: 200,
@@ -1367,7 +1461,7 @@ exports.createPaymentAndroid = async function(req, res) {
           email,
           price: live.price,
           purchaseDate: purchaseDate,
-          platform: 'ios',
+          platform: 'android',
           expiredDate: expiredDate,
           status: 'approved',
           paymentAndroid: {
@@ -1375,6 +1469,14 @@ exports.createPaymentAndroid = async function(req, res) {
           },
         })
         const saved = await order.save()
+        const expiredDateText = moment(saved.expiredDate).format('DD MMMM YYYY')
+        await sendEmail(
+          `Thank you for purchase ${
+            saved.productName
+          }, you can watch until ${expiredDateText}`,
+          saved.email,
+          'Thank you for purchase Max Muay Thai'
+        )
         res.send({
           status: {
             code: 200,
@@ -1423,6 +1525,11 @@ exports.cancelPaymentAndroid = async function(req, res) {
       result.status = 'cancelled'
       result.cancelDate = Date.now()
       const saved = await result.save()
+      await sendEmail(
+        `Your order id is ${saved.orderId}. it was cancel successful.`,
+        saved.email,
+        `Success for cancel ${saved.productName} Max Muay Thai`
+      )
       res.status(200).send({
         status: {
           code: 200,
@@ -1463,7 +1570,6 @@ exports.subscribeAndroid = async function(req, res) {
         message: `key is invalid`,
       }
     }
-    console.log('purchaseDate', purchaseDate)
     let expiredDate = moment(purchaseDate)
       .add(1, 'month')
       .calendar()
@@ -1482,6 +1588,7 @@ exports.subscribeAndroid = async function(req, res) {
           'paymentAndroid.transactionId': transactionId,
         })
         if (transactionOrder != null) {
+          //console.log(transactionOrder)
           throw {
             code: 200,
             message: 'your transaction has already',
@@ -1496,7 +1603,7 @@ exports.subscribeAndroid = async function(req, res) {
             email,
             price: subscribeProduct.price,
             purchaseDate: purchaseDate,
-            platform: 'ios',
+            platform: 'android',
             expiredDate: expiredDate,
             status: 'approved',
             paymentAndroid: {
@@ -1504,6 +1611,16 @@ exports.subscribeAndroid = async function(req, res) {
             },
           })
           const saved = await order.save()
+          const expiredDateText = moment(saved.expiredDate).format(
+            'DD MMMM YYYY'
+          )
+          await sendEmail(
+            `Thank you for purchase ${
+              saved.productName
+            }, you can watch until ${expiredDateText}`,
+            saved.email,
+            'Thank you for purchase Max Muay Thai'
+          )
           res.status(200).send({
             status: {
               code: 200,
@@ -1556,6 +1673,11 @@ exports.cancelSubscribeAndroid = async function(req, res) {
       result.status = 'cancelled'
       result.cancelDate = Date.now()
       const saved = await result.save()
+      await sendEmail(
+        `Your order id is ${saved.orderId}. it was cancel successful.`,
+        saved.email,
+        `Success for cancel ${saved.productName} Max Muay Thai`
+      )
       res.status(200).send({
         status: {
           code: 200,

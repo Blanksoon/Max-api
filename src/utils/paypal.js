@@ -212,11 +212,10 @@ export function excuteBilling(paymentToken) {
       billingAgreement
     ) {
       if (error) {
-        console.log('hfjfjjffjjf')
         console.log(error)
         reject(error)
       } else {
-        console.log('Billing Agreement Execute Response')
+        //console.log('Billing Agreement Execute Response')
         //console.log(JSON.stringify(billingAgreement))
         resolve(billingAgreement)
         //res.send(JSON.stringify(billingAgreement))
