@@ -415,8 +415,8 @@ exports.products = async function(req, res) {
   let outputvods = await findLives('not-paid', {
     $and: [
       { title_en: { $ne: 'Max Sunday Afternoon' } },
-      { title_en: { $ne: 'Octa Fight Wednesday' } },
-      { title_en: { $ne: 'Octa Fight Thursday' } },
+      { title_en: { $ne: 'Octa Fight Monday' } },
+      { title_en: { $ne: 'Octa Fight Tuesday' } },
     ],
   })
   let subscribes = await Subscribe.find(
