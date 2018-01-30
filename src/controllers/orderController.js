@@ -184,10 +184,12 @@ async function findLives(status, query) {
   } else {
     statusOrder = 'paid'
   }
+  console.log(query)
   returnVods = await Live.find(query)
     .sort({ onAirDate: -1 })
     .then(async function(lives) {
       if (Object.keys(lives).length != 0) {
+        console.log(lives)
         dataLives.data = await setDataLive(lives, statusOrder)
         return dataLives
       } else {
@@ -410,7 +412,13 @@ exports.products = async function(req, res) {
     .catch(function(err) {
       return err
     })
-  let outputvods = await findLives('not-paid', {})
+  let outputvods = await findLives('not-paid', {
+    $and: [
+      { title_en: { $ne: 'Max Sunday Afternoon' } },
+      { title_en: { $ne: 'Octa Fight Wednesday' } },
+      { title_en: { $ne: 'Octa Fight Thursday' } },
+    ],
+  })
   let subscribes = await Subscribe.find(
     {},
     { productId: 1, price: 1, status: 1, description: 1, title_en: 1 }
