@@ -2,6 +2,7 @@ import env from '../config/env'
 
 var mongoose = require('mongoose'),
   Order = mongoose.model('Order'),
+  Setting = mongoose.model('Setting'),
   Live = mongoose.model('Live'),
   Subscribe = mongoose.model('Subscribe'),
   Package = mongoose.model('Package'),
@@ -641,4 +642,14 @@ exports.fetchSubscribe = async function(req, res) {
   output.status.message = 'success'
   output.data = order
   res.status(200).send(output)
+}
+
+exports.fetchVersion = async function(req, res) {
+  try {
+    const allVersion = await Setting.find({})
+    res.status(200).send(allVersion)
+  } catch (error) {
+    console.log(error)
+    res.status(200).send('error')
+  }
 }
