@@ -10,6 +10,7 @@ const cors = require('cors')
 // Global import
 const mongoose = require('mongoose')
 const Vod = require('./models/vod')
+const Setting = require('./models/setting')
 const User = require('./models/user')
 const Order = require('./models/order')
 const Live = require('./models/live')

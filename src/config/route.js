@@ -115,6 +115,7 @@ module.exports = function(app) {
   //app.route('/subscribe').post(middleware, order.subscribe)
   app.get('/product', order.products)
   app.get('/subscribe-history', order.fetchSubscribe)
+  app.get('/version', order.fetchVersion)
 
   // Paypal checkout
   if (process.env.NODE_ENV === 'dev') {

@@ -111,7 +111,9 @@ socialAuthen['facebook'] = async function(providerData) {
       checkNewUser = new User(createObject)
       try {
         user = await new_user.save()
-        await promotionForNewCustomer(user)
+        if (env.PROMOTION === 'on') {
+          await promotionForNewCustomer(user)
+        }
         //console.log('user', user)
       } catch (err) {
         return {
@@ -888,7 +890,12 @@ exports.activateLocalUser = async function(req, res) {
       output.status.message = `can't find customer`
       return res.json(output)
     }
-    const result = await promotionForNewCustomer(user)
+    let result = ''
+    if (env.PROMOTION === 'on') {
+      result = await promotionForNewCustomer(user)
+    } else {
+      result = 'success'
+    }
     if (result === 'success') {
       return res.json(output)
     } else if (result === 'have order') {
