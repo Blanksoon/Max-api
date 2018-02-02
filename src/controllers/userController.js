@@ -260,6 +260,7 @@ const sendEmailPromotion = (text, email, subject) => {
         output.data = {}
         resolve('false')
       } else {
+        console.log(info)
         resolve('success')
       }
     })
