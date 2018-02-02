@@ -653,3 +653,38 @@ exports.fetchVersion = async function(req, res) {
     res.status(200).send('error')
   }
 }
+
+exports.fetchAmountCustomerFree = async function(req, res) {
+  let startDate = new Date(req.body.startDate + 'T00:00:00.000Z')
+  let endDate = new Date(req.body.endDate + 'T00:00:00.000Z')
+  const secretKey = req.body.key
+  const output = {}
+  console.log('startDate', startDate)
+  console.log('endDate', endDate)
+  try {
+    if (secretKey === env.PROMOTIONKEY) {
+      const listOfCustomer = await Order.find(
+        {
+          purchaseDate: {
+            $gt: startDate,
+            $lte: endDate,
+          },
+          status: 'approved',
+          orderType: 'free',
+        },
+        { purchaseDate: 1, status: 1, email: 1, productName: 1, expiredDate: 1 }
+      )
+      if (listOfCustomer.length === 0) {
+        throw 'No customer sign up'
+      }
+      output.amountOfCustomer = listOfCustomer.length
+      output.listOfCustomer = listOfCustomer
+      res.status(200).send(output)
+    } else {
+      throw `Key isn't match`
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(200).send(err)
+  }
+}

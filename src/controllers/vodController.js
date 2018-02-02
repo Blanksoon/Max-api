@@ -294,7 +294,8 @@ async function decodeJwt(token, req) {
       //console.log('decode', decode)
       status = decode.statusJwt
     } else {
-      //console.log('decode', decode)
+      //console.log('decode', decode.data._id)
+      //console.log(decode)
       const query = {
         userId: decode.data._id,
         expiredDate: { $gte: today },
@@ -810,6 +811,7 @@ exports.vodsOndemand = async function(req, res) {
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
+    console.log('order', order)
     if (order == 'you have purchase') {
       outputvods = await findVodsOndemand('paid', {}, index, limit)
       json = setDataOutput(outputvods, output)

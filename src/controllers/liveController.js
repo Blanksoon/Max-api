@@ -216,11 +216,17 @@ async function decodeJwt(token, req) {
         userId: decode.data._id,
         expiredDate: { $gte: today },
         $or: [
-          { productId: '59dc6d2786595e42a27635c4' },
-          { productId: '59dc6d66af142842d0bc2551' },
-          { productId: '59dc6da4ab8a7442f58390f4' },
-          { productId: '59dc6dcb61490e430a0d6ec8' },
-          { productId: '5a0c0450b29318da40e335f0' },
+          { productId: '59dc6d2786595e42a27635c4' }, //Max Muay Thai
+          { productId: '59dc6d66af142842d0bc2551' }, //Muay Thai Battle
+          { productId: '59dc6da4ab8a7442f58390f4' }, //Muay Thai Fighter
+          { productId: '59dc6dcb61490e430a0d6ec8' }, //The champion Muay Thai
+          { productId: '5a43eb3fe356ed0f196c434a' }, //Global Fight Wednesday
+          { productId: '5a43ec7ce356ed0f196c434b' }, //Global Fight Thursday
+          { productId: '5a43ed6be356ed0f196c434c' }, //Octa Fight Monday
+          { productId: '5a43ee30e356ed0f196c434d' }, //Octa Fight Tuesday
+          { productId: '5a43eea8e356ed0f196c4350' }, //Max Sunday Afternoon
+          { productId: '5a0c0450b29318da40e335f0' }, //Subscribe Live And Vods
+          { productId: '5a5c2ed0e356edd4d27f88ab' }, //Package Lives And Vods
         ],
         status: 'approved',
       }
@@ -309,6 +315,7 @@ exports.lives = async function(req, res) {
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
+    //console.log('order', order)
     if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', {})
       //outputvods = await findLives('paid', {})
@@ -322,7 +329,10 @@ exports.lives = async function(req, res) {
       let i = 0
       let subscribe = false
       while (i < order.length) {
-        if (order[i].productId === '5a0c0450b29318da40e335f0') {
+        if (
+          order[i].productId === '5a0c0450b29318da40e335f0' ||
+          order[i].productId === '5a5c2ed0e356edd4d27f88ab'
+        ) {
           subscribe = true
         }
         i++
@@ -365,6 +375,7 @@ exports.livesById = async function(req, res) {
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
+    //console.log(order)
     if (order == `you have't purchase`) {
       outputvods = await findLives('not-paid', { _id: `${req.params.liveId}` })
       json = setDataOutput(outputvods, output)
@@ -375,7 +386,10 @@ exports.livesById = async function(req, res) {
       let i = 0
       let subscribe = false
       while (i < order.length) {
-        if (order[i].productName === 'subscribe lives and vods') {
+        if (
+          order[i].productName === 'subscribe lives and vods' ||
+          order[i].productName === 'package lives and vods'
+        ) {
           subscribe = true
         }
         i++

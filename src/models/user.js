@@ -46,6 +46,10 @@ var UserSchema = new Schema({
   stripe: {
     customerId: String,
   },
+  createDate: {
+    type: Date,
+    default: Date.now(),
+  },
   versionKey: false,
 })
 

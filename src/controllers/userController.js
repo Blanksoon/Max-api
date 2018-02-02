@@ -291,12 +291,13 @@ const promotionForNewCustomer = customer => {
         platform: 'creditcard',
         expiredDate: expiredDate,
         status: 'approved',
+        orderType: 'free',
       })
       const expiredDateText = moment(expiredDate).format('DD MMMM YYYY')
       //console.log(newOrder)
       await newOrder.save()
       const result = await sendEmailPromotion(
-        `This's promotion for new our customer, you can watch until ${expiredDateText}`,
+        `This's promotion for new our customer, you can watch lives and vods until ${expiredDateText}`,
         user.email,
         'watch live and vod for free 1 month'
       )
