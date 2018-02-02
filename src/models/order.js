@@ -68,6 +68,10 @@ var OrderSchema = new Schema({
   stripe: {
     paymentId: String,
   },
+  orderType: {
+    type: String,
+    default: 'paid',
+  },
   versionKey: false,
 })
 
