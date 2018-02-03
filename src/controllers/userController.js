@@ -4,6 +4,7 @@ import env from '../config/env'
 import User from '../models/user'
 import Order from '../models/order'
 import moment from 'moment'
+import { model, mongo } from 'mongoose'
 
 const defaultSuccessMessage = 'success'
 const defaultErrorMessage = 'data_not_found'
@@ -282,6 +283,7 @@ const promotionForNewCustomer = customer => {
       const expiredDate = moment(today)
         .add(1, 'month')
         .format('MMMM DD YYYY H:mm:ss')
+      const expireDateIso = moment(today).add(1, 'month')
       const newOrder = new Order({
         productId: '5a5c2ed0e356edd4d27f88ab',
         productName: 'package lives and vods',
@@ -294,8 +296,8 @@ const promotionForNewCustomer = customer => {
         status: 'approved',
         orderType: 'free',
       })
-      const expiredDateText = moment(expiredDate).format('DD MMMM YYYY')
-      //console.log(newOrder)
+      const expiredDateText = moment(expireDateIso).format('DD MMMM YYYY')
+      //console.log(typeof expireDateIso)
       await newOrder.save()
       const result = await sendEmailPromotion(
         `This's promotion for new our customer, you can watch lives and vods until ${expiredDateText}`,
