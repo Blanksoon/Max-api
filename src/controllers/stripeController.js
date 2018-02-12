@@ -325,7 +325,7 @@ exports.payPerViewPackageCreditCard = async function(req, res) {
 }
 
 exports.payPerViewPackageAlipay = async function(req, res) {
-  console.log('token', req.query.token)
+  //console.log('token', req.query.token)
   //console.log('liveId', req.query.liveId)
   //console.log('sourceId', req.query.sourceId)
   const token = req.query.token
@@ -403,7 +403,7 @@ exports.payPerViewPackageAlipay = async function(req, res) {
 }
 
 exports.payPerViewAlipay = async function(req, res) {
-  console.log('token', req.query.token)
+  //console.log('token', req.query.token)
   //console.log('liveId', req.query.liveId)
   //console.log('sourceId', req.query.sourceId)
   const token = req.query.token
@@ -496,7 +496,7 @@ exports.payPerViewAlipay = async function(req, res) {
 }
 
 exports.confirmTransaction = async function(req, res) {
-  console.log(req.query)
+  //console.log(req.query)
   try {
     const stautsTransaction = await retrieveSource(req.query.source)
     if (stautsTransaction.status === 'chargeable') {

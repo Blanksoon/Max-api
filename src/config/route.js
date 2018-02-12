@@ -70,6 +70,7 @@ module.exports = function(app) {
   const live = require('../controllers/liveController')
   const ppcheckout = require('../controllers/ppcheckoutController')
   const stripe = require('../controllers/stripeController')
+  const wechat = require('../controllers/wechatController')
 
   app.all('/*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -191,6 +192,7 @@ module.exports = function(app) {
 
   //wechat
   app.get('/wechat', user.wechat)
+  app.get('/wechat/payperview', wechat.payPerViewWechat)
 
   //stripe
   app.get('/stripe/creditcard', stripe.payPerViewCreditCard)

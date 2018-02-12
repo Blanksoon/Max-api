@@ -68,6 +68,9 @@ var OrderSchema = new Schema({
   stripe: {
     paymentId: String,
   },
+  wechat: {
+    paymentId: String,
+  },
   orderType: {
     type: String,
     default: 'paid',
