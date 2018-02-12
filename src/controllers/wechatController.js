@@ -197,7 +197,15 @@ exports.payPerViewWechat = async function(req, res) {
 
 exports.confirmTransaction = async function(req, res) {
   //console.log(req.query)
+  const payload = req.body
+  const queryload = req.query
   try {
+    fs.writeFileSync('./reqbodywechat.txt', JSON.stringify(payload), {
+      flag: 'a',
+    })
+    fs.writeFileSync('./reqquerywechat.txt', JSON.stringify(queryload), {
+      flag: 'a',
+    })
     if (req.query.data.result === 'SUCCESS') {
       const order = await Order.findOne({
         'wechat.paymentId': req.query.data.mch_order_no,
