@@ -195,99 +195,107 @@ exports.payPerViewWechat = async function(req, res) {
   }
 }
 
-// exports.payPerViewPackageCreditCard = async function(req, res) {
-//   //console.log('token', req.query.token)
-//   //console.log('packageId', req.query.packageId)
-//   //console.log('sourceId', req.query.sourceId)
-//   const token = req.query.token
-//   const packageId = req.query.packageId
-//   const sourceId = req.query.sourceId
-//   try {
-//     const decode = await decryptJwt(token, req)
-//     const packageProduct = await checkStatusPackage(packageId)
-//     const userId = decode.data._id
-//     const email = decode.data.email
-//     // Check customerid stripe
-//     const user = await User.findOne({ _id: userId })
-//     if (user.stripe.customerId === undefined) {
-//       // user has no customerid in stripe
-//       const stripeUser = await createCustomer(email)
-//       user.stripe.customerId = stripeUser.id
-//       await user.save()
-//     }
-//     const transaction = await createTransaction(
-//       user.stripe.customerId,
-//       sourceId
-//     )
-//     const today = Date.now()
-//     const expiredDate = moment(today)
-//       .add(1, 'month')
-//       .format('MMMM DD YYYY H:mm:ss')
-//     const newOrder = new Order({
-//       productId: packageProduct.id,
-//       productName: packageProduct.title_en,
-//       userId,
-//       email,
-//       price: packageProduct.price,
-//       purchaseDate: new Date(),
-//       platform: 'creditcard',
-//       expiredDate: expiredDate,
-//       status: 'created',
-//     })
-//     const order = await newOrder.save()
+exports.confirmTransaction = async function(req, res) {
+  //console.log(req.query)
+  try {
+    if (req.query.data.result === 'SUCCESS') {
+      const order = await Order.findOne({
+        'wechat.paymentId': req.query.data.mch_order_no,
+      })
+      order.status = 'approved'
+      const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
+      await order.save()
+      await sendEmail(
+        `Thank you for purchase ${
+          order.productName
+        }, you can watch until ${expiredDateText}`,
+        order.email,
+        'Thank you for purchase Max Muay Thai'
+      )
+      res.redirect(env.FRONTEND_URL + '/getticket')
+    } else {
+      console.log('2')
+      res.redirect(env.FRONTEND_URL + '/error')
+    }
+  } catch (err) {
+    // res.status(200).send({
+    //   status: {
+    //     code: error.code || 500,
+    //     success: false,
+    //     message: error.message,
+    //   },
+    //   data: [],
+    // })
+    console.log('4')
+    res.redirect(env.FRONTEND_URL + '/error')
+  }
+}
 
-//     const successTransaction = await chargeTransaction(
-//       transaction.id,
-//       user.stripe.customerId,
-//       packageProduct.price * 100,
-//       packageProduct.title_en
-//     )
-//     if (successTransaction.status === 'succeeded') {
-//       order.stripe.paymentId = successTransaction.id
-//       order.status = 'approved'
-//       await order.save()
-//       const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
-//       await sendEmail(
-//         `Thank you for purchase ${
-//           order.productName
-//         }, you can watch until ${expiredDateText}`,
-//         order.email,
-//         'Thank you for purchase Max Muay Thai'
-//       )
-//       res.status(200).send({
-//         status: {
-//           code: 200,
-//           success: true,
-//           message: 'success for purchase',
-//         },
-//         data: {
-//           url: env.FRONTEND_URL + '/getticket',
-//         },
-//       })
-//     } else {
-//       res.status(200).send({
-//         status: {
-//           code: 500,
-//           success: true,
-//           message: successTransaction.status,
-//         },
-//         data: {
-//           url: env.FRONTEND_URL + '/error',
-//         },
-//       })
-//     }
-//   } catch (error) {
-//     console.log(error)
-//     res.status(200).send({
-//       status: {
-//         code: error.code || 500,
-//         success: false,
-//         message: error.message,
-//       },
-//       data: [],
-//     })
-//   }
-// }
+exports.payPerViewPackageWechat = async function(req, res) {
+  const token = req.query.token
+  const packageId = req.query.packageId
+  try {
+    const decode = await decryptJwt(token, req)
+    const packageProduct = await checkStatusPackage(packageId)
+    const userId = decode.data._id
+    const email = decode.data.email
+    const today = Date.now()
+    const expiredDate = moment(today)
+      .add(1, 'month')
+      .format('MMMM DD YYYY H:mm:ss')
+    const mch_order_no = await randomString(16)
+    const nonce_str = await randomString(16)
+    let price = 0
+    if (packageProduct.price === 1.99) {
+      price = 7000
+    } else if (packageProduct.price === 4.99) {
+      price = 17500
+    } else {
+      price = 35000
+    }
+    const result = await createOrder(mch_order_no, nonce_str, price)
+    //console.log('result: ', result)
+    if (result.data.err_msg != undefined) {
+      throw result.data.err_code
+    }
+    const newOrder = new Order({
+      productId: packageProduct.id,
+      productName: packageProduct.title_en,
+      userId,
+      email,
+      price: packageProduct.price,
+      purchaseDate: new Date(),
+      platform: 'wechat',
+      expiredDate: expiredDate,
+      wechat: {
+        paymentId: result.data.mch_order_no,
+      },
+      status: 'created',
+    })
+    const order = await newOrder.save()
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success for purchase',
+      },
+      data: {
+        qrcode: result.data.imgdat,
+        switch: 1,
+      },
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
 
 // exports.payPerViewPackageAlipay = async function(req, res) {
 //   //console.log('token', req.query.token)
@@ -457,67 +465,6 @@ exports.payPerViewWechat = async function(req, res) {
 //       },
 //       data: [],
 //     })
-//   }
-// }
-
-// exports.confirmTransaction = async function(req, res) {
-//   //console.log(req.query)
-//   try {
-//     const stautsTransaction = await retrieveSource(req.query.source)
-//     if (stautsTransaction.status === 'chargeable') {
-//       // console.log('id', stautsTransaction.id)
-//       // console.log('customer', stautsTransaction.customer)
-//       // console.log('amount', stautsTransaction.amount)
-//       const beforeChargeOrder = await Order.findOne({
-//         'stripe.paymentId': stautsTransaction.id,
-//       })
-//       let desc = ''
-//       if (beforeChargeOrder.productName !== undefined) {
-//         desc = beforeChargeOrder.productName
-//       } else {
-//         desc = beforeChargeOrder.title_en
-//       }
-//       const transaction = await chargeTransactionAlipay(
-//         stautsTransaction.id,
-//         stautsTransaction.customer,
-//         stautsTransaction.amount,
-//         desc
-//       )
-//       if (transaction.status === 'succeeded') {
-//         const order = await Order.findOne({
-//           'stripe.paymentId': stautsTransaction.id,
-//         })
-//         order.stripe.paymentId = transaction.id
-//         order.status = 'approved'
-//         const expiredDateText = moment(order.expiredDate).format('DD MMMM YYYY')
-//         await order.save()
-//         await sendEmail(
-//           `Thank you for purchase ${
-//             order.productName
-//           }, you can watch until ${expiredDateText}`,
-//           order.email,
-//           'Thank you for purchase Max Muay Thai'
-//         )
-//         res.redirect(env.FRONTEND_URL + '/getticket')
-//       } else {
-//         console.log('2')
-//         res.redirect(env.FRONTEND_URL + '/error')
-//       }
-//     } else {
-//       console.log('3')
-//       res.redirect(env.FRONTEND_URL + '/error')
-//     }
-//   } catch (err) {
-//     // res.status(200).send({
-//     //   status: {
-//     //     code: error.code || 500,
-//     //     success: false,
-//     //     message: error.message,
-//     //   },
-//     //   data: [],
-//     // })
-//     console.log('4')
-//     res.redirect(env.FRONTEND_URL + '/error')
 //   }
 // }
 
