@@ -7,7 +7,7 @@ import fetch from 'isomorphic-fetch'
 
 export function createOrder(mch_order_no, nonce_str, price) {
   return new Promise((resolve, reject) => {
-    const pem = fs.readFileSync(__dirname + `/private_pkcs1.pem`)
+    const pem = fs.readFileSync(env.PATHPRIVATEKEYWECHAT)
     const key = pem.toString('ascii')
     const buffer =
       `appid=mch21377channel=wechatfee_type=THBimg_type=pngmch_order_no=` +
