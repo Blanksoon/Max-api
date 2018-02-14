@@ -261,7 +261,7 @@ const sendEmailPromotion = (text, email, subject) => {
         output.data = {}
         resolve('false')
       } else {
-        console.log(info)
+        console.log('send promotion email success', info)
         resolve('success')
       }
     })
@@ -297,8 +297,8 @@ const promotionForNewCustomer = customer => {
         orderType: 'free',
       })
       const expiredDateText = moment(expireDateIso).format('DD MMMM YYYY')
-      //console.log(typeof expireDateIso)
       await newOrder.save()
+      console.log(expiredDateText)
       const result = await sendEmailPromotion(
         `This's promotion for new our customer, you can watch lives and vods until ${expiredDateText}`,
         user.email,
@@ -393,7 +393,7 @@ const email = (text, output, subject, link, line1, MessageOnButton) => {
               </a>`, // You can choose to send an HTML body instead
     }
     transporter.sendMail(mailOptions, function(error, info) {
-      console.log('info', info)
+      //console.log('info', info)
       if (error) {
         console.log('error', error)
         output.status.code = '400'
@@ -402,7 +402,7 @@ const email = (text, output, subject, link, line1, MessageOnButton) => {
         output.data = {}
         resolve('false')
       } else {
-        console.log('send active email success')
+        console.log('send active email success', info)
         resolve('success')
       }
     })
@@ -874,7 +874,7 @@ exports.localLogin = async function(req, res) {
 
 exports.activateLocalUser = async function(req, res) {
   var token = req.query.token
-  console.log('token', token)
+  //console.log('token', token)
   var decode = {}
   var query = {}
   var statusToken = ''
