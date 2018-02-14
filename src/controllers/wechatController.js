@@ -152,7 +152,7 @@ exports.payPerViewWechat = async function(req, res) {
       price = 35000
     }
     const result = await createOrder(mch_order_no, nonce_str, price)
-    //console.log('result: ', result)
+    console.log('result: ', result)
     if (result.data.err_msg != undefined) {
       throw result.data.err_code
     }
