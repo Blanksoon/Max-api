@@ -681,6 +681,22 @@ exports.getProgramName = function(req, res) {
         title_en: 'Battle Muay Thai',
         title_th: 'มวยไทย แบทเทิล',
       },
+      {
+        title_en: 'Global Fight Wednesday',
+        title_th: 'โกลด์บอล ไฟท์ วันพุธ',
+      },
+      {
+        title_en: 'Global Fight Thursday',
+        title_th: 'โกลด์บอล ไฟท์ วันพฤหัส',
+      },
+      {
+        title_en: 'MUAY THAI FIGHTER Monday',
+        title_th: 'มวยไทยไฟต์เตอร์ วันจันทร์',
+      },
+      {
+        title_en: 'MUAY THAI FIGHTER Tuesday',
+        title_th: 'มวยไทยไฟต์เตอร์ วันอังคาร',
+      },
     ],
   }
   return res.json(output)
