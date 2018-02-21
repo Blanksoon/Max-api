@@ -314,7 +314,7 @@ exports.cancelPayment = async function(req, res) {
 
 exports.billingPlans = async function(req, res) {
   var billingPlanAttributes = {
-    description: 'Watch unlimited lives and vods for 1 months : 9.99$',
+    description: 'Watch unlimited vods for 1 months : 4.99$',
     merchant_preferences: {
       auto_bill_amount: 'yes',
       cancel_url: env.SERVER_URL + '/subscribe/cancel',
@@ -327,7 +327,7 @@ exports.billingPlans = async function(req, res) {
       {
         amount: {
           currency: 'USD',
-          value: '9.99',
+          value: '4.99',
         },
         cycles: '0',
         frequency: 'MONTH',
