@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import env from './env'
+import multer from 'multer'
 
 exports.verifyToken = function verifyToken(req, res, next) {
   var token = req.body.token || req.query.token || req.headers['x-access-token']
@@ -71,6 +72,9 @@ module.exports = function(app) {
   const ppcheckout = require('../controllers/ppcheckoutController')
   const stripe = require('../controllers/stripeController')
   const wechat = require('../controllers/wechatController')
+  const maxnews = require('../controllers/newsController')
+
+  const upload = multer({ dest: '/tmp/' })
 
   app.all('/*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -208,4 +212,13 @@ module.exports = function(app) {
   app.get('/stripe/confirm-subscribe-alipay', stripe.confirmSubscribeAlipay)
 
   app.get('/test/email', user.testSendEmail)
+
+  //maxnews
+  app.post(
+    '/maxnews/upload/image',
+    upload.single('avatar'),
+    maxnews.uploadImageMaxNews
+  )
+
+  app.post('/maxnews/add/news', maxnews.addMaxNews)
 }
