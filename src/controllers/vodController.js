@@ -913,13 +913,14 @@ exports.addNewVods = async function(req, res) {
   }
   const vod = new Vod(req.body)
   vod.feature = 'unactive'
-  console.log('vod: ', vod)
+  //console.log('vod: ', vod)
+  let result = ''
   try {
-    const result = await vod.save()
+    result = await vod.save()
   } catch (error) {
     console.log(error)
   }
-  console.log('2222', result)
+  //console.log('2222', result)
   res.status(200).send(result)
   //res.send({ tese: 'ji' })
 }
