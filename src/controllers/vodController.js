@@ -920,6 +920,6 @@ exports.addNewVods = async function(req, res) {
     console.log(error)
   }
   console.log('2222', result)
-  //res.status(200).send(result)
-  res.send({ tese: 'ji' })
+  res.status(200).send(result)
+  //res.send({ tese: 'ji' })
 }
