@@ -300,17 +300,35 @@ async function decodeJwt(token, req) {
         userId: decode.data._id,
         expiredDate: { $gte: today },
         $or: [
-          { productId: '5a0c040eb29318da40e335ef' },
-          { productId: '5a0c0450b29318da40e335f0' },
-          { productId: '5a5c2e9ce356edd4d27f88aa' },
-          { productId: '5a5c2ed0e356edd4d27f88ab' },
+          { productId: '5a5c2e9ce356edd4d27f88aa' }, //pack vods
+          { productId: '5a5c2ed0e356edd4d27f88ab' }, //pack live
         ],
         status: 'approved',
       }
+
+      const querySub = {
+        userId: decode.data._id,
+        expiredDate: { $gte: today },
+        $or: [
+          { productId: '5a0c040eb29318da40e335ef' }, //sub vods
+          { productId: '5a0c0450b29318da40e335f0' }, //sub live and vods
+        ],
+        status: { $ne: 'created', $ne: 'expired' },
+      }
       //const query = { userId: decode.data.email }
       const order = await queryOrder(query)
+      const orderSub = await queryOrder(querySub)
+
+      if (orderSub !== `you have't purchase`) {
+        //console.log('11111111111111', order)
+        status = orderSub
+      } else if (order !== `you have't purchase`) {
+        status = order
+      } else {
+        status = order
+      }
       //console.log('ordersss', order)
-      status = order
+      //status = order
     }
   } catch (err) {
     console.log(err)
@@ -841,4 +859,68 @@ exports.vodsOndemand = async function(req, res) {
     json.numberOfVods = allVods
     return res.json(json)
   }
+}
+
+exports.uploadImageThumbnail = async function(req, res) {
+  console.log(req.file)
+  const file = env.PATHIMAGEMAXNEWS + '/' + req.file.originalname
+  //console.log('file: ', file)
+  fs.rename(req.file.path, file, function(err) {
+    if (err) {
+      console.log(err)
+      res.send(500)
+    } else {
+      res.json({
+        message: 'File uploaded successfully',
+        filename: req.file.filename,
+      })
+    }
+  })
+}
+
+exports.addNewVods = async function(req, res) {
+  console.log('body: ', req.body)
+  const imgUrl =
+    'https://storage.maxmuaythai.com/images/NEWS/' + req.body.thumbnailUrl
+  req.body.thumbnailUrl = imgUrl
+  if (req.body.logoUrl === 'Max Muay Thai') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/MAX/logo/MAX_logo.png'
+  } else if (req.body.logoUrl === 'Muay Thai Battle') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/BATTLE/logo/BATTLE_logo.png'
+  } else if (req.body.logoUrl === 'Muaythai Fighter') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/FIGHTER/logo/FIGHTER_logo.png'
+  } else if (req.body.logoUrl === 'The Champion Muay Thai') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/CHAMPION/logo/CHAMPION_logo.png'
+  } else if (req.body.logoUrl === 'Global Fight Wednesday') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/GLOBAL/logo/GLOBAL_logo.png'
+  } else if (req.body.logoUrl === 'Global Fight Thursday') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/GLOBAL/logo/GLOBAL_logo.png'
+  } else if (req.body.logoUrl === 'MUAY THAI FIGHTER Monday') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/OCTA/logo/OCTA_Fight_logo.png'
+  } else if (req.body.logoUrl === 'MUAY THAI FIGHTER Tuesday') {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/OCTA/logo/OCTA_Fight_logo.png'
+  } else {
+    req.body.logoUrl =
+      'https://storage.maxmuaythai.com/images/CHAMPION/logo/CHAMPION_logo.png'
+  }
+  const vod = new Vod(req.body)
+  vod.feature = 'unactive'
+  //console.log('vod: ', vod)
+  let result = ''
+  try {
+    result = await vod.save()
+  } catch (error) {
+    console.log(error)
+  }
+  //console.log('2222', result)
+  res.status(200).send(result)
+  //res.send({ tese: 'ji' })
 }

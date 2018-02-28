@@ -23,17 +23,11 @@ exports.uploadImageMaxNews = async function(req, res) {
 }
 
 exports.addMaxNews = async function(req, res) {
-  console.log('body: ', req.body)
   const imgUrl =
     'https://storage.maxmuaythai.com/images/NEWS/' + req.body.imageUrl
   req.body.imageUrl = imgUrl
   const news = new News(req.body)
-  news.save(function(err, order) {
-    if (err) {
-      console.log('err: ', err)
-    } else {
-      console.log('order: ', order)
-    }
-  })
-  res.status(200).send('hello')
+  const result = await news.save()
+  console.log('2222', result)
+  res.status(200).send(result)
 }

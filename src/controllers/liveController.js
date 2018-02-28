@@ -225,14 +225,34 @@ async function decodeJwt(token, req) {
           { productId: '5a43ed6be356ed0f196c434c' }, //Octa Fight Monday
           { productId: '5a43ee30e356ed0f196c434d' }, //Octa Fight Tuesday
           { productId: '5a43eea8e356ed0f196c4350' }, //Max Sunday Afternoon
-          { productId: '5a0c0450b29318da40e335f0' }, //Subscribe Live And Vods
           { productId: '5a5c2ed0e356edd4d27f88ab' }, //Package Lives And Vods
         ],
         status: 'approved',
       }
+
+      const querySub = {
+        userId: decode.data._id,
+        expiredDate: { $gte: today },
+        $or: [
+          { productId: '5a0c0450b29318da40e335f0' }, //Subscribe Live And Vods
+        ],
+        status: { $ne: 'created', $ne: 'expired' },
+      }
       const order = await queryOrder(query)
+      const orderSub = await queryOrder(querySub)
+      //console.log('1111111111111 ', order)
+      //console.log('2222222222222 ', orderSub)
+      if (orderSub !== `you have't purchase`) {
+        //console.log('11111111111111', order)
+        status = orderSub
+      } else if (order !== `you have't purchase`) {
+        status = order
+      } else {
+        status = order
+      }
       //console.log('11111111111111', order)
-      status = order
+      //console.log('33333333333 ', status)
+      //status = order
     }
   } catch (err) {
     console.log(err)

@@ -15,15 +15,12 @@ const vodSchema = new Schema({
   },
   promoFromTime: {
     type: String,
-    required: 'promoFromTime is required',
   },
   promoToTime: {
     type: String,
-    required: 'promoToTime is required',
   },
   free: {
     type: String,
-    required: 'free is required',
   },
   thumbnailUrl: {
     type: String,
@@ -51,11 +48,9 @@ const vodSchema = new Schema({
   },
   onAirDateStr_en: {
     type: String,
-    required: 'onAirDateStr_en is required',
   },
   onAirDateStr_th: {
     type: String,
-    required: 'onAirDateStr_th is required',
   },
   onAirDate: {
     type: Date,
