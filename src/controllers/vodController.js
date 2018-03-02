@@ -924,3 +924,27 @@ exports.addNewVods = async function(req, res) {
   res.status(200).send(result)
   //res.send({ tese: 'ji' })
 }
+
+exports.vodsInCms = async function(req, res) {
+  try {
+    const result = await Vod.find({})
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch vods',
+      },
+      data: result,
+      dataLength: result.length,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'error',
+      },
+    })
+  }
+}

@@ -88,6 +88,7 @@ module.exports = function(app) {
   app.post('/insert-vod', vod.insertValue)
   app.get('/vods-feature', vod.featureVods)
   app.route('/vods').get(vod.vods)
+  app.route('/cms/vods').get(vod.vodsInCms)
   app.route('/vods-ondemand').get(vod.vodsOndemand)
   app.post('/vods/new', vod.addNewVods)
   // .get(vod.search)
@@ -113,6 +114,7 @@ module.exports = function(app) {
   // Live Routes
   app.route('/lives').get(live.lives)
   app.route('/lives/:liveId').get(live.livesById)
+  app.get('/cms/lives', live.livesInCms)
   app.post('/insert-live', live.insertValue)
 
   // Order and Transection Routes
@@ -220,6 +222,6 @@ module.exports = function(app) {
     upload.single('avatar'),
     maxnews.uploadImageMaxNews
   )
-
   app.post('/maxnews/add/news', maxnews.addMaxNews)
+  app.get(`/cms/maxnews`, maxnews.findMaxNews)
 }

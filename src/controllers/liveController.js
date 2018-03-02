@@ -433,3 +433,27 @@ exports.livesById = async function(req, res) {
     return res.json(json)
   }
 }
+
+exports.livesInCms = async function(req, res) {
+  try {
+    const result = await Live.find({})
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch lives',
+      },
+      data: result,
+      dataLength: result.length,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'error',
+      },
+    })
+  }
+}
