@@ -23,7 +23,6 @@ const liveSchema = new Schema({
   },
   showOrder: {
     type: Number,
-    required: 'showOrder is required',
   },
   startTime: {
     type: String,
@@ -127,7 +126,7 @@ function addLiveDate(live) {
     live.liveToDate = new Date(`${dateStr}T${live.endTime}+0700`)
 
     // The live for current week has already ended
-    const POTENTIAL_DELAY = 60 * 60 * 1000 // 60*60*1000 millisec = 1 hour 
+    const POTENTIAL_DELAY = 60 * 60 * 1000 // 60*60*1000 millisec = 1 hour
     if (curDate.getTime() - POTENTIAL_DELAY > live.liveToDate.getTime()) {
       live.liveFromDate.setDate(live.liveFromDate.getDate() + 7)
       live.liveToDate.setDate(live.liveToDate.getDate() + 7)

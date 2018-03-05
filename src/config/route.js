@@ -115,6 +115,10 @@ module.exports = function(app) {
   app.route('/lives').get(live.lives)
   app.route('/lives/:liveId').get(live.livesById)
   app.get('/cms/lives', live.livesInCms)
+  app.post('/cms/new-lives', live.insertLivesCms)
+  app.post('/cms/delete-lives', live.deleteLiveCms)
+  app.get('/cms/lives/:liveId', live.findOneLivesCms)
+  app.post('/cms/lives/update', live.uppdateLivesCms)
   app.post('/insert-live', live.insertValue)
 
   // Order and Transection Routes

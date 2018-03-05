@@ -35,7 +35,7 @@ exports.addMaxNews = async function(req, res) {
 exports.findMaxNews = async function(req, res) {
   try {
     const result = await News.find({})
-    console.log('result', result.length)
+    //console.log('result', result.length)
     res.status(200).send({
       status: {
         code: 200,
