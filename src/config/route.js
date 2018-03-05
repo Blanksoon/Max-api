@@ -89,8 +89,11 @@ module.exports = function(app) {
   app.get('/vods-feature', vod.featureVods)
   app.route('/vods').get(vod.vods)
   app.route('/cms/vods').get(vod.vodsInCms)
+  app.post('/cms/delete-vods', vod.deleteVodsCms)
+  app.get('/cms/vods/:vodId', vod.findOneVodsCms)
   app.route('/vods-ondemand').get(vod.vodsOndemand)
   app.post('/vods/new', vod.addNewVods)
+  app.post('/cms/vods/update', vod.uppdateVodsCms)
   // .get(vod.search)
   //.post(middleware, vod.create)
 
