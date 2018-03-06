@@ -493,11 +493,9 @@ exports.insertLivesCms = async function(req, res) {
     productId: -1.0,
   })
   live.productId = String(parseInt(productId[0].productId) + 1)
-  live.fightcardUrl =
-    'https://storage.maxmuaythai.com/images/NEWS/' + live.fightcardUrl
-  live.bannerUrl =
-    'https://storage.maxmuaythai.com/images/NEWS/' + live.bannerUrl
-  live.logoUrl = 'https://storage.maxmuaythai.com/images/NEWS/' + live.logoUrl
+  live.fightcardUrl = env.IMAGEURL + live.fightcardUrl
+  live.bannerUrl = env.IMAGEURL + live.bannerUrl
+  live.logoUrl = env.IMAGEURL + live.logoUrl
   console.log(live.productId, typeof live.productId)
   try {
     result = await live.save()
@@ -537,15 +535,13 @@ exports.uppdateLivesCms = async function(req, res) {
   //console.log('data: ', data)
   if (data.fightcardUrl.substring(0, 4) !== 'http') {
     console.log('11: ', data.fightcardUrl.substring(0, 4))
-    data.fightcardUrl =
-      'https://storage.maxmuaythai.com/images/NEWS/' + data.fightcardUrl
+    data.fightcardUrl = env.IMAGEURL + data.fightcardUrl
   }
   if (data.bannerUrl.substring(0, 4) !== 'http') {
-    data.bannerUrl =
-      'https://storage.maxmuaythai.com/images/NEWS/' + data.bannerUrl
+    data.bannerUrl = env.IMAGEURL + data.bannerUrl
   }
   if (data.logoUrl.substring(0, 4) !== 'http') {
-    data.logoUrl = 'https://storage.maxmuaythai.com/images/NEWS/' + data.logoUrl
+    data.logoUrl = env.IMAGEURL + data.logoUrl
   }
   let live = {}
   try {

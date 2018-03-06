@@ -912,8 +912,7 @@ exports.uploadImageThumbnail = async function(req, res) {
 
 exports.addNewVods = async function(req, res) {
   console.log('body: ', req.body)
-  const imgUrl =
-    'https://storage.maxmuaythai.com/images/NEWS/' + req.body.thumbnailUrl
+  const imgUrl = env.IMAGEURL + req.body.thumbnailUrl
   req.body.thumbnailUrl = imgUrl
   req.body.logoUrl = checkLogoUrl(req.body.logoUrl)
   const vod = new Vod(req.body)
@@ -981,8 +980,7 @@ exports.uppdateVodsCms = async function(req, res) {
   data.logoUrl = checkLogoUrl(data.logoUrl)
   //console.log('data: ', data)
   if (data.thumbnailUrl.substring(0, 4) !== 'http') {
-    data.thumbnailUrl =
-      'https://storage.maxmuaythai.com/images/NEWS/' + data.thumbnailUrl
+    data.thumbnailUrl = env.IMAGEURL + data.thumbnailUrl
   }
   let vod = {}
   try {
