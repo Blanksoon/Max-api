@@ -937,7 +937,7 @@ exports.vodsInCms = async function(req, res) {
     let result = await Vod.find({})
     const dataResult = result.map(item => ({
       ...item['_doc'],
-      onAirDate: moment(item['_doc'].onAirDate).format('YYYY/MM/DD'),
+      onAirDate: moment(item['_doc'].onAirDate).format('DD/MM/YYYY'),
       videoUrl: item['_doc'].videoUrl.substring(41, 49),
     }))
     res.status(200).send({
