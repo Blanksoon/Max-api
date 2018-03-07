@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 const News = mongoose.model('News')
 
 exports.uploadImageMaxNews = async function(req, res) {
-  console.log(req.file)
+  //console.log(req.file)
   const file = env.PATHIMAGEMAXNEWS + '/' + req.file.originalname
   //console.log('file: ', file)
   fs.rename(req.file.path, file, function(err) {
