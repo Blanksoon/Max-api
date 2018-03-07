@@ -1,6 +1,6 @@
 'use strict'
 import env from '../config/env'
-
+import moment from 'moment'
 const vods = require('../../data/vods/vods')
 const vodslogin = require('../../data/vods/buyVods')
 const mongoose = require('mongoose')
@@ -46,6 +46,38 @@ const queryOrder = query => {
         resolve(err.message)
       })
   })
+}
+
+const checkLogoUrl = logoName => {
+  let logoUrl = ''
+  if (logoName === 'Max Muay Thai') {
+    logoUrl = 'https://storage.maxmuaythai.com/images/MAX/logo/MAX_logo.png'
+  } else if (logoName === 'Muay Thai Battle') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/BATTLE/logo/BATTLE_logo.png'
+  } else if (logoName === 'Muaythai Fighter') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/FIGHTER/logo/FIGHTER_logo.png'
+  } else if (logoName === 'The Champion Muay Thai') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/CHAMPION/logo/CHAMPION_logo.png'
+  } else if (logoName === 'Global Fight Wednesday') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/GLOBAL/logo/GLOBAL_logo.png'
+  } else if (logoName === 'Global Fight Thursday') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/GLOBAL/logo/GLOBAL_logo.png'
+  } else if (logoName === 'MUAY THAI FIGHTER Monday') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/OCTA/logo/OCTA_Fight_logo.png'
+  } else if (logoName === 'MUAY THAI FIGHTER Tuesday') {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/OCTA/logo/OCTA_Fight_logo.png'
+  } else {
+    logoUrl =
+      'https://storage.maxmuaythai.com/images/CHAMPION/logo/CHAMPION_logo.png'
+  }
+  return logoUrl
 }
 
 function genNextQueryParams(params) {
@@ -878,39 +910,13 @@ exports.uploadImageThumbnail = async function(req, res) {
   })
 }
 
-exports.addNewVods = async function(req, res) {
+exports.addNewVodsCms = async function(req, res) {
   console.log('body: ', req.body)
-  const imgUrl =
-    'https://storage.maxmuaythai.com/images/NEWS/' + req.body.thumbnailUrl
+  const imgUrl = env.IMAGEURL + req.body.thumbnailUrl
+  req.body.promoUrl = `manifests/${req.body.videoUrl}.m3u8`
+  req.body.videoUrl = `manifests/${req.body.videoUrl}.m3u8`
   req.body.thumbnailUrl = imgUrl
-  if (req.body.logoUrl === 'Max Muay Thai') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/MAX/logo/MAX_logo.png'
-  } else if (req.body.logoUrl === 'Muay Thai Battle') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/BATTLE/logo/BATTLE_logo.png'
-  } else if (req.body.logoUrl === 'Muaythai Fighter') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/FIGHTER/logo/FIGHTER_logo.png'
-  } else if (req.body.logoUrl === 'The Champion Muay Thai') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/CHAMPION/logo/CHAMPION_logo.png'
-  } else if (req.body.logoUrl === 'Global Fight Wednesday') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/GLOBAL/logo/GLOBAL_logo.png'
-  } else if (req.body.logoUrl === 'Global Fight Thursday') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/GLOBAL/logo/GLOBAL_logo.png'
-  } else if (req.body.logoUrl === 'MUAY THAI FIGHTER Monday') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/OCTA/logo/OCTA_Fight_logo.png'
-  } else if (req.body.logoUrl === 'MUAY THAI FIGHTER Tuesday') {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/OCTA/logo/OCTA_Fight_logo.png'
-  } else {
-    req.body.logoUrl =
-      'https://storage.maxmuaythai.com/images/CHAMPION/logo/CHAMPION_logo.png'
-  }
+  req.body.logoUrl = checkLogoUrl(req.body.logoUrl)
   const vod = new Vod(req.body)
   vod.feature = 'unactive'
   //console.log('vod: ', vod)
@@ -927,15 +933,21 @@ exports.addNewVods = async function(req, res) {
 
 exports.vodsInCms = async function(req, res) {
   try {
-    const result = await Vod.find({})
+    let i = 0
+    let result = await Vod.find({})
+    const dataResult = result.map(item => ({
+      ...item['_doc'],
+      onAirDate: moment(item['_doc'].onAirDate).format('YYYY/MM/DD'),
+      videoUrl: item['_doc'].videoUrl.substring(41, 49),
+    }))
     res.status(200).send({
       status: {
         code: 200,
         success: true,
         message: 'success fetch vods',
       },
-      data: result,
-      dataLength: result.length,
+      data: dataResult,
+      dataLength: dataResult.length,
     })
   } catch (error) {
     console.log(error)
@@ -947,4 +959,48 @@ exports.vodsInCms = async function(req, res) {
       },
     })
   }
+}
+
+exports.deleteVodsCms = async function(req, res) {
+  //console.log(req.body)
+  try {
+    const vod = await Vod.findOneAndRemove({ _id: req.body.id })
+    // console.log(live)
+  } catch (error) {
+    console.log(error)
+  }
+  res.status(200).send({ t: '1' })
+}
+
+exports.findOneVodsCms = async function(req, res) {
+  const vodId = req.params.vodId
+  let vod = {}
+  try {
+    vod = await Vod.findOne({ _id: vodId })
+    //vod.promoUrl = vod.promoUrl.substring(41, 49)
+    vod.videoUrl = vod.videoUrl.substring(41, 49)
+  } catch (error) {
+    console.log(error)
+  }
+  res.status(200).send(vod)
+}
+
+exports.updateVodsCms = async function(req, res) {
+  const data = req.body
+  data.logoUrl = checkLogoUrl(data.logoUrl)
+  //console.log('data: ', data)
+  req.body.promoUrl = `manifests/${req.body.videoUrl}.m3u8`
+  req.body.videoUrl = `manifests/${req.body.videoUrl}.m3u8`
+  if (data.thumbnailUrl.substring(0, 4) !== 'http') {
+    data.thumbnailUrl = env.IMAGEURL + data.thumbnailUrl
+  }
+  console.log('data._id : ', data._id)
+  let vod = {}
+  try {
+    vod = await Vod.findOneAndUpdate({ _id: data._id }, data, { new: true })
+  } catch (error) {
+    console.log(error)
+  }
+  //console.log('vod', vod)
+  res.status(200).send(vod)
 }

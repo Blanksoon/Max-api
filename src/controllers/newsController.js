@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 const News = mongoose.model('News')
 
 exports.uploadImageMaxNews = async function(req, res) {
-  console.log(req.file)
+  //console.log(req.file)
   const file = env.PATHIMAGEMAXNEWS + '/' + req.file.originalname
   //console.log('file: ', file)
   fs.rename(req.file.path, file, function(err) {
@@ -23,8 +23,7 @@ exports.uploadImageMaxNews = async function(req, res) {
 }
 
 exports.addMaxNews = async function(req, res) {
-  const imgUrl =
-    'https://storage.maxmuaythai.com/images/NEWS/' + req.body.imageUrl
+  const imgUrl = env.IMAGEURL + req.body.imageUrl
   req.body.imageUrl = imgUrl
   const news = new News(req.body)
   const result = await news.save()
@@ -35,7 +34,7 @@ exports.addMaxNews = async function(req, res) {
 exports.findMaxNews = async function(req, res) {
   try {
     const result = await News.find({})
-    console.log('result', result.length)
+    //console.log('result', result.length)
     res.status(200).send({
       status: {
         code: 200,

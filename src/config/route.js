@@ -89,8 +89,11 @@ module.exports = function(app) {
   app.get('/vods-feature', vod.featureVods)
   app.route('/vods').get(vod.vods)
   app.route('/cms/vods').get(vod.vodsInCms)
+  app.post('/cms/delete-vods', vod.deleteVodsCms)
+  app.get('/cms/vods/:vodId', vod.findOneVodsCms)
   app.route('/vods-ondemand').get(vod.vodsOndemand)
-  app.post('/vods/new', vod.addNewVods)
+  app.post('/vods/new', vod.addNewVodsCms)
+  app.post('/cms/vods/update', vod.updateVodsCms)
   // .get(vod.search)
   //.post(middleware, vod.create)
 
@@ -115,6 +118,10 @@ module.exports = function(app) {
   app.route('/lives').get(live.lives)
   app.route('/lives/:liveId').get(live.livesById)
   app.get('/cms/lives', live.livesInCms)
+  app.post('/cms/new-lives', live.insertLivesCms)
+  app.post('/cms/delete-lives', live.deleteLiveCms)
+  app.get('/cms/lives/:liveId', live.findOneLivesCms)
+  app.post('/cms/lives/update', live.uppdateLivesCms)
   app.post('/insert-live', live.insertValue)
 
   // Order and Transection Routes

@@ -36,7 +36,7 @@ const vodSchema = new Schema({
   },
   promoUrl: {
     type: String,
-    required: 'promoUrl is required',
+    //required: 'promoUrl is required',
   },
   title_en: {
     type: String,

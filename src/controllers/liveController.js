@@ -68,6 +68,25 @@ const setDataProduct = (data, exceptionData, buyLives) => {
   })
 }
 
+const checkDayBeforeSave = day => {
+  switch (day) {
+    case 'Sunday':
+      return 0
+    case 'Monday':
+      return 1
+    case 'Tuesday':
+      return 2
+    case 'Wednesday':
+      return 3
+    case 'Thursday':
+      return 4
+    case 'Friday':
+      return 5
+    case 'Saturday':
+      return 6
+  }
+}
+
 async function createToken() {
   const server = 'http://139.59.127.206:8008'
   const apiKey = 'badc87ee-3c81-486f-9e3e-fee583dbc9c8'
@@ -456,4 +475,79 @@ exports.livesInCms = async function(req, res) {
       },
     })
   }
+}
+
+exports.insertLivesCms = async function(req, res) {
+  //console.log(req.body)
+  req.body.liveDay = checkDayBeforeSave(req.body.liveDay)
+  //console.log('req.body.liveDay', req.body.liveDay)
+  const live = new Live(req.body)
+  //console.log('live: ', live)
+  let result = ''
+  const productId = await Live.find(
+    {},
+    {
+      productId: 1,
+    }
+  ).sort({
+    productId: -1.0,
+  })
+  live.productId = String(parseInt(productId[0].productId) + 1)
+  live.fightcardUrl = env.IMAGEURL + live.fightcardUrl
+  live.bannerUrl = env.IMAGEURL + live.bannerUrl
+  live.logoUrl = env.IMAGEURL + live.logoUrl
+  console.log(live.productId, typeof live.productId)
+  try {
+    result = await live.save()
+  } catch (error) {
+    console.log(error)
+  }
+  console.log('2222', result)
+  res.status(200).send({ t: 'hi' })
+  //res.send({ tese: 'ji' })
+}
+
+exports.deleteLiveCms = async function(req, res) {
+  //console.log(req.body)
+  try {
+    const live = await Live.findOneAndRemove({ _id: req.body.id })
+    // console.log(live)
+  } catch (error) {
+    console.log(error)
+  }
+  res.status(200).send({ t: '1' })
+}
+
+exports.findOneLivesCms = async function(req, res) {
+  const liveId = req.params.liveId
+  let live = {}
+  try {
+    live = await Live.findOne({ _id: liveId })
+  } catch (error) {
+    console.log(error)
+  }
+  res.status(200).send(live)
+}
+
+exports.uppdateLivesCms = async function(req, res) {
+  const data = req.body
+  data.liveDay = checkDayBeforeSave(data.liveDay)
+  //console.log('data: ', data)
+  if (data.fightcardUrl.substring(0, 4) !== 'http') {
+    console.log('11: ', data.fightcardUrl.substring(0, 4))
+    data.fightcardUrl = env.IMAGEURL + data.fightcardUrl
+  }
+  if (data.bannerUrl.substring(0, 4) !== 'http') {
+    data.bannerUrl = env.IMAGEURL + data.bannerUrl
+  }
+  if (data.logoUrl.substring(0, 4) !== 'http') {
+    data.logoUrl = env.IMAGEURL + data.logoUrl
+  }
+  let live = {}
+  try {
+    live = await Live.findOneAndUpdate({ _id: data._id }, data, { new: true })
+  } catch (error) {
+    console.log(error)
+  }
+  res.status(200).send(live)
 }
