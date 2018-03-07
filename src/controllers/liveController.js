@@ -1,4 +1,5 @@
 import env from '../config/env'
+import moment from 'moment'
 
 const defaultSuccessMessage = 'success'
 const fetch = require('isomorphic-unfetch')
@@ -456,13 +457,18 @@ exports.livesById = async function(req, res) {
 exports.livesInCms = async function(req, res) {
   try {
     const result = await Live.find({})
+    const dataResult = result.map(item => ({
+      ...item['_doc'],
+      //onAirDate: moment(item['_doc'].onAirDate).format('DD/MM/YYYY'),
+      promoUrl: item['_doc'].promoUrl.substring(41, 49),
+    }))
     res.status(200).send({
       status: {
         code: 200,
         success: true,
         message: 'success fetch lives',
       },
-      data: result,
+      data: dataResult,
       dataLength: result.length,
     })
   } catch (error) {
@@ -478,10 +484,12 @@ exports.livesInCms = async function(req, res) {
 }
 
 exports.insertLivesCms = async function(req, res) {
-  //console.log(req.body)
   req.body.liveDay = checkDayBeforeSave(req.body.liveDay)
   //console.log('req.body.liveDay', req.body.liveDay)
   const live = new Live(req.body)
+  live.promoUrl = `manifests/${req.body.promoUrl}.m3u8`
+  live.startTime = moment(req.body.startTime).format('HH:MM:SS')
+  live.endTime = moment(req.body.endTime).format('HH:MM:SS')
   //console.log('live: ', live)
   let result = ''
   const productId = await Live.find(
@@ -502,7 +510,7 @@ exports.insertLivesCms = async function(req, res) {
   } catch (error) {
     console.log(error)
   }
-  console.log('2222', result)
+  //console.log('2222', result)
   res.status(200).send({ t: 'hi' })
   //res.send({ tese: 'ji' })
 }
@@ -523,15 +531,20 @@ exports.findOneLivesCms = async function(req, res) {
   let live = {}
   try {
     live = await Live.findOne({ _id: liveId })
+    live.promoUrl = live.promoUrl.substring(41, 49)
   } catch (error) {
     console.log(error)
   }
   res.status(200).send(live)
 }
 
-exports.uppdateLivesCms = async function(req, res) {
+exports.updateLivesCms = async function(req, res) {
+  console.log(moment(req.body.startTime).format('HH:MM:SS'))
   const data = req.body
+  data.startTime = moment(req.body.startTime).format('HH:MM:SS')
+  data.endTime = moment(req.body.endTime).format('HH:MM:SS')
   data.liveDay = checkDayBeforeSave(data.liveDay)
+  data.promoUrl = `manifests/${req.body.promoUrl}.m3u8`
   //console.log('data: ', data)
   if (data.fightcardUrl.substring(0, 4) !== 'http') {
     console.log('11: ', data.fightcardUrl.substring(0, 4))

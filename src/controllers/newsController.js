@@ -55,3 +55,25 @@ exports.findMaxNews = async function(req, res) {
     })
   }
 }
+
+exports.findOneMaxNewsCms = async function(req, res) {
+  const newsId = req.params.newsId
+  let news = {}
+  try {
+    news = await News.findOne({ _id: newsId })
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch news',
+      },
+      data: news,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(200).send(error)
+  }
+}
+
+// exports.filterMaxNewsCms = async function(req, res){
+// }

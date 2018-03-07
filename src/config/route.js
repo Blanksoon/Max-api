@@ -121,7 +121,7 @@ module.exports = function(app) {
   app.post('/cms/new-lives', live.insertLivesCms)
   app.post('/cms/delete-lives', live.deleteLiveCms)
   app.get('/cms/lives/:liveId', live.findOneLivesCms)
-  app.post('/cms/lives/update', live.uppdateLivesCms)
+  app.post('/cms/lives/update', live.updateLivesCms)
   app.post('/insert-live', live.insertValue)
 
   // Order and Transection Routes
@@ -231,4 +231,5 @@ module.exports = function(app) {
   )
   app.post('/maxnews/add/news', maxnews.addMaxNews)
   app.get(`/cms/maxnews`, maxnews.findMaxNews)
+  app.get('/cms/maxnews/:newsId', maxnews.findOneMaxNewsCms)
 }
