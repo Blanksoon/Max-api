@@ -80,9 +80,26 @@ const checkLogoUrl = logoName => {
   return logoUrl
 }
 
+const checkFeatureVods = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const vods = await Vod.findOne({ feature: 'active' })
+      //console.log('2')
+      if (vods) {
+        //console.log('3')
+        vods.feature = 'unactive'
+        await vods.save()
+      }
+      resolve('sucess')
+    } catch (err) {
+      console.log('err: ', err)
+      resolve(err.message)
+    }
+  })
+}
+
 function genNextQueryParams(params) {
   var nextQueryParams = ''
-
   Object.keys(params).forEach(function(key) {
     if (key == 'offset')
       nextQueryParams +=
@@ -911,14 +928,19 @@ exports.uploadImageThumbnail = async function(req, res) {
 }
 
 exports.addNewVodsCms = async function(req, res) {
-  console.log('body: ', req.body)
+  //console.log('body: ', req.body)
+  if (req.body.feature === 'active') {
+    console.log('1')
+    const a = await checkFeatureVods()
+    console.log('a', a)
+  }
   const imgUrl = env.IMAGEURL + req.body.thumbnailUrl
   req.body.promoUrl = `manifests/${req.body.videoUrl}.m3u8`
   req.body.videoUrl = `manifests/${req.body.videoUrl}.m3u8`
   req.body.thumbnailUrl = imgUrl
   req.body.logoUrl = checkLogoUrl(req.body.logoUrl)
   const vod = new Vod(req.body)
-  vod.feature = 'unactive'
+  //vod.feature = 'unactive'
   //console.log('vod: ', vod)
   let result = ''
   try {
@@ -987,6 +1009,10 @@ exports.findOneVodsCms = async function(req, res) {
 
 exports.updateVodsCms = async function(req, res) {
   const data = req.body
+  if (req.body.feature === 'active') {
+    console.log('1')
+    await checkFeatureVods()
+  }
   data.logoUrl = checkLogoUrl(data.logoUrl)
   //console.log('data: ', data)
   req.body.promoUrl = `manifests/${req.body.videoUrl}.m3u8`

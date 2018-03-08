@@ -154,13 +154,19 @@ function addLiveDate(live) {
 }
 
 liveSchema.post('findOne', live => {
-  addLiveDate(live)
-  live.promoUrl = jwplayerUrl(live.promoUrl)
-})
-liveSchema.post('find', lives => {
-  lives.forEach(live => {
+  if (live === null) {
+  } else {
     addLiveDate(live)
     live.promoUrl = jwplayerUrl(live.promoUrl)
-  })
+  }
+})
+liveSchema.post('find', lives => {
+  if (lives === null) {
+  } else {
+    lives.forEach(live => {
+      addLiveDate(live)
+      live.promoUrl = jwplayerUrl(live.promoUrl)
+    })
+  }
 })
 module.exports = mongoose.model('Live', liveSchema)

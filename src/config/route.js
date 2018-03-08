@@ -120,6 +120,7 @@ module.exports = function(app) {
   app.get('/cms/lives', live.livesInCms)
   app.post('/cms/new-lives', live.insertLivesCms)
   app.post('/cms/delete-lives', live.deleteLiveCms)
+  app.get('/cms/lives/get-progname', live.fetchProgNameCms)
   app.get('/cms/lives/:liveId', live.findOneLivesCms)
   app.post('/cms/lives/update', live.updateLivesCms)
   app.post('/insert-live', live.insertValue)

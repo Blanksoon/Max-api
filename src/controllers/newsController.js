@@ -1,6 +1,7 @@
 import fs from 'fs'
 import multer from 'multer'
 import env from '../config/env'
+import moment from 'moment'
 
 const mongoose = require('mongoose')
 const News = mongoose.model('News')
@@ -34,14 +35,24 @@ exports.addMaxNews = async function(req, res) {
 exports.findMaxNews = async function(req, res) {
   try {
     const result = await News.find({})
-    //console.log('result', result.length)
+    //console.log('result', result)
+    const data = result.map(item => ({
+      ...item['_doc'],
+      createDate: moment(item['_doc'].createDate).format('DD/MM/YYYY'),
+      createDate_en: moment(item['_doc'].createDate).format(
+        'ddd. MMM Do, YYYY'
+      ),
+      createDate_th: moment(item['_doc'].createDate)
+        .locale('th')
+        .format('ddd. MMM Do, YYYY'),
+    }))
     res.status(200).send({
       status: {
         code: 200,
         success: true,
         message: 'success fetch maxnews',
       },
-      data: result,
+      data: data,
       dataLength: result.length,
     })
   } catch (error) {
@@ -75,5 +86,15 @@ exports.findOneMaxNewsCms = async function(req, res) {
   }
 }
 
+exports.deleteNewsCms = async function(req, res) {
+  //console.log(req.body)
+  try {
+    const vod = await Vod.findOneAndRemove({ _id: req.body.id })
+    // console.log(live)
+  } catch (error) {
+    console.log(error)
+  }
+  res.status(200).send({ t: '1' })
+}
 // exports.filterMaxNewsCms = async function(req, res){
 // }

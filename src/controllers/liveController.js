@@ -564,3 +564,8 @@ exports.updateLivesCms = async function(req, res) {
   }
   res.status(200).send(live)
 }
+
+exports.fetchProgNameCms = async function(req, res) {
+  const name = await Live.find({}, { programName: 1, title_en: 1, title_th: 1 })
+  res.status(200).send(name)
+}
