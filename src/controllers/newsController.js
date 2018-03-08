@@ -34,7 +34,7 @@ exports.addMaxNews = async function(req, res) {
 
 exports.findMaxNews = async function(req, res) {
   try {
-    const result = await News.find({})
+    const result = await News.find({}).sort({ createDate: -1 })
     //console.log('result', result)
     const data = result.map(item => ({
       ...item['_doc'],
@@ -87,9 +87,9 @@ exports.findOneMaxNewsCms = async function(req, res) {
 }
 
 exports.deleteNewsCms = async function(req, res) {
-  //console.log(req.body)
+  console.log(req.body)
   try {
-    const vod = await Vod.findOneAndRemove({ _id: req.body.id })
+    const news = await News.findOneAndRemove({ _id: req.body.id })
     // console.log(live)
   } catch (error) {
     console.log(error)

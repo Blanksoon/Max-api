@@ -231,6 +231,7 @@ module.exports = function(app) {
     maxnews.uploadImageMaxNews
   )
   app.post('/maxnews/add/news', maxnews.addMaxNews)
+  app.post(`/cms/delete-news`, maxnews.deleteNewsCms)
   app.get(`/cms/maxnews`, maxnews.findMaxNews)
   app.get('/cms/maxnews/:newsId', maxnews.findOneMaxNewsCms)
 }
