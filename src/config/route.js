@@ -114,6 +114,8 @@ module.exports = function(app) {
     .put(middleware, user.update)
     .delete(middleware, user.delete)
 
+  app.post(`/users/login`, user.cmsLogin)
+
   // Live Routes
   app.route('/lives').get(live.lives)
   app.route('/lives/:liveId').get(live.livesById)
@@ -230,8 +232,10 @@ module.exports = function(app) {
     upload.single('avatar'),
     maxnews.uploadImageMaxNews
   )
+  app.get(`/maxnews`, maxnews.findMaxNews)
   app.post('/maxnews/add/news', maxnews.addMaxNews)
   app.post(`/cms/delete-news`, maxnews.deleteNewsCms)
-  app.get(`/cms/maxnews`, maxnews.findMaxNews)
+  app.get(`/cms/maxnews`, maxnews.findMaxNewsCms)
   app.get('/cms/maxnews/:newsId', maxnews.findOneMaxNewsCms)
+  app.post('/cms/maxnews/update', maxnews.updateNewsCms)
 }

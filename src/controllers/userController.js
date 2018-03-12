@@ -1212,3 +1212,24 @@ exports.testSendEmail = async function(req, res) {
     }
   })
 }
+
+exports.cmsLogin = async function(req, res) {
+  console.log('email: ', req.body)
+  if (
+    req.body.email === 'admin@email.com' &&
+    req.body.password === 'maxadmin2016'
+  ) {
+    var token = jwt.sign({ data: req.body }, env.JWT_SECRET, {
+      expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
+    })
+    res.status(200).send({
+      token: token,
+      email: req.body.email,
+    })
+  } else {
+    res.status(500).send({
+      code: 500,
+      message: 'email or password is invalid',
+    })
+  }
+}
