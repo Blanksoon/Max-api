@@ -79,6 +79,34 @@ exports.addMaxNews = async function(req, res) {
   }
 }
 
+exports.findOneMaxNews = async function(req, res) {
+  const token = req.query.token
+  const newsId = req.params.newsId
+  let news = {}
+  //console.log('newsId: ', newsId)
+  try {
+    news = await News.findOne({ _id: newsId })
+    //console.log('news: ', news)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch news',
+      },
+      data: news,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
+  }
+}
+
 exports.findMaxNews = async function(req, res) {
   try {
     const result = await News.find({}).sort({ createDate: -1 })
