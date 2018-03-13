@@ -7,6 +7,19 @@ const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const News = mongoose.model('News')
 
+const checkUserCms = (username, password) => {
+  let i = 0
+  const content = fs.readFileSync(env.ADMINPATH)
+  let users = JSON.parse(content)
+  while (i < users.length) {
+    if (users[i].username === username && users[i].password === password) {
+      return true
+    }
+    i++
+  }
+  return false
+}
+
 const readJwt = token => {
   return new Promise((resolve, reject) => {
     const error = {
@@ -18,8 +31,12 @@ const readJwt = token => {
         error.statusJwt = 'Failed to authenticate token.'
         error.err = err
         reject(error.statusJwt)
+      } else {
+        if (checkUserCms(decoded.data.email, decoded.data.password)) {
+          resolve(decoded)
+        }
+        reject('User not found')
       }
-      resolve(decoded)
     })
   })
 }

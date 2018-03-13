@@ -1,6 +1,7 @@
 'use strict'
 import env from '../config/env'
 import moment from 'moment'
+import fs from 'fs'
 const vods = require('../../data/vods/vods')
 const vodslogin = require('../../data/vods/buyVods')
 const mongoose = require('mongoose')
@@ -11,6 +12,40 @@ const defaultErrorMessage = 'data_not_found'
 const jwt = require('jsonwebtoken')
 
 //functions
+const checkUserCms = (username, password) => {
+  let i = 0
+  const content = fs.readFileSync(env.ADMINPATH)
+  let users = JSON.parse(content)
+  while (i < users.length) {
+    if (users[i].username === username && users[i].password === password) {
+      return true
+    }
+    i++
+  }
+  return false
+}
+
+const readJwtCms = token => {
+  return new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, env.JWT_SECRET, async function(err, decoded) {
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        reject(error.statusJwt)
+      } else {
+        if (checkUserCms(decoded.data.email, decoded.data.password)) {
+          resolve(decoded)
+        }
+        reject('User not found')
+      }
+    })
+  })
+}
+
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
     const error = {
@@ -967,10 +1002,7 @@ exports.addNewVodsCms = async function(req, res) {
 exports.vodsInCms = async function(req, res) {
   const token = req.query.token
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     let i = 0
     let result = await Vod.find({})
     const dataResult = result.map(item => ({
@@ -1003,10 +1035,7 @@ exports.deleteVodsCms = async function(req, res) {
   //console.log(req.body)
   const token = req.body.token
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     const vod = await Vod.findOneAndRemove({ _id: req.body.data.id })
     res.status(200).send({ status: 'success' })
   } catch (error) {
@@ -1025,10 +1054,7 @@ exports.findOneVodsCms = async function(req, res) {
   const vodId = req.params.vodId
   let vod = {}
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     vod = await Vod.findOne({ _id: vodId })
     //vod.promoUrl = vod.promoUrl.substring(41, 49)
     vod.videoUrl = vod.videoUrl.substring(41, 49)
@@ -1060,10 +1086,7 @@ exports.updateVodsCms = async function(req, res) {
   }
   let vod = {}
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     vod = await Vod.findOneAndUpdate({ _id: data._id }, data, { new: true })
     res.status(200).send(vod)
   } catch (error) {

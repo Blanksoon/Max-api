@@ -1,5 +1,6 @@
 import env from '../config/env'
 import moment from 'moment'
+import fs from 'fs'
 
 const defaultSuccessMessage = 'success'
 const fetch = require('isomorphic-unfetch')
@@ -10,6 +11,40 @@ const Order = mongoose.model('Order')
 const Live = mongoose.model('Live')
 
 //function
+const checkUserCms = (username, password) => {
+  let i = 0
+  const content = fs.readFileSync(env.ADMINPATH)
+  let users = JSON.parse(content)
+  while (i < users.length) {
+    if (users[i].username === username && users[i].password === password) {
+      return true
+    }
+    i++
+  }
+  return false
+}
+
+const readJwtCms = token => {
+  return new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, env.JWT_SECRET, async function(err, decoded) {
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        reject(error.statusJwt)
+      } else {
+        if (checkUserCms(decoded.data.email, decoded.data.password)) {
+          resolve(decoded)
+        }
+        reject('User not found')
+      }
+    })
+  })
+}
+
 const readJwt = (token, req) => {
   return new Promise((resolve, reject) => {
     const error = {
@@ -458,11 +493,7 @@ exports.livesInCms = async function(req, res) {
   const token = req.query.token
   //console.log('token: ', token)
   try {
-    const decodeToken = await readJwt(token)
-    console.log('decodeToken: ', decodeToken)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     const result = await Live.find({})
     const dataResult = result.map(item => ({
       ...item['_doc'],
@@ -496,8 +527,8 @@ exports.insertLivesCms = async function(req, res) {
   //console.log('req.body.liveDay', req.body.liveDay)
   const live = new Live(req.body.data)
   live.promoUrl = `manifests/${req.body.data.promoUrl}.m3u8`
-  live.startTime = moment(req.body.data.startTime).format('HH:MM:SS')
-  live.endTime = moment(req.body.data.endTime).format('HH:MM:SS')
+  live.startTime = moment(req.body.data.startTime).format('HH:mm:ss')
+  live.endTime = moment(req.body.data.endTime).format('HH:mm:ss')
   //console.log('live: ', live)
   let result = ''
   const productId = await Live.find(
@@ -514,10 +545,7 @@ exports.insertLivesCms = async function(req, res) {
   live.logoUrl = env.IMAGEURL + live.logoUrl
   console.log(live.productId, typeof live.productId)
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     result = await live.save()
     res.status(200).send(result)
   } catch (error) {
@@ -539,10 +567,7 @@ exports.deleteLiveCms = async function(req, res) {
   //console.log(req.body)
   const token = req.body.token
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     const live = await Live.findOneAndRemove({ _id: req.body.data.id })
     // console.log(live)
     res.status(200).send({ status: 'success' })
@@ -562,10 +587,7 @@ exports.findOneLivesCms = async function(req, res) {
   const liveId = req.params.liveId
   let live = {}
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     live = await Live.findOne({ _id: liveId })
     live.promoUrl = live.promoUrl.substring(41, 49)
     res.status(200).send(live)
@@ -581,16 +603,17 @@ exports.findOneLivesCms = async function(req, res) {
 }
 
 exports.updateLivesCms = async function(req, res) {
-  //console.log(moment(req.body.startTime).format('HH:MM:SS'))
+  //console.log('req.body.startTime: ', req.body.data.startTime.getTime)
+  //console.log(moment(req.body.data.startTime).format('HH:mm:ss'))
   const token = req.body.token
   const data = req.body.data
-  data.startTime = moment(req.body.data.startTime).format('HH:MM:SS')
-  data.endTime = moment(req.body.data.endTime).format('HH:MM:SS')
+  data.startTime = moment(req.body.data.startTime).format('HH:mm:ss')
+  data.endTime = moment(req.body.data.endTime).format('HH:mm:ss')
   data.liveDay = checkDayBeforeSave(data.liveDay)
   data.promoUrl = `manifests/${req.body.data.promoUrl}.m3u8`
   //console.log('data: ', data)
   if (data.fightcardUrl.substring(0, 4) !== 'http') {
-    console.log('11: ', data.fightcardUrl.substring(0, 4))
+    //console.log('11: ', data.fightcardUrl.substring(0, 4))
     data.fightcardUrl = env.IMAGEURL + data.fightcardUrl
   }
   if (data.bannerUrl.substring(0, 4) !== 'http') {
@@ -601,10 +624,7 @@ exports.updateLivesCms = async function(req, res) {
   }
   let live = {}
   try {
-    const decodeToken = await readJwt(token)
-    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
-      throw 'Failed to authenticate token.'
-    }
+    const decodeToken = await readJwtCms(token)
     live = await Live.findOneAndUpdate({ _id: data._id }, data, { new: true })
     res.status(200).send(live)
   } catch (error) {

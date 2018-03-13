@@ -5,6 +5,7 @@ import User from '../models/user'
 import Order from '../models/order'
 import moment from 'moment'
 import { model, mongo } from 'mongoose'
+import fs from 'fs'
 
 const defaultSuccessMessage = 'success'
 const defaultErrorMessage = 'data_not_found'
@@ -233,6 +234,19 @@ socialAuthen['facebook'] = async function(providerData) {
       data: [],
     }
   }
+}
+
+const checkUserCms = (username, password) => {
+  let i = 0
+  const content = fs.readFileSync(env.ADMINPATH)
+  let users = JSON.parse(content)
+  while (i < users.length) {
+    if (users[i].username === username && users[i].password === password) {
+      return true
+    }
+    i++
+  }
+  return false
 }
 
 const sendEmailPromotion = (text, email, subject) => {
@@ -1214,11 +1228,12 @@ exports.testSendEmail = async function(req, res) {
 }
 
 exports.cmsLogin = async function(req, res) {
-  console.log('email: ', req.body)
-  if (
-    req.body.email === 'admin@email.com' &&
-    req.body.password === 'maxadmin2016'
-  ) {
+  //console.log('email: ', req.body)
+  // if (
+  //   req.body.email === 'admin@email.com' &&
+  //   req.body.password === 'maxadmin2016'
+  // ) {
+  if (checkUserCms(req.body.email, req.body.password)) {
     var token = jwt.sign({ data: req.body }, env.JWT_SECRET, {
       expiresIn: parseInt(env.JWT_TOKEN_LIFETIME),
     })
