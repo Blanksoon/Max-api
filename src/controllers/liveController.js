@@ -455,7 +455,14 @@ exports.livesById = async function(req, res) {
 }
 
 exports.livesInCms = async function(req, res) {
+  const token = req.query.token
+  //console.log('token: ', token)
   try {
+    const decodeToken = await readJwt(token)
+    console.log('decodeToken: ', decodeToken)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     const result = await Live.find({})
     const dataResult = result.map(item => ({
       ...item['_doc'],
@@ -473,23 +480,24 @@ exports.livesInCms = async function(req, res) {
     })
   } catch (error) {
     console.log(error)
-    res.status(200).send({
+    res.status(500).send({
       status: {
-        code: 200,
+        code: 500,
         success: true,
-        message: 'error',
+        message: error,
       },
     })
   }
 }
 
 exports.insertLivesCms = async function(req, res) {
-  req.body.liveDay = checkDayBeforeSave(req.body.liveDay)
+  const token = req.body.token
+  req.body.data.liveDay = checkDayBeforeSave(req.body.data.liveDay)
   //console.log('req.body.liveDay', req.body.liveDay)
-  const live = new Live(req.body)
-  live.promoUrl = `manifests/${req.body.promoUrl}.m3u8`
-  live.startTime = moment(req.body.startTime).format('HH:MM:SS')
-  live.endTime = moment(req.body.endTime).format('HH:MM:SS')
+  const live = new Live(req.body.data)
+  live.promoUrl = `manifests/${req.body.data.promoUrl}.m3u8`
+  live.startTime = moment(req.body.data.startTime).format('HH:MM:SS')
+  live.endTime = moment(req.body.data.endTime).format('HH:MM:SS')
   //console.log('live: ', live)
   let result = ''
   const productId = await Live.find(
@@ -506,45 +514,80 @@ exports.insertLivesCms = async function(req, res) {
   live.logoUrl = env.IMAGEURL + live.logoUrl
   console.log(live.productId, typeof live.productId)
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     result = await live.save()
+    res.status(200).send(result)
   } catch (error) {
     console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
   //console.log('2222', result)
-  res.status(200).send({ t: 'hi' })
+  //res.status(200).send({ t: 'hi' })
   //res.send({ tese: 'ji' })
 }
 
 exports.deleteLiveCms = async function(req, res) {
   //console.log(req.body)
+  const token = req.body.token
   try {
-    const live = await Live.findOneAndRemove({ _id: req.body.id })
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
+    const live = await Live.findOneAndRemove({ _id: req.body.data.id })
     // console.log(live)
+    res.status(200).send({ status: 'success' })
   } catch (error) {
-    console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: false,
+        message: error,
+      },
+    })
   }
-  res.status(200).send({ t: '1' })
 }
 
 exports.findOneLivesCms = async function(req, res) {
+  const token = req.query.token
   const liveId = req.params.liveId
   let live = {}
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     live = await Live.findOne({ _id: liveId })
     live.promoUrl = live.promoUrl.substring(41, 49)
+    res.status(200).send(live)
   } catch (error) {
-    console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
-  res.status(200).send(live)
 }
 
 exports.updateLivesCms = async function(req, res) {
-  console.log(moment(req.body.startTime).format('HH:MM:SS'))
-  const data = req.body
-  data.startTime = moment(req.body.startTime).format('HH:MM:SS')
-  data.endTime = moment(req.body.endTime).format('HH:MM:SS')
+  //console.log(moment(req.body.startTime).format('HH:MM:SS'))
+  const token = req.body.token
+  const data = req.body.data
+  data.startTime = moment(req.body.data.startTime).format('HH:MM:SS')
+  data.endTime = moment(req.body.data.endTime).format('HH:MM:SS')
   data.liveDay = checkDayBeforeSave(data.liveDay)
-  data.promoUrl = `manifests/${req.body.promoUrl}.m3u8`
+  data.promoUrl = `manifests/${req.body.data.promoUrl}.m3u8`
   //console.log('data: ', data)
   if (data.fightcardUrl.substring(0, 4) !== 'http') {
     console.log('11: ', data.fightcardUrl.substring(0, 4))
@@ -558,9 +601,25 @@ exports.updateLivesCms = async function(req, res) {
   }
   let live = {}
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     live = await Live.findOneAndUpdate({ _id: data._id }, data, { new: true })
+    res.status(200).send(live)
   } catch (error) {
     console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
-  res.status(200).send(live)
+}
+
+exports.fetchProgNameCms = async function(req, res) {
+  const name = await Live.find({}, { programName: 1, title_en: 1, title_th: 1 })
+  res.status(200).send(name)
 }

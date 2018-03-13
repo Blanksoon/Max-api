@@ -80,9 +80,26 @@ const checkLogoUrl = logoName => {
   return logoUrl
 }
 
+const checkFeatureVods = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const vods = await Vod.findOne({ feature: 'active' })
+      //console.log('2')
+      if (vods) {
+        //console.log('3')
+        vods.feature = 'unactive'
+        await vods.save()
+      }
+      resolve('sucess')
+    } catch (err) {
+      console.log('err: ', err)
+      resolve(err.message)
+    }
+  })
+}
+
 function genNextQueryParams(params) {
   var nextQueryParams = ''
-
   Object.keys(params).forEach(function(key) {
     if (key == 'offset')
       nextQueryParams +=
@@ -911,28 +928,49 @@ exports.uploadImageThumbnail = async function(req, res) {
 }
 
 exports.addNewVodsCms = async function(req, res) {
-  console.log('body: ', req.body)
-  const imgUrl = env.IMAGEURL + req.body.thumbnailUrl
-  req.body.promoUrl = `manifests/${req.body.videoUrl}.m3u8`
-  req.body.videoUrl = `manifests/${req.body.videoUrl}.m3u8`
-  req.body.thumbnailUrl = imgUrl
-  req.body.logoUrl = checkLogoUrl(req.body.logoUrl)
-  const vod = new Vod(req.body)
-  vod.feature = 'unactive'
+  //console.log('body: ', req.body)
+  const token = req.body.token
+  if (req.body.data.feature === 'active') {
+    await checkFeatureVods()
+  }
+  const imgUrl = env.IMAGEURL + req.body.data.thumbnailUrl
+  req.body.data.promoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
+  req.body.data.videoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
+  req.body.data.thumbnailUrl = imgUrl
+  req.body.data.logoUrl = checkLogoUrl(req.body.data.logoUrl)
+  const vod = new Vod(req.body.data)
+  //vod.feature = 'unactive'
   //console.log('vod: ', vod)
   let result = ''
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     result = await vod.save()
+    res.status(200).send(result)
   } catch (error) {
     console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
   //console.log('2222', result)
-  res.status(200).send(result)
+  //res.status(200).send(result)
   //res.send({ tese: 'ji' })
 }
 
 exports.vodsInCms = async function(req, res) {
+  const token = req.query.token
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     let i = 0
     let result = await Vod.find({})
     const dataResult = result.map(item => ({
@@ -951,11 +989,11 @@ exports.vodsInCms = async function(req, res) {
     })
   } catch (error) {
     console.log(error)
-    res.status(200).send({
+    res.status(500).send({
       status: {
-        code: 200,
+        code: 500,
         success: true,
-        message: 'error',
+        message: error,
       },
     })
   }
@@ -963,44 +1001,81 @@ exports.vodsInCms = async function(req, res) {
 
 exports.deleteVodsCms = async function(req, res) {
   //console.log(req.body)
+  const token = req.body.token
   try {
-    const vod = await Vod.findOneAndRemove({ _id: req.body.id })
-    // console.log(live)
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
+    const vod = await Vod.findOneAndRemove({ _id: req.body.data.id })
+    res.status(200).send({ status: 'success' })
   } catch (error) {
-    console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: false,
+        message: error,
+      },
+    })
   }
-  res.status(200).send({ t: '1' })
 }
 
 exports.findOneVodsCms = async function(req, res) {
+  const token = req.query.token
   const vodId = req.params.vodId
   let vod = {}
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     vod = await Vod.findOne({ _id: vodId })
     //vod.promoUrl = vod.promoUrl.substring(41, 49)
     vod.videoUrl = vod.videoUrl.substring(41, 49)
+    res.status(200).send(vod)
   } catch (error) {
     console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
-  res.status(200).send(vod)
 }
 
 exports.updateVodsCms = async function(req, res) {
-  const data = req.body
+  const token = req.body.token
+  const data = req.body.data
+  if (req.body.data.keyfeature === 'active') {
+    await checkFeatureVods()
+  }
   data.logoUrl = checkLogoUrl(data.logoUrl)
   //console.log('data: ', data)
-  req.body.promoUrl = `manifests/${req.body.videoUrl}.m3u8`
-  req.body.videoUrl = `manifests/${req.body.videoUrl}.m3u8`
+  req.body.data.promoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
+  req.body.data.videoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
   if (data.thumbnailUrl.substring(0, 4) !== 'http') {
     data.thumbnailUrl = env.IMAGEURL + data.thumbnailUrl
   }
-  console.log('data._id : ', data._id)
   let vod = {}
   try {
+    const decodeToken = await readJwt(token)
+    if (decodeToken.statusJwt === 'Failed to authenticate token.') {
+      throw 'Failed to authenticate token.'
+    }
     vod = await Vod.findOneAndUpdate({ _id: data._id }, data, { new: true })
+    res.status(200).send(vod)
   } catch (error) {
     console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
   //console.log('vod', vod)
-  res.status(200).send(vod)
+  //res.status(200).send(vod)
 }
