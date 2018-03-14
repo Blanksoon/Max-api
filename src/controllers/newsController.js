@@ -248,5 +248,35 @@ exports.findMaxNewsCms = async function(req, res) {
   }
 }
 
+exports.findRelateMaxnews = async function(req, res) {
+  //console.log('1: ', req.query.programName)
+  //console.log('2: ', req.query.id)
+  try {
+    const data = await News.find({
+      programName: req.query.programName,
+      _id: { $ne: req.query.id },
+    })
+      .sort({ createDate: -1 })
+      .limit(3)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch maxnews',
+      },
+      data: data,
+    })
+  } catch (error) {
+    //console.log('error: ', error)
+    res.status(500).send({
+      status: {
+        code: 200,
+        success: true,
+        message: error,
+      },
+    })
+  }
+}
+
 // exports.filterMaxNewsCms = async function(req, res){
 // }
