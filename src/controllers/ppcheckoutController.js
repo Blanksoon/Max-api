@@ -330,7 +330,7 @@ exports.billingPlans = async function(req, res) {
           value: '4.99',
         },
         cycles: '0',
-        frequency: 'MONTH',
+        frequency: 'DAY',
         frequency_interval: '1',
         name: '1 month subscription',
         type: 'REGULAR',
