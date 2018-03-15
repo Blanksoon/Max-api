@@ -390,7 +390,7 @@ exports.billingPlans = async function(req, res) {
 }
 
 exports.subscribe = async function(req, res) {
-  //console.log('hi')
+  console.log('hi')
   const token = req.query.token
   const output = {
     status: {

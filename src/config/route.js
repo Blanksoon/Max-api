@@ -161,6 +161,7 @@ module.exports = function(app) {
     .post(ppcheckout.cancelSubscribe)
   app.route('/billingplans').post(ppcheckout.billingPlans)
   app.route('/subscribe/:subscribeId').post(ppcheckout.subscribe)
+  app.route('/subscribe/cancel').get(ppcheckout.cancelSubscribe)
   app.route('/subscribe/success').get(ppcheckout.successSubscribe)
   app.route('/client_token').get(ppcheckout.braintreeToken)
 
