@@ -446,7 +446,7 @@ exports.subscribe = async function(req, res) {
           },
           status: 'created',
         })
-        // console.log('sssssssssss', env.BILLINGPLAN)
+        console.log('sssssssssss', env.BILLINGPLAN)
         if (env.BILLINGPLAN === 'billingPlanStaging') {
           billingId = subscribeProduct.billingPlanStaging.billingPlanId
         } else if (env.BILLINGPLAN === 'billingPlanProd') {
@@ -455,7 +455,7 @@ exports.subscribe = async function(req, res) {
         } else {
           billingId = subscribeProduct.billingPlanDev.billingPlanId
         }
-        //console.log('billingId', billingId)
+        console.log('billingId', billingId)
         const billingAgreementAttributes = {
           name: subscribeProduct.title_en,
           description: subscribeProduct.description,
