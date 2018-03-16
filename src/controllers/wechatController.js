@@ -133,7 +133,7 @@ const randomString = len => {
 exports.payPerViewWechat = async function(req, res) {
   const token = req.query.token
   const liveId = req.query.liveId
-  console.log(liveId)
+  //console.log(liveId)
   try {
     const decode = await decryptJwt(token, req)
     const live = await checkStatusLive(liveId)
@@ -152,7 +152,7 @@ exports.payPerViewWechat = async function(req, res) {
       price = 35000
     }
     const result = await createOrder(mch_order_no, nonce_str, price)
-    console.log('result: ', result)
+    //console.log('result: ', result)
     if (result.data.err_msg != undefined) {
       throw result.data.err_code
     }
@@ -222,7 +222,7 @@ exports.confirmTransaction = async function(req, res) {
       )
       res.redirect(env.FRONTEND_URL + '/getticket')
     } else {
-      console.log('2')
+      //console.log('2')
       res.redirect(env.FRONTEND_URL + '/error')
     }
   } catch (err) {
@@ -234,7 +234,7 @@ exports.confirmTransaction = async function(req, res) {
     //   },
     //   data: [],
     // })
-    console.log('4')
+    //console.log('4')
     res.redirect(env.FRONTEND_URL + '/error')
   }
 }

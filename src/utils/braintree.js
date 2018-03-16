@@ -21,7 +21,7 @@ export function creatAndSettledPayment(live, nonceFromTheClient) {
       },
       function(err, transactionResult) {
         if (transactionResult.errors != undefined) {
-          console.log('transactionResult.errors', transactionResult.errors)
+          //console.log('transactionResult.errors', transactionResult.errors)
           reject({
             message: 'Cannot use a payment_method_nonce more than once.',
           })

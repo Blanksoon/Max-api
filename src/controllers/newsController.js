@@ -149,7 +149,7 @@ exports.findOneMaxNewsCms = async function(req, res) {
   try {
     const decodeToken = await readJwt(token)
     news = await News.findOne({ _id: newsId })
-    console.log('news: ', news)
+    //console.log('news: ', news)
     res.status(200).send({
       status: {
         code: 200,
@@ -190,7 +190,7 @@ exports.deleteNewsCms = async function(req, res) {
 exports.updateNewsCms = async function(req, res) {
   const token = req.body.token
   const data = req.body.data
-  console.log('data.imageUrl: ', req.body)
+  //console.log('data.imageUrl: ', req.body)
   let news = {}
   if (data.imageUrl.substring(0, 4) !== 'http') {
     data.imageUrl = env.IMAGEURL + data.imageUrl
@@ -241,6 +241,36 @@ exports.findMaxNewsCms = async function(req, res) {
     res.status(500).send({
       status: {
         code: 500,
+        success: true,
+        message: error,
+      },
+    })
+  }
+}
+
+exports.findRelateMaxnews = async function(req, res) {
+  //console.log('1: ', req.query.programName)
+  //console.log('2: ', req.query.id)
+  try {
+    const data = await News.find({
+      programName: req.query.programName,
+      _id: { $ne: req.query.id },
+    })
+      .sort({ createDate: -1 })
+      .limit(3)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch maxnews',
+      },
+      data: data,
+    })
+  } catch (error) {
+    //console.log('error: ', error)
+    res.status(500).send({
+      status: {
+        code: 200,
         success: true,
         message: error,
       },

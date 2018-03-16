@@ -161,8 +161,10 @@ module.exports = function(app) {
     .post(ppcheckout.cancelSubscribe)
   app.route('/billingplans').post(ppcheckout.billingPlans)
   app.route('/subscribe/:subscribeId').post(ppcheckout.subscribe)
+  app.route('/subscribe/cancel').get(ppcheckout.cancelSubscribe)
   app.route('/subscribe/success').get(ppcheckout.successSubscribe)
   app.route('/client_token').get(ppcheckout.braintreeToken)
+  app.route('/find-test').get(ppcheckout.listId)
 
   //Braintree
   app
@@ -233,6 +235,7 @@ module.exports = function(app) {
     maxnews.uploadImageMaxNews
   )
   app.get(`/maxnews`, maxnews.findMaxNews)
+  app.get('/maxnews/related', maxnews.findRelateMaxnews)
   app.get('/maxnews/:newsId', maxnews.findOneMaxNews)
   app.post('/maxnews/add/news', maxnews.addMaxNews)
   app.post(`/cms/delete-news`, maxnews.deleteNewsCms)

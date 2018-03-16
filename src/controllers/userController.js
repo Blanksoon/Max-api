@@ -312,7 +312,7 @@ const promotionForNewCustomer = customer => {
       })
       const expiredDateText = moment(expireDateIso).format('DD MMMM YYYY')
       await newOrder.save()
-      console.log(expiredDateText)
+      //console.log(expiredDateText)
       const result = await sendEmailPromotion(
         `This's promotion for new our customer, you can watch lives and vods until ${expiredDateText}`,
         user.email,
@@ -348,7 +348,7 @@ const emailWithOnlyText = (text, output, subject) => {
       text: `${text}`,
     }
     transporter.sendMail(mailOptions, function(error, info) {
-      console.log('info', info)
+      //console.log('info', info)
       if (error) {
         console.log('error', error)
         output.status.code = '400'
@@ -1179,7 +1179,7 @@ exports.updateUser = async function(req, res) {
 }
 
 exports.wechat = async function(req, res) {
-  console.log(req)
+  //console.log(req)
   res.send(req.query.echostr)
 }
 

@@ -24,7 +24,7 @@ export async function createPayment(order) {
     returnUrl = `${env.SERVER_URL}/ppcheckout/${order.orderId}/success`
     cancelUrl = `${env.SERVER_URL}/ppcheckout/${order.orderId}/cancel`
   }
-  console.log('returnUrl', returnUrl)
+  //console.log('returnUrl', returnUrl)
   const create_payment_json = {
     intent: 'sale',
     payer: {
@@ -308,7 +308,7 @@ function deleteIdMongo(obj) {
   for (let property in obj) {
     console.log(property)
     if (property === '_id') {
-      console.log('come in')
+      //console.log('come in')
       continue
     }
     resultObj[property] = obj[property]
@@ -355,5 +355,43 @@ export function createNeworderSubscribe(paymentId) {
         // console.log('err', err)
         reject(err)
       })
+  })
+}
+
+export function findId(id) {
+  var billingAgreementId = 'I-XWK9WP0WAGLU'
+
+  var start_date = '2018-02-01'
+  var end_date = '2018-03-15'
+
+  return new Promise(async (resolve, reject) => {
+    // paypal.billingAgreement.searchTransactions(
+    //   billingAgreementId,
+    //   start_date,
+    //   end_date,
+    //   function(error, results) {
+    //     if (error) {
+    //       console.log(error)
+    //       throw error
+    //     } else {
+    //       console.log('Billing Agreement Transactions Search Response')
+    //       //console.log(results)
+    //       resolve(results)
+    //     }
+    //   }
+    // )
+    // paypal.billingAgreement.get(billingAgreementId, function(
+    //   error,
+    //   billingAgreement
+    // ) {
+    //   if (error) {
+    //     console.log(error)
+    //     throw error
+    //   } else {
+    //     console.log('Get Billing Agreement')
+    //     //console.log(JSON.stringify(billingAgreement))
+    //     resolve(billingAgreement)
+    //   }
+    // })
   })
 }

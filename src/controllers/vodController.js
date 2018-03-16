@@ -353,7 +353,7 @@ async function findVodsOndemand(status, query, index, limit) {
     .sort({ onAirDate: -1 })
     .then(function(vods) {
       if (Object.keys(vods).length != 0) {
-        console.log('vods', vods.length)
+        //console.log('vods', vods.length)
         dataVods.data = setData(vods, statusOrder)
         return dataVods
       } else {
@@ -810,7 +810,7 @@ exports.vodsOndemand = async function(req, res) {
   var limit = 16
   var index = req.query.index
   var allVods = await findAllVods({})
-  console.log(allVods)
+  //console.log(allVods)
   var outputvods = {}
   var json = {}
   var order = ''
@@ -879,7 +879,7 @@ exports.vodsOndemand = async function(req, res) {
     allVods = await findAllVods({
       programName_en: progName,
     })
-    console.log('progName', progName)
+    //console.log('progName', progName)
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVodsOndemand(
         'not-paid',
@@ -929,7 +929,7 @@ exports.vodsOndemand = async function(req, res) {
     return res.json(json)
   } else {
     order = await decodeJwt(token, req)
-    console.log('order', order)
+    //console.log('order', order)
     if (order == 'you have purchase') {
       outputvods = await findVodsOndemand('paid', {}, index, limit)
       json = setDataOutput(outputvods, output)
@@ -946,7 +946,7 @@ exports.vodsOndemand = async function(req, res) {
 }
 
 exports.uploadImageThumbnail = async function(req, res) {
-  console.log(req.file)
+  //console.log(req.file)
   const file = env.PATHIMAGEMAXNEWS + '/' + req.file.originalname
   //console.log('file: ', file)
   fs.rename(req.file.path, file, function(err) {
