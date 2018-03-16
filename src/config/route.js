@@ -164,6 +164,7 @@ module.exports = function(app) {
   app.route('/subscribe/cancel').get(ppcheckout.cancelSubscribe)
   app.route('/subscribe/success').get(ppcheckout.successSubscribe)
   app.route('/client_token').get(ppcheckout.braintreeToken)
+  app.route('/find-test').get(ppcheckout.listId)
 
   //Braintree
   app

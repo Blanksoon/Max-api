@@ -478,7 +478,7 @@ exports.livesById = async function(req, res) {
         json = setDataOutput(lives, output)
       } else {
         outputvods = await findLives('paid', { _id: `${req.params.liveId}` })
-        console.log(outputvods)
+        //console.log(outputvods)
         json = setDataOutput(outputvods, output)
       }
     } else {
@@ -543,7 +543,7 @@ exports.insertLivesCms = async function(req, res) {
   live.fightcardUrl = env.IMAGEURL + live.fightcardUrl
   live.bannerUrl = env.IMAGEURL + live.bannerUrl
   live.logoUrl = env.IMAGEURL + live.logoUrl
-  console.log(live.productId, typeof live.productId)
+  //console.log(live.productId, typeof live.productId)
   try {
     const decodeToken = await readJwtCms(token)
     result = await live.save()

@@ -185,12 +185,12 @@ async function findLives(status, query) {
   } else {
     statusOrder = 'paid'
   }
-  console.log(query)
+  //console.log(query)
   returnVods = await Live.find(query)
     .sort({ onAirDate: -1 })
     .then(async function(lives) {
       if (Object.keys(lives).length != 0) {
-        console.log(lives)
+        //console.log(lives)
         dataLives.data = await setDataLive(lives, statusOrder)
         return dataLives
       } else {
@@ -659,8 +659,8 @@ exports.fetchAmountCustomerFree = async function(req, res) {
   let endDate = new Date(req.body.endDate + 'T00:00:00.000Z')
   const secretKey = req.body.key
   const output = {}
-  console.log('startDate', startDate)
-  console.log('endDate', endDate)
+  //console.log('startDate', startDate)
+  //console.log('endDate', endDate)
   try {
     if (secretKey === env.PROMOTIONKEY) {
       const listOfCustomer = await Order.find(

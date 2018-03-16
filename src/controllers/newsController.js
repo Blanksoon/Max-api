@@ -149,7 +149,7 @@ exports.findOneMaxNewsCms = async function(req, res) {
   try {
     const decodeToken = await readJwt(token)
     news = await News.findOne({ _id: newsId })
-    console.log('news: ', news)
+    //console.log('news: ', news)
     res.status(200).send({
       status: {
         code: 200,
@@ -190,7 +190,7 @@ exports.deleteNewsCms = async function(req, res) {
 exports.updateNewsCms = async function(req, res) {
   const token = req.body.token
   const data = req.body.data
-  console.log('data.imageUrl: ', req.body)
+  //console.log('data.imageUrl: ', req.body)
   let news = {}
   if (data.imageUrl.substring(0, 4) !== 'http') {
     data.imageUrl = env.IMAGEURL + data.imageUrl

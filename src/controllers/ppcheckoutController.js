@@ -20,6 +20,7 @@ import {
   cancelBilling,
   findTransactions,
   createNeworderSubscribe,
+  findId,
 } from '../utils/paypal'
 import { creatAndSettledPayment, cancelPayment } from '../utils/braintree'
 import braintree from 'braintree'
@@ -87,7 +88,7 @@ const readJwtBraintree = (token, req) => {
 }
 
 const createCustomerBraintree = (nonceFromTheClient, gateway, email) => {
-  console.log('createCustomerBraintree')
+  //console.log('createCustomerBraintree')
   return new Promise((resolve, reject) => {
     gateway.customer.create(
       {
@@ -97,15 +98,15 @@ const createCustomerBraintree = (nonceFromTheClient, gateway, email) => {
       },
       function(err, result) {
         if (err) {
-          console.log('1', err)
+          //console.log('1', err)
           reject('hi')
         } else if (result.success) {
-          console.log('2', result.success)
-          console.log('3', result.customer.id)
-          console.log('4', result.customer.paymentMethods[0].token)
+          //console.log('2', result.success)
+          //console.log('3', result.customer.id)
+          //console.log('4', result.customer.paymentMethods[0].token)
           resolve(result.customer.paymentMethods[0].token)
         } else {
-          console.log(result)
+          //console.log(result)
           reject(result)
         }
         // result.success
@@ -340,7 +341,7 @@ exports.billingPlans = async function(req, res) {
   }
   try {
     const billingState = await billingPlan(billingPlanAttributes)
-    console.log('bill', billingState)
+    //console.log('bill', billingState)
     res.status(200).send({
       status: {
         code: 200,
@@ -390,7 +391,6 @@ exports.billingPlans = async function(req, res) {
 }
 
 exports.subscribe = async function(req, res) {
-  console.log('hi')
   const token = req.query.token
   const output = {
     status: {
@@ -446,16 +446,13 @@ exports.subscribe = async function(req, res) {
           },
           status: 'created',
         })
-        console.log('sssssssssss', env.BILLINGPLAN)
         if (env.BILLINGPLAN === 'billingPlanStaging') {
           billingId = subscribeProduct.billingPlanStaging.billingPlanId
         } else if (env.BILLINGPLAN === 'billingPlanProd') {
           billingId = subscribeProduct.billingPlanProd.billingPlanId
-          //console.log('111111111', billingId)
         } else {
           billingId = subscribeProduct.billingPlanDev.billingPlanId
         }
-        console.log('billingId', billingId)
         const billingAgreementAttributes = {
           name: subscribeProduct.title_en,
           description: subscribeProduct.description,
@@ -513,7 +510,7 @@ exports.subscribe = async function(req, res) {
 }
 
 exports.successSubscribe = async function(req, res) {
-  console.log('hi')
+  //console.log('hi')
   const paymentToken = req.query.token
   //console.log('token', paymentToken)
   //const orderId = req.params.orderId
@@ -583,7 +580,7 @@ exports.successSubscribe = async function(req, res) {
 }
 
 exports.cancelSubscribe = async function(req, res) {
-  console.log('hi')
+  //console.log('hi')
   // await findTransactions()
   // res.sendStatus(200)
   const orderId = req.params.orderId
@@ -595,9 +592,9 @@ exports.cancelSubscribe = async function(req, res) {
       }
     }
     if (order) {
-      console.log('paymentId', order.paypal)
+      //console.log('paymentId', order.paypal)
       const data = await cancelBilling(order.paypal.paymentId)
-      console.log(data)
+      //console.log(data)
       if (data === 'success') {
         order.cancelDate = Date.now()
         order.status = 'cancelled'
@@ -656,7 +653,7 @@ exports.createWebhook = async function(req, res) {
   ]
   try {
     const webhook = await createWebhook(eventTypes)
-    console.log(webhook)
+    //console.log(webhook)
     res.status(200).send(webhook)
   } catch (error) {
     console.log(error)
@@ -665,7 +662,7 @@ exports.createWebhook = async function(req, res) {
 exports.listWebhook = async function(req, res) {
   try {
     const webhook = await listWebhook()
-    console.log(webhook)
+    //console.log(webhook)
     res.status(200).send(webhook)
   } catch (error) {
     console.log(error)
@@ -675,7 +672,7 @@ exports.deleteWebhook = async function(req, res) {
   const webhookId = req.params.webhookId
   try {
     const webhook = await deleteWebhook(webhookId)
-    console.log(webhook)
+    //console.log(webhook)
     res.status(200).send(webhook)
   } catch (error) {
     console.log(error)
@@ -683,6 +680,7 @@ exports.deleteWebhook = async function(req, res) {
 }
 exports.webhookHandler = async function(req, res) {
   const payload = req.body
+  console.log('webhookHandler')
   fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
   if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
     try {
@@ -1409,8 +1407,8 @@ exports.createPaymentAndroid = async function(req, res) {
   const transactionId = req.body.transactionId
   const transactionDate = req.body.transactionDate
   const key = req.body.key
-  console.log('transactionDate: ', transactionDate)
-  console.log('key: ', key)
+  //console.log('transactionDate: ', transactionDate)
+  //console.log('key: ', key)
   try {
     const decode = await readJwt(token, req)
     const userId = decode.data._id
@@ -1698,4 +1696,9 @@ exports.cancelSubscribeAndroid = async function(req, res) {
       data: [],
     })
   }
+}
+
+exports.listId = async function(req, res) {
+  const a = await findId()
+  res.status(200).send(a)
 }

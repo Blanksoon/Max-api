@@ -378,7 +378,7 @@ exports.payPerViewPackageAlipay = async function(req, res) {
       },
     })
     const order = await newOrder.save()
-    console.log('123', transaction.redirect.url)
+    //console.log('123', transaction.redirect.url)
     res.status(200).send({
       status: {
         code: 200,
@@ -471,7 +471,7 @@ exports.payPerViewAlipay = async function(req, res) {
     //     url: env.FRONTEND_URL + '/error',
     //   })
     // }
-    console.log('123', transaction.redirect.url)
+    //console.log('123', transaction.redirect.url)
     res.status(200).send({
       status: {
         code: 200,
@@ -535,11 +535,11 @@ exports.confirmTransaction = async function(req, res) {
         )
         res.redirect(env.FRONTEND_URL + '/getticket')
       } else {
-        console.log('2')
+        //console.log('2')
         res.redirect(env.FRONTEND_URL + '/error')
       }
     } else {
-      console.log('3')
+      //console.log('3')
       res.redirect(env.FRONTEND_URL + '/error')
     }
   } catch (err) {
@@ -551,7 +551,7 @@ exports.confirmTransaction = async function(req, res) {
     //   },
     //   data: [],
     // })
-    console.log('4')
+    //console.log('4')
     res.redirect(env.FRONTEND_URL + '/error')
   }
 }
@@ -842,9 +842,9 @@ exports.subscribeAlipay = async function(req, res) {
 
 exports.confirmSubscribeAlipay = async function(req, res) {
   //console.log(req)
-  console.log('body', req.body)
-  console.log('query', req.query)
-  console.log('params', req.params)
+  //console.log('body', req.body)
+  //console.log('query', req.query)
+  //console.log('params', req.params)
   res.status(200).send('hi')
 }
 
@@ -895,11 +895,11 @@ exports.stripeWebhookHandler = async function(req, res) {
   })
   if (req.body.type === 'invoice.payment_succeeded') {
     try {
-      console.log('hi', req.body)
-      console.log(
-        'body.......',
-        new Date(req.body.data.object.period_end * 1000)
-      )
+      //console.log('hi', req.body)
+      // console.log(
+      //   'body.......',
+      //   new Date(req.body.data.object.period_end * 1000)
+      // )
       const newOrder = await createNeworderSubscribe(
         req.body.data.object.subscription
       )
