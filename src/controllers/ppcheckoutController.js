@@ -1700,5 +1700,6 @@ exports.cancelSubscribeAndroid = async function(req, res) {
 
 exports.listId = async function(req, res) {
   const a = await findId()
+  console.log(moment('2018-03-16T10:00:00Z').format('YYYY-DD-MM HH:mm:ss'))
   res.status(200).send(a)
 }

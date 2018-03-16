@@ -380,18 +380,18 @@ export function findId(id) {
     //     }
     //   }
     // )
-    paypal.billingAgreement.get(billingAgreementId, function(
-      error,
-      billingAgreement
-    ) {
-      if (error) {
-        console.log(error)
-        throw error
-      } else {
-        console.log('Get Billing Agreement')
-        //console.log(JSON.stringify(billingAgreement))
-        resolve(billingAgreement)
-      }
-    })
+    // paypal.billingAgreement.get(billingAgreementId, function(
+    //   error,
+    //   billingAgreement
+    // ) {
+    //   if (error) {
+    //     console.log(error)
+    //     throw error
+    //   } else {
+    //     console.log('Get Billing Agreement')
+    //     //console.log(JSON.stringify(billingAgreement))
+    //     resolve(billingAgreement)
+    //   }
+    // })
   })
 }
