@@ -236,6 +236,27 @@ socialAuthen['facebook'] = async function(providerData) {
   }
 }
 
+const readJwtCms = token => {
+  return new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, env.JWT_SECRET, async function(err, decoded) {
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        reject(error.statusJwt)
+      } else {
+        if (checkUserCms(decoded.data.email, decoded.data.password)) {
+          resolve(decoded)
+        }
+        reject('User not found')
+      }
+    })
+  })
+}
+
 const checkUserCms = (username, password) => {
   let i = 0
   const content = fs.readFileSync(env.ADMINPATH)
@@ -1245,6 +1266,38 @@ exports.cmsLogin = async function(req, res) {
     res.status(500).send({
       code: 500,
       message: 'email or password is invalid',
+    })
+  }
+}
+
+exports.usersInCms = async function(req, res) {
+  const token = req.query.token
+  //console.log('token: ', token)
+  try {
+    const decodeToken = await readJwtCms(token)
+    const result = await User.find({})
+    const dataResult = result.map(item => ({
+      ...item['_doc'],
+      //onAirDate: moment(item['_doc'].onAirDate).format('DD/MM/YYYY'),
+      //promoUrl: item['_doc'].promoUrl.substring(41, 49),
+    }))
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch lives',
+      },
+      data: dataResult,
+      dataLength: result.length,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
     })
   }
 }

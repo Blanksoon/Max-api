@@ -1,5 +1,5 @@
 import env from '../config/env'
-
+import fs from 'fs'
 var mongoose = require('mongoose'),
   Order = mongoose.model('Order'),
   Setting = mongoose.model('Setting'),
@@ -34,6 +34,40 @@ const findOrders = (query, output) => {
         console.log('err', err)
         resolve(err.message)
       })
+  })
+}
+
+const checkUserCms = (username, password) => {
+  let i = 0
+  const content = fs.readFileSync(env.ADMINPATH)
+  let users = JSON.parse(content)
+  while (i < users.length) {
+    if (users[i].username === username && users[i].password === password) {
+      return true
+    }
+    i++
+  }
+  return false
+}
+
+const readJwtCms = token => {
+  return new Promise((resolve, reject) => {
+    const error = {
+      statusJwt: '',
+      err: '',
+    }
+    jwt.verify(token, env.JWT_SECRET, async function(err, decoded) {
+      if (err) {
+        error.statusJwt = 'Failed to authenticate token.'
+        error.err = err
+        reject(error.statusJwt)
+      } else {
+        if (checkUserCms(decoded.data.email, decoded.data.password)) {
+          resolve(decoded)
+        }
+        reject('User not found')
+      }
+    })
   })
 }
 
@@ -686,5 +720,56 @@ exports.fetchAmountCustomerFree = async function(req, res) {
   } catch (err) {
     console.log(err)
     res.status(200).send(err)
+  }
+}
+
+exports.ordersInCms = async function(req, res) {
+  const token = req.query.token
+  const limit = parseInt(req.query.limit)
+  const index = parseInt(req.query.offset)
+  // console.log('limit: ', limit)
+  // console.log('index: ', index)
+  // console.log('token: ', token)
+  //console.log('token: ', token)
+  try {
+    const decodeToken = await readJwtCms(token)
+    const data = await Order.find({})
+    const result = await Order.find({})
+      .limit(limit)
+      .skip(index)
+    const dataResult = result.map(item => ({
+      ...item['_doc'],
+      cancelDate: moment(item['_doc'].cancelDate).format('DD/MM/YYYY'),
+      expiredDate: moment(item['_doc'].expiredDate).format('DD/MM/YYYY'),
+      purchaseDate: moment(item['_doc'].purchaseDate).format('DD/MM/YYYY'),
+      //promoUrl: item['_doc'].promoUrl.substring(41, 49),
+    }))
+    let i = 0
+    while (i < result.length) {
+      if (dataResult[i].cancelDate === 'Invalid date') {
+        dataResult[i].cancelDate = 'null'
+      } else {
+        dataResult[i].cancelDate = dataResult[i].cancelDate
+      }
+      i++
+    }
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch orders',
+      },
+      data: dataResult,
+      dataLength: data.length,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
+      },
+    })
   }
 }

@@ -135,6 +135,7 @@ module.exports = function(app) {
   app.get('/subscribe-history', order.fetchSubscribe)
   app.get('/version', order.fetchVersion)
   app.post('/get-daily-customer-free', order.fetchAmountCustomerFree)
+  app.get('/cms/order', order.ordersInCms)
 
   // Paypal checkout
   if (process.env.NODE_ENV === 'dev') {
@@ -207,6 +208,7 @@ module.exports = function(app) {
   app.get('/profile', user.profileUser)
   app.post('/update-user', user.updateUser)
   app.get('/purchase-history', order.purchaseHistory)
+  app.get('/cms/user', user.usersInCms)
   //app.post('/test', ppcheckout.findOrder)
 
   //wechat
