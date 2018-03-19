@@ -727,10 +727,6 @@ exports.ordersInCms = async function(req, res) {
   const token = req.query.token
   const limit = parseInt(req.query.limit)
   const index = parseInt(req.query.offset)
-  // console.log('limit: ', limit)
-  // console.log('index: ', index)
-  // console.log('token: ', token)
-  //console.log('token: ', token)
   try {
     const decodeToken = await readJwtCms(token)
     const data = await Order.find({})

@@ -1001,10 +1001,15 @@ exports.addNewVodsCms = async function(req, res) {
 
 exports.vodsInCms = async function(req, res) {
   const token = req.query.token
+  const limit = parseInt(req.query.limit)
+  const index = parseInt(req.query.offset)
   try {
     const decodeToken = await readJwtCms(token)
     let i = 0
-    let result = await Vod.find({})
+    let data = await Vod.find({})
+    const result = await Vod.find({})
+      .limit(limit)
+      .skip(index)
     const dataResult = result.map(item => ({
       ...item['_doc'],
       onAirDate: moment(item['_doc'].onAirDate).format('DD/MM/YYYY'),
@@ -1017,7 +1022,7 @@ exports.vodsInCms = async function(req, res) {
         message: 'success fetch vods',
       },
       data: dataResult,
-      dataLength: dataResult.length,
+      dataLength: data.length,
     })
   } catch (error) {
     console.log(error)

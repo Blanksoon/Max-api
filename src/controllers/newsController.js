@@ -214,10 +214,14 @@ exports.updateNewsCms = async function(req, res) {
 
 exports.findMaxNewsCms = async function(req, res) {
   const token = req.query.token
+  const limit = parseInt(req.query.limit)
+  const index = parseInt(req.query.offset)
   try {
     const decodeToken = await readJwt(token)
+    const lengthNews = await News.find({})
     const result = await News.find({})
-    //console.log('result', result)
+      .limit(limit)
+      .skip(index)
     const data = result.map(item => ({
       ...item['_doc'],
       createDate: moment(item['_doc'].createDate).format('DD/MM/YYYY'),
@@ -235,7 +239,7 @@ exports.findMaxNewsCms = async function(req, res) {
         message: 'success fetch maxnews',
       },
       data: data,
-      dataLength: result.length,
+      dataLength: lengthNews.length,
     })
   } catch (error) {
     res.status(500).send({

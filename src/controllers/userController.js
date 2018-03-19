@@ -1272,10 +1272,14 @@ exports.cmsLogin = async function(req, res) {
 
 exports.usersInCms = async function(req, res) {
   const token = req.query.token
-  //console.log('token: ', token)
+  const limit = parseInt(req.query.limit)
+  const index = parseInt(req.query.offset)
   try {
     const decodeToken = await readJwtCms(token)
+    const data = await User.find({})
     const result = await User.find({})
+      .limit(limit)
+      .skip(index)
     const dataResult = result.map(item => ({
       ...item['_doc'],
       //onAirDate: moment(item['_doc'].onAirDate).format('DD/MM/YYYY'),
@@ -1288,7 +1292,7 @@ exports.usersInCms = async function(req, res) {
         message: 'success fetch lives',
       },
       data: dataResult,
-      dataLength: result.length,
+      dataLength: data.length,
     })
   } catch (error) {
     console.log(error)
