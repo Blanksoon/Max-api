@@ -73,6 +73,7 @@ module.exports = function(app) {
   const stripe = require('../controllers/stripeController')
   const wechat = require('../controllers/wechatController')
   const maxnews = require('../controllers/newsController')
+  const poster = require('../controllers/posterController')
 
   const upload = multer({ dest: '/tmp/' })
 
@@ -244,4 +245,8 @@ module.exports = function(app) {
   app.get(`/cms/maxnews`, maxnews.findMaxNewsCms)
   app.get('/cms/maxnews/:newsId', maxnews.findOneMaxNewsCms)
   app.post('/cms/maxnews/update', maxnews.updateNewsCms)
+
+  //poster
+  app.post(`/cms/new-poster`, poster.addPosters)
+  app.get(`/cms/posters`, poster.findPoster)
 }

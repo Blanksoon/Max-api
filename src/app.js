@@ -17,6 +17,7 @@ const Live = require('./models/live')
 const Subscribe = require('./models/subscribe')
 const Package = require('./models/package')
 const News = require('./models/news')
+const Posters = require('./models/poster')
 const paypal = require('./utils/paypal')
 
 // Config depedencies

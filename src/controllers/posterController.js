@@ -5,7 +5,7 @@ import moment from 'moment'
 
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
-const News = mongoose.model('News')
+const Poster = mongoose.model('Posters')
 
 const checkUserCms = (username, password) => {
   let i = 0
@@ -58,17 +58,44 @@ exports.uploadImageMaxNews = async function(req, res) {
   })
 }
 
-exports.addMaxNews = async function(req, res) {
+exports.addPosters = async function(req, res) {
+  console.log('req.body.data: ', req.body.data)
   const token = req.body.token
-  const imgUrl = env.IMAGEURL + req.body.data.imageUrl
-  req.body.data.imageUrl = imgUrl
+  let posterEn = req.body.data.posterEn
+  let posterTh = req.body.data.posterTh
+  if (req.body.data.posterEn !== undefined && req.body.data.posterEn !== null) {
+    if (req.body.data.posterEn.substring(0, 4) !== 'http') {
+      posterEn = env.IMAGEURL + req.body.data.posterEn
+    }
+  }
+  if (req.body.data.posterTh !== undefined && req.body.data.posterTh !== null) {
+    if (req.body.data.posterTh.substring(0, 4) !== 'http') {
+      posterTh = env.IMAGEURL + req.body.data.posterTh
+    }
+  }
+  if (req.body.data.posterTh !== undefined) {
+    req.body.data.posterTh = posterTh
+  } else {
+    req.body.data.posterTh = null
+  }
+  if (req.body.data.posterEn !== undefined) {
+    req.body.data.posterEn = posterEn
+  } else {
+    req.body.data.posterEn = null
+  }
+  req.body.data.createDate = Date.now()
   try {
     const decodeToken = await readJwt(token)
-    const news = new News(req.body.data)
-    const result = await news.save()
-    //console.log('2222', result)
-    res.status(200).send(result)
+    const posters = await Poster.findOneAndUpdate(
+      { _id: '5ab0e275b6f2e41a98ffea88' },
+      req.body.data,
+      {
+        new: true,
+      }
+    )
+    res.status(200).send(posters)
   } catch (error) {
+    console.log('error: ', error)
     res.status(500).send({
       status: {
         code: 500,
@@ -107,28 +134,18 @@ exports.findOneMaxNews = async function(req, res) {
   }
 }
 
-exports.findMaxNews = async function(req, res) {
+exports.findPoster = async function(req, res) {
+  const token = req.query.token
   try {
-    const result = await News.find({}).sort({ createDate: -1 })
-    //console.log('result', result)
-    const data = result.map(item => ({
-      ...item['_doc'],
-      createDate: moment(item['_doc'].createDate).format('DD/MM/YYYY'),
-      createDate_en: moment(item['_doc'].createDate).format(
-        'ddd. MMM Do, YYYY'
-      ),
-      createDate_th: moment(item['_doc'].createDate)
-        .locale('th')
-        .format('ddd. MMM Do, YYYY'),
-    }))
+    const decodeToken = await readJwt(token)
+    const result = await Poster.find({})
     res.status(200).send({
       status: {
         code: 200,
         success: true,
-        message: 'success fetch maxnews',
+        message: 'success fetch poster',
       },
-      data: data,
-      dataLength: result.length,
+      data: result,
     })
   } catch (error) {
     console.log(error)
@@ -136,7 +153,7 @@ exports.findMaxNews = async function(req, res) {
       status: {
         code: 200,
         success: true,
-        message: 'error',
+        message: error,
       },
     })
   }
