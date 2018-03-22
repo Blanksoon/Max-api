@@ -59,7 +59,7 @@ exports.uploadImageMaxNews = async function(req, res) {
 }
 
 exports.addPosters = async function(req, res) {
-  console.log('req.body.data: ', req.body.data)
+  //console.log('req.body.data: ', req.body.data)
   const token = req.body.token
   let posterEn = req.body.data.posterEn
   let posterTh = req.body.data.posterTh
@@ -137,7 +137,7 @@ exports.findOneMaxNews = async function(req, res) {
 exports.findPoster = async function(req, res) {
   const token = req.query.token
   try {
-    const decodeToken = await readJwt(token)
+    //const decodeToken = await readJwt(token)
     const result = await Poster.find({})
     res.status(200).send({
       status: {
