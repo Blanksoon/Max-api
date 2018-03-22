@@ -1305,3 +1305,18 @@ exports.usersInCms = async function(req, res) {
     })
   }
 }
+
+exports.updateDeviceToken = async function(req, res) {
+  const token = req.body.token
+  const deviceToken = req.body.deviceToken
+  try {
+    const data = await verifyToken(token)
+    const user = await User.findOneAndUpdate(
+      { email: data.email },
+      { deviceToken: deviceToken }
+    )
+    res.status(200).send({ email: user.email, deviceToken: user.deviceToken })
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}

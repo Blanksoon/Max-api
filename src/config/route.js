@@ -210,6 +210,7 @@ module.exports = function(app) {
   app.post('/update-user', user.updateUser)
   app.get('/purchase-history', order.purchaseHistory)
   app.get('/cms/user', user.usersInCms)
+  app.post('/update-device-token', user.updateDeviceToken)
   //app.post('/test', ppcheckout.findOrder)
 
   //wechat
