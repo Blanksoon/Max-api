@@ -57,7 +57,7 @@ var OrderSchema = new Schema({
     paymentId: String,
     tokenSubscribe: String,
     SubscribtionId: String,
-    testOrder: Object,
+    //testOrder: Object,
   },
   paymentIos: {
     transactionId: String,

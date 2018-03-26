@@ -16,17 +16,16 @@ var NoticeSchema = new Schema({
     required: 'notificationContent is required',
   },
   notificationDate: {
-    type: String,
+    type: Date,
     required: 'notificationDate is required',
   },
   isRead: {
     type: String,
+    required: 'isRead is required',
   },
   isActive: {
     type: String,
-  },
-  sendDate: {
-    type: Date,
+    required: 'isActive is required',
   },
   versionKey: false,
 })

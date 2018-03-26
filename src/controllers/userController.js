@@ -6,6 +6,7 @@ import Order from '../models/order'
 import moment from 'moment'
 import { model, mongo } from 'mongoose'
 import fs from 'fs'
+import xl from 'excel4node'
 
 const defaultSuccessMessage = 'success'
 const defaultErrorMessage = 'data_not_found'
@@ -593,6 +594,64 @@ function setData(data) {
   })
 
   return output
+}
+
+const exportExcel = customer => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Create a new instance of a Workbook class
+      var wb = new xl.Workbook()
+
+      // Add Worksheets to the workbook
+      var ws = wb.addWorksheet('Sheet 1')
+      var ws2 = wb.addWorksheet('Sheet 2')
+
+      // Create a reusable style
+      var style = wb.createStyle({
+        font: {
+          color: '#FF0800',
+          size: 12,
+        },
+        numberFormat: '$#,##0.00; ($#,##0.00); -',
+      })
+
+      // Set value of cell A1 to 100 as a number type styled with paramaters of style
+      ws
+        .cell(1, 1)
+        .number(100)
+        .style(style)
+
+      // Set value of cell B1 to 300 as a number type styled with paramaters of style
+      ws
+        .cell(1, 2)
+        .number(200)
+        .style(style)
+
+      // Set value of cell C1 to a formula styled with paramaters of style
+      ws
+        .cell(1, 3)
+        .formula('A1 + B1')
+        .style(style)
+
+      // Set value of cell A2 to 'string' styled with paramaters of style
+      ws
+        .cell(2, 1)
+        .string('string')
+        .style(style)
+
+      // Set value of cell A3 to true as a boolean type styled with paramaters of style but with an adjustment to the font size.
+      ws
+        .cell(3, 1)
+        .bool(true)
+        .style(style)
+        .style({ font: { size: 14 } })
+      wb.write('Excel.xlsx')
+      resolve('success')
+    } catch (error) {
+      console.log('error: ', error)
+      resolve(error)
+    }
+  })
 }
 
 //controllers
@@ -1318,5 +1377,100 @@ exports.updateDeviceToken = async function(req, res) {
     res.status(200).send({ email: user.email, deviceToken: user.deviceToken })
   } catch (err) {
     res.status(500).send(err)
+  }
+}
+
+exports.userExportExcel = async function(req, res) {
+  const token = req.query.token
+  try {
+    const decodeToken = await readJwtCms(token)
+    const wb = new xl.Workbook()
+    const ws = wb.addWorksheet('Sheet 1')
+    let i = 0
+    let row = 2
+    const user = await User.find({})
+    // console.log('user: ', user.length)
+    const headerStyle = wb.createStyle({
+      font: {
+        color: '#FF0800',
+        size: 16,
+      },
+    })
+
+    ws
+      .cell(1, 1)
+      .string('Email')
+      .style(headerStyle)
+    ws
+      .cell(1, 2)
+      .string('Name')
+      .style(headerStyle)
+    ws
+      .cell(1, 3)
+      .string('Lastname')
+      .style(headerStyle)
+    ws
+      .cell(1, 4)
+      .string('Status')
+      .style(headerStyle)
+    ws
+      .cell(1, 5)
+      .string('Country')
+      .style(headerStyle)
+    ws
+      .cell(1, 6)
+      .string('BirthDate')
+      .style(headerStyle)
+    ws
+      .cell(1, 7)
+      .string('Gender')
+      .style(headerStyle)
+    ws
+      .cell(1, 8)
+      .string('Fb-FistName')
+      .style(headerStyle)
+    ws
+      .cell(1, 9)
+      .string('Fb-LastName')
+      .style(headerStyle)
+    ws
+      .cell(1, 10)
+      .string('Fb-Locale')
+      .style(headerStyle)
+    ws
+      .cell(1, 11)
+      .string('Fb-gender')
+      .style(headerStyle)
+    ws
+      .cell(1, 12)
+      .string('Fb-email')
+      .style(headerStyle)
+    ws
+      .cell(1, 13)
+      .string('Fb-name')
+      .style(headerStyle)
+
+    while (i < user.length) {
+      ws.cell(row, 1).string(`${user[i].email}`)
+      ws.cell(row, 2).string(`${user[i].name}`)
+      ws.cell(row, 3).string(`${user[i].lastname}`)
+      ws.cell(row, 4).string(`${user[i].status}`)
+      ws.cell(row, 5).string(`${user[i].country}`)
+      ws.cell(row, 6).string(`${user[i].date_birth}`)
+      ws.cell(row, 7).string(`${user[i].gender}`)
+      if (user[i].fb_info !== null) {
+        ws.cell(row, 8).string(`${user[i].fb_info.name}`)
+        ws.cell(row, 9).string(`${user[i].fb_info.last_name}`)
+        ws.cell(row, 10).string(`${user[i].fb_info.locale}`)
+        ws.cell(row, 11).string(`${user[i].fb_info.gender}`)
+        ws.cell(row, 12).string(`${user[i].fb_info.email}`)
+        ws.cell(row, 13).string(`${user[i].fb_info.name}`)
+      }
+      row++
+      i++
+    }
+    wb.write('ExcelFile.xlsx', res)
+  } catch (err) {
+    console.log('err: ', err)
   }
 }
