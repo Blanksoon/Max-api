@@ -196,7 +196,7 @@ exports.payPerViewWechat = async function(req, res) {
 }
 
 exports.confirmTransaction = async function(req, res) {
-  //console.log(req.query)
+  console.log(req.query)
   const payload = req.body
   const queryload = req.query
   try {

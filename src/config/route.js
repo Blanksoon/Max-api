@@ -219,7 +219,7 @@ module.exports = function(app) {
   //wechat
   app.get('/wechat', user.wechat)
   app.get('/wechat/live/payperview', wechat.payPerViewWechat)
-  app.get('/wechat/NativepayApp/pay_notify', wechat.confirmTransaction)
+  app.post('/wechat/NativepayApp/pay_notify', wechat.confirmTransaction)
   app.get('/wechat/package/payperview', wechat.payPerViewPackageWechat)
 
   //stripe
