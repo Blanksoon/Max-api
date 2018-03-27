@@ -530,7 +530,7 @@ exports.successSubscribe = async function(req, res) {
             tokenSubscribe: result.id,
             paymentId: result.id,
             payerId: result.payer.payer_info.payer_id,
-            testOrder: result,
+            //testOrder: result,
           }
           //console.log('jjjjjj', result.agreement_details)
           //order.expiredDate = result.agreement_details.next_billing_date

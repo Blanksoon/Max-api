@@ -6,6 +6,7 @@ const vods = require('../../data/vods/vods')
 const vodslogin = require('../../data/vods/buyVods')
 const mongoose = require('mongoose')
 const Vod = mongoose.model('Vod')
+const Live = mongoose.model('Live')
 const Order = mongoose.model('Order')
 const defaultSuccessMessage = 'success'
 const defaultErrorMessage = 'data_not_found'
@@ -129,6 +130,20 @@ const checkFeatureVods = () => {
     } catch (err) {
       console.log('err: ', err)
       resolve(err.message)
+    }
+  })
+}
+
+const insertDataToVodsCms = progname => {
+  return new Promise(async (resolve, reject) => {
+    if (progname === 'Battle Muay Thai') {
+      progname = `Muay Thai Battle`
+    }
+    const data = await Live.findOne({ programName: progname })
+    if (data !== null) {
+      resolve(data)
+    } else {
+      reject(`programname isn't match with some live`)
     }
   })
 }
@@ -968,11 +983,16 @@ exports.addNewVodsCms = async function(req, res) {
   if (req.body.data.feature === 'active') {
     await checkFeatureVods()
   }
+  const LiveData = await insertDataToVodsCms(req.body.data.programName_en)
+  req.body.data.programName_th = LiveData.title_th
+  req.body.data.title_en = LiveData.title_en
+  req.body.data.title_th = LiveData.title_th
+  req.body.data.logoUrl = LiveData.logoUrl
   const imgUrl = env.IMAGEURL + req.body.data.thumbnailUrl
   req.body.data.promoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
   req.body.data.videoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
   req.body.data.thumbnailUrl = imgUrl
-  req.body.data.logoUrl = checkLogoUrl(req.body.data.logoUrl)
+  //req.body.data.logoUrl = checkLogoUrl(req.body.data.logoUrl)
   const vod = new Vod(req.body.data)
   //vod.feature = 'unactive'
   //console.log('vod: ', vod)
@@ -1082,7 +1102,12 @@ exports.updateVodsCms = async function(req, res) {
   if (req.body.data.keyfeature === 'active') {
     await checkFeatureVods()
   }
-  data.logoUrl = checkLogoUrl(data.logoUrl)
+  const LiveData = await insertDataToVodsCms(req.body.data.programName_en)
+  req.body.data.programName_th = LiveData.title_th
+  req.body.data.title_en = LiveData.title_en
+  req.body.data.title_th = LiveData.title_th
+  req.body.data.logoUrl = LiveData.logoUrl
+  //data.logoUrl = checkLogoUrl(data.logoUrl)
   //console.log('data: ', data)
   req.body.data.promoUrl = `manifests/${req.body.data.videoUrl}.m3u8`
   req.body.data.videoUrl = `manifests/${req.body.data.videoUrl}.m3u8`

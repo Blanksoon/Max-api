@@ -1,5 +1,6 @@
 import env from '../config/env'
 import fs from 'fs'
+import xl from 'excel4node'
 var mongoose = require('mongoose'),
   Order = mongoose.model('Order'),
   Setting = mongoose.model('Setting'),
@@ -767,5 +768,124 @@ exports.ordersInCms = async function(req, res) {
         message: error,
       },
     })
+  }
+}
+
+exports.orderExportExcel = async function(req, res) {
+  const token = req.query.token
+  try {
+    const decodeToken = await readJwtCms(token)
+    const wb = new xl.Workbook()
+    const ws = wb.addWorksheet('Sheet 1')
+    let i = 0
+    let row = 2
+    const order = await Order.find({})
+    // console.log('user: ', user.length)
+    const headerStyle = wb.createStyle({
+      font: {
+        color: '#FF0800',
+        size: 16,
+      },
+    })
+
+    ws
+      .cell(1, 1)
+      .string('productId')
+      .style(headerStyle)
+    ws
+      .cell(1, 2)
+      .string('productName')
+      .style(headerStyle)
+    ws
+      .cell(1, 3)
+      .string('userId')
+      .style(headerStyle)
+    ws
+      .cell(1, 4)
+      .string('email')
+      .style(headerStyle)
+    ws
+      .cell(1, 5)
+      .string('price')
+      .style(headerStyle)
+    ws
+      .cell(1, 6)
+      .string('platform')
+      .style(headerStyle)
+    ws
+      .cell(1, 7)
+      .string('cancelDate')
+      .style(headerStyle)
+    ws
+      .cell(1, 8)
+      .string('expiredDate')
+      .style(headerStyle)
+    ws
+      .cell(1, 9)
+      .string('status')
+      .style(headerStyle)
+    ws
+      .cell(1, 10)
+      .string('paypal-payerId')
+      .style(headerStyle)
+    ws
+      .cell(1, 11)
+      .string('paypal-paymentId')
+      .style(headerStyle)
+    ws
+      .cell(1, 12)
+      .string('paypal-tokenSubscribe')
+      .style(headerStyle)
+    ws
+      .cell(1, 13)
+      .string('paypal-SubscribtionId')
+      .style(headerStyle)
+    ws
+      .cell(1, 14)
+      .string('paymentIos-transactionId')
+      .style(headerStyle)
+    ws
+      .cell(1, 15)
+      .string('paymentAndroid-transactionId')
+      .style(headerStyle)
+    ws
+      .cell(1, 16)
+      .string('stripe-paymentId')
+      .style(headerStyle)
+    ws
+      .cell(1, 17)
+      .string('wechat-paymentId')
+      .style(headerStyle)
+    ws
+      .cell(1, 18)
+      .string('orderType')
+      .style(headerStyle)
+
+    while (i < order.length) {
+      ws.cell(row, 1).string(`${order[i].productId}`)
+      ws.cell(row, 2).string(`${order[i].productName}`)
+      ws.cell(row, 3).string(`${order[i].userId}`)
+      ws.cell(row, 4).string(`${order[i].email}`)
+      ws.cell(row, 5).string(`${order[i].price}`)
+      ws.cell(row, 6).string(`${order[i].platform}`)
+      ws.cell(row, 7).string(`${order[i].cancelDate}`)
+      ws.cell(row, 8).string(`${order[i].expiredDate}`)
+      ws.cell(row, 9).string(`${order[i].status}`)
+      ws.cell(row, 10).string(`${order[i].paypal.payerId}`)
+      ws.cell(row, 11).string(`${order[i].paypal.paymentId}`)
+      ws.cell(row, 12).string(`${order[i].paypal.tokenSubscribe}`)
+      ws.cell(row, 13).string(`${order[i].paypal.SubscribtionId}`)
+      ws.cell(row, 14).string(`${order[i].paymentIos.transactionId}`)
+      ws.cell(row, 15).string(`${order[i].paymentAndroid.transactionId}`)
+      ws.cell(row, 16).string(`${order[i].stripe.paymentId}`)
+      ws.cell(row, 17).string(`${order[i].wechat.paymentId}`)
+      ws.cell(row, 18).string(`${order[i].orderType.type}`)
+
+      row++
+      i++
+    }
+    wb.write('ExcelFile.xlsx', res)
+  } catch (err) {
+    console.log('err: ', err)
   }
 }

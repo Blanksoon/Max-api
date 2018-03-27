@@ -73,6 +73,8 @@ module.exports = function(app) {
   const stripe = require('../controllers/stripeController')
   const wechat = require('../controllers/wechatController')
   const maxnews = require('../controllers/newsController')
+  const poster = require('../controllers/posterController')
+  const notice = require('../controllers/noticeController')
 
   const upload = multer({ dest: '/tmp/' })
 
@@ -136,6 +138,7 @@ module.exports = function(app) {
   app.get('/version', order.fetchVersion)
   app.post('/get-daily-customer-free', order.fetchAmountCustomerFree)
   app.get('/cms/order', order.ordersInCms)
+  app.get('/cms/export/order', order.orderExportExcel)
 
   // Paypal checkout
   if (process.env.NODE_ENV === 'dev') {
@@ -209,6 +212,8 @@ module.exports = function(app) {
   app.post('/update-user', user.updateUser)
   app.get('/purchase-history', order.purchaseHistory)
   app.get('/cms/user', user.usersInCms)
+  app.post('/update-device-token', user.updateDeviceToken)
+  app.get('/cms/export/user', user.userExportExcel)
   //app.post('/test', ppcheckout.findOrder)
 
   //wechat
@@ -244,4 +249,16 @@ module.exports = function(app) {
   app.get(`/cms/maxnews`, maxnews.findMaxNewsCms)
   app.get('/cms/maxnews/:newsId', maxnews.findOneMaxNewsCms)
   app.post('/cms/maxnews/update', maxnews.updateNewsCms)
+
+  //poster
+  app.post(`/cms/new-poster`, poster.addPosters)
+  app.get(`/cms/posters`, poster.findPoster)
+
+  //Notification
+  app.post(`/notice/add`, notice.addNotice)
+  app.post(`/notice/update/is-read`, notice.updateIsRead)
+  app.post(`/notice/update/is-active`, notice.updateIsActive)
+  app.get(`/notice/find/by-user`, notice.findByUser)
+  app.get(`/notice/find/user`, notice.findAllUser)
+  app.get(`/notice/find/by-product`, notice.findUserByProductId)
 }
