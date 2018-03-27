@@ -48,7 +48,6 @@ var UserSchema = new Schema({
   },
   createDate: {
     type: Date,
-    default: Date.now(),
   },
   deviceToken: {
     type: String,

@@ -860,6 +860,10 @@ exports.orderExportExcel = async function(req, res) {
       .cell(1, 18)
       .string('orderType')
       .style(headerStyle)
+    ws
+      .cell(1, 19)
+      .string('purchaseDate')
+      .style(headerStyle)
 
     while (i < order.length) {
       ws.cell(row, 1).string(`${order[i].productId}`)
@@ -880,7 +884,7 @@ exports.orderExportExcel = async function(req, res) {
       ws.cell(row, 16).string(`${order[i].stripe.paymentId}`)
       ws.cell(row, 17).string(`${order[i].wechat.paymentId}`)
       ws.cell(row, 18).string(`${order[i].orderType.type}`)
-
+      ws.cell(row, 19).string(`${order[i].purchaseDate}`)
       row++
       i++
     }

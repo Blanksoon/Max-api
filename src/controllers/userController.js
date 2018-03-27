@@ -109,6 +109,7 @@ socialAuthen['facebook'] = async function(providerData) {
         lastname: facebookData.last_name,
         gender: facebookData.gender,
         //country: facebookData.locale,
+        createDate: Date.now(),
       }
       var new_user = new User(createObject)
       checkNewUser = new User(createObject)
@@ -528,6 +529,7 @@ const createUser = (newUser, type, output) => {
   return new Promise(async (resolve, reject) => {
     try {
       // console.log('create User')
+      newUser.createDate = Date.now()
       const user = await newUser.save()
       //console.log('user', user)
       const token = jwt.sign({ data: user }, env.JWT_SECRET, {
@@ -1449,6 +1451,10 @@ exports.userExportExcel = async function(req, res) {
       .cell(1, 13)
       .string('Fb-name')
       .style(headerStyle)
+    ws
+      .cell(1, 14)
+      .string('createDate')
+      .style(headerStyle)
 
     while (i < user.length) {
       ws.cell(row, 1).string(`${user[i].email}`)
@@ -1466,6 +1472,7 @@ exports.userExportExcel = async function(req, res) {
         ws.cell(row, 12).string(`${user[i].fb_info.email}`)
         ws.cell(row, 13).string(`${user[i].fb_info.name}`)
       }
+      ws.cell(row, 14).string(`${user[i].createDate}`)
       row++
       i++
     }
