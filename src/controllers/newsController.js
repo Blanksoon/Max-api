@@ -224,6 +224,10 @@ exports.findMaxNewsCms = async function(req, res) {
       .skip(index)
     const data = result.map(item => ({
       ...item['_doc'],
+      article_en: `${item.article_en.substring(0, 35)}...`,
+      article_th: `${item.article_th.substring(0, 35)}...`,
+      heading_th: `${item.heading_th.substring(0, 35)}...`,
+      heading_en: `${item.heading_en.substring(0, 35)}...`,
       createDate: moment(item['_doc'].createDate).format('DD/MM/YYYY'),
       createDate_en: moment(item['_doc'].createDate).format(
         'ddd. MMM Do, YYYY'

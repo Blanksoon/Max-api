@@ -820,6 +820,8 @@ exports.getProgramName = function(req, res) {
 }
 
 exports.vodsOndemand = async function(req, res) {
+  //console.log('1: ', req.query)
+  //console.log('2: ', req.body)
   var token = req.query.token
   var searchName = req.query.search
   var limit = 16
@@ -904,6 +906,7 @@ exports.vodsOndemand = async function(req, res) {
         index,
         limit
       )
+      //console.log('outputvods: ', outputvods)
       json = setDataOutput(outputvods, output)
       json.numberOfVods = allVods
       return res.json(json)
