@@ -196,7 +196,7 @@ export function cancelSubscribe(planId) {
 
 export function createNeworderSubscribe(paymentId) {
   return new Promise(async (resolve, reject) => {
-    console.log('paymentId', paymentId)
+    //console.log('paymentId', paymentId)
     let order = await Order.findOne({
       'stripe.paymentId': paymentId,
       status: 'approved',

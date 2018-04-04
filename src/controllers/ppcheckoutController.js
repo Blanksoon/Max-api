@@ -680,7 +680,7 @@ exports.deleteWebhook = async function(req, res) {
 }
 exports.webhookHandler = async function(req, res) {
   const payload = req.body
-  console.log('webhookHandler')
+  //console.log('webhookHandler')
   fs.writeFileSync('./webhook.txt', JSON.stringify(payload), { flag: 'a' })
   if (req.body.event_type === 'PAYMENT.SALE.COMPLETED') {
     try {
@@ -1700,6 +1700,6 @@ exports.cancelSubscribeAndroid = async function(req, res) {
 
 exports.listId = async function(req, res) {
   const a = await findId()
-  console.log(moment('2018-03-16T10:00:00Z').format('YYYY-DD-MM HH:mm:ss'))
+  //console.log(moment('2018-03-16T10:00:00Z').format('YYYY-DD-MM HH:mm:ss'))
   res.status(200).send(a)
 }

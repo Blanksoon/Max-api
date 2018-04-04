@@ -896,7 +896,7 @@ exports.vodsOndemand = async function(req, res) {
     allVods = await findAllVods({
       programName_en: progName,
     })
-    //console.log('progName', progName)
+    //console.log('progName', allVods)
     if (token == undefined || token == '' || token == 'undefined') {
       outputvods = await findVodsOndemand(
         'not-paid',
@@ -908,7 +908,7 @@ exports.vodsOndemand = async function(req, res) {
       )
       //console.log('outputvods: ', outputvods)
       json = setDataOutput(outputvods, output)
-      json.numberOfVods = allVods
+      json.numberOfVods = console.log('json', json)
       return res.json(json)
     } else {
       order = await decodeJwt(token, req)
