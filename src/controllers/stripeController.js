@@ -909,5 +909,4 @@ exports.stripeWebhookHandler = async function(req, res) {
       res.status(200).send(err)
     }
   }
-  res.status(200).send(payload)
 }
