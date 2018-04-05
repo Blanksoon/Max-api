@@ -905,8 +905,8 @@ exports.stripeWebhookHandler = async function(req, res) {
       )
       res.status(200).send('hi')
     } catch (err) {
-      res.status(200).send(err)
       console.log('error in webhook', err)
+      res.status(200).send(err)
     }
   }
   res.status(200).send(payload)
