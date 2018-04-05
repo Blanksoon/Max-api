@@ -203,6 +203,7 @@ export function createNeworderSubscribe(paymentId) {
     })
       .then(async function(orderData) {
         const today = Date.now()
+        console.log('orderData: ', orderData)
         if (orderData.expiredDate >= today) {
           resolve(orderData)
         } else {
