@@ -39,7 +39,7 @@ export function createOrder(mch_order_no, nonce_str, price) {
     )
     formData.append('total_fee', price)
     formData.append('sign', keySign)
-    //console.log('formData: ', formData)
+    console.log('formData: ', formData)
     fetch(`http://api.mch.ksher.net/KsherPay/native_pay`, {
       method: 'POST',
       body: formData,
