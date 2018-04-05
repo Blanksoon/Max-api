@@ -207,32 +207,35 @@ export function createNeworderSubscribe(paymentId) {
         // if (orderData.expiredDate >= today || orderData.expiredDate === null) {
         //   resolve(orderData)
         // } else {
-        const data = orderData.toObject()
-        const orders = _.omit(data, ['_id'])
-        const oldOrder = orderData
-        oldOrder.status = 'expired'
-        await oldOrder.save() //old order
-        let expiredDate = moment(today) // new order
-          .add(1, 'M')
-          .calendar()
-        const newOrder = new Order({
-          productId: orders.productId,
-          productName: orders.productName,
-          userId: orders.userId,
-          email: orders.email,
-          price: orders.price,
-          purchaseDate: new Date(),
-          platform: orders.platform,
-          expiredDate: expiredDate,
-          status: 'approved',
-          stripe: orders.stripe,
-          cancelDate: null,
-          orderId: orders.orderId,
-          paymentIos: orders.paymetIos,
-        })
-        await newOrder.save()
-        resolve(newOrder)
-        //}
+        if (!orderData) {
+          reject('orderData not found')
+        } else {
+          const data = orderData.toObject()
+          const orders = _.omit(data, ['_id'])
+          const oldOrder = orderData
+          oldOrder.status = 'expired'
+          await oldOrder.save() //old order
+          let expiredDate = moment(today) // new order
+            .add(1, 'M')
+            .calendar()
+          const newOrder = new Order({
+            productId: orders.productId,
+            productName: orders.productName,
+            userId: orders.userId,
+            email: orders.email,
+            price: orders.price,
+            purchaseDate: new Date(),
+            platform: orders.platform,
+            expiredDate: expiredDate,
+            status: 'approved',
+            stripe: orders.stripe,
+            cancelDate: null,
+            orderId: orders.orderId,
+            paymentIos: orders.paymetIos,
+          })
+          await newOrder.save()
+          resolve(newOrder)
+        }
       })
       .catch(function(err) {
         console.log('err', err)
