@@ -200,6 +200,9 @@ exports.confirmTransaction = async function(req, res) {
   const payload = req.body
   const queryload = req.query
   try {
+    fs.writeFileSync('./req.txt', JSON.stringify(req), {
+      flag: 'a',
+    })
     fs.writeFileSync('./reqbodywechat.txt', JSON.stringify(payload), {
       flag: 'a',
     })
