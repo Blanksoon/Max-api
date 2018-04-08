@@ -169,14 +169,6 @@ exports.payPerViewCreditCard = async function(req, res) {
       status: 'created',
     })
     const order = await newOrder.save()
-    // let price = 0
-    // if (live.price === 1.99) {
-    //   price = 298
-    // } else if (live.price === 4.99) {
-    //   price = 698
-    // } else {
-    //   price = 1498
-    // }
     const successTransaction = await chargeTransaction(
       transaction.id,
       user.stripe.customerId,
@@ -218,7 +210,7 @@ exports.payPerViewCreditCard = async function(req, res) {
       })
     }
   } catch (error) {
-    console.log(error)
+    console.log('error: ', error)
     res.status(200).send({
       status: {
         code: error.code || 500,
