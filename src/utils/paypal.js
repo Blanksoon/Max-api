@@ -318,7 +318,7 @@ function deleteIdMongo(obj) {
 
 export function createNeworderSubscribe(paymentId) {
   return new Promise(async (resolve, reject) => {
-    console.log('paymentId', paymentId)
+    console.log('Paypal-paymentId', paymentId)
     let order = await Order.findOne({
       'paypal.paymentId': paymentId,
       status: 'approved',
