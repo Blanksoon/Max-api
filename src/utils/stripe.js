@@ -203,13 +203,17 @@ export function createNeworderSubscribe(paymentId) {
     })
       .then(async function(orderData) {
         const today = Date.now()
-        console.log('orderData: ', orderData)
+        today = moment(today).subtract(10, 'minutes')
+        console.log('today: ', today)
+        console.log('orderData: ', orderData.expiredDate)
         if (orderData.expiredDate >= today || orderData.expiredDate === null) {
+          console.log('1')
           resolve(orderData)
           // } else {
           // if (!orderData) {
           //   reject('orderData not found')
         } else {
+          console.log('2')
           const data = orderData.toObject()
           const orders = _.omit(data, ['_id'])
           const oldOrder = orderData

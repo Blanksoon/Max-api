@@ -6,3 +6,4 @@ yarn\.lock
 package-lock\.json
 dist
 webhook.txt
+stripewebhook.txt
