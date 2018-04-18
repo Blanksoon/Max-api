@@ -202,7 +202,7 @@ export function createNeworderSubscribe(paymentId) {
       status: 'approved',
     })
       .then(async function(orderData) {
-        const today = Date.now()
+        let today = Date.now()
         today = moment(today).subtract(10, 'minutes')
         console.log('today: ', today)
         console.log('orderData: ', orderData.expiredDate)
