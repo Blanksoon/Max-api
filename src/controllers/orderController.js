@@ -682,7 +682,14 @@ exports.fetchSubscribe = async function(req, res) {
 exports.fetchVersion = async function(req, res) {
   try {
     const allVersion = await Setting.find({})
-    res.status(200).send(allVersion)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch version',
+      },
+      data: allVersion[0],
+    })
   } catch (error) {
     console.log(error)
     res.status(200).send('error')
