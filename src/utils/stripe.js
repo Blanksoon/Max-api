@@ -203,10 +203,10 @@ export function createNeworderSubscribe(paymentId) {
     })
       .then(async function(orderData) {
         let today = Date.now()
-        today = moment(today).subtract(10, 'minutes')
+        //today = moment(today).subtract(10, 'minutes')
         console.log('today: ', today)
         console.log('orderData: ', orderData.expiredDate)
-        if (orderData.expiredDate >= today || orderData.expiredDate === null) {
+        if (orderData.expiredDate >= today && orderData.expiredDate === null) {
           console.log('1')
           resolve(orderData)
           // } else {
