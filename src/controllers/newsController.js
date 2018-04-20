@@ -58,6 +58,24 @@ exports.uploadImageMaxNews = async function(req, res) {
   })
 }
 
+exports.uploadImage = async function(req, res) {
+  console.log('1:', req.file)
+  const file = env.PATHIMAGEMAXNEWS + '/' + req.file.originalname
+  //console.log('file: ', file)
+  fs.rename(req.file.path, file, function(err) {
+    if (err) {
+      console.log(err)
+      res.send(500)
+    } else {
+      res.status(200).send({
+        uploaded: 1,
+        filename: req.file.originalname,
+        url: `${env.IMAGEURL}${req.file.originalname}`,
+      })
+    }
+  })
+}
+
 exports.addMaxNews = async function(req, res) {
   const token = req.body.token
   const imgUrl = env.IMAGEURL + req.body.data.imageUrl
