@@ -317,9 +317,11 @@ exports.testPdf = async function(req, res) {
       `${__dirname}/test.pdf`,
       `${__dirname}/output.pdf`
     )
+    const a = 'hello how are you'
     pdfDoc
       // edit 1st page
       .editPage(1)
+      .text(a, 10, 30)
       .text('Add some texts to an existing pdf file', 150, 300)
       .rectangle(20, 20, 40, 100)
       .comment('Add 1st comment annotaion', 200, 300)
