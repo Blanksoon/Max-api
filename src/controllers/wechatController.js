@@ -8,7 +8,9 @@ import Subscribe from '../models/subscribe'
 import User from '../models/user'
 import nodemailer from 'nodemailer'
 import moment from 'moment'
+import HummusRecipe from 'hummus-recipe'
 import { createOrder } from '../utils/wechat'
+import { dirname } from 'path'
 
 const sendEmail = (text, email, subject) => {
   return new Promise((resolve, reject) => {
@@ -294,6 +296,43 @@ exports.payPerViewPackageWechat = async function(req, res) {
         qrcode: result.data.imgdat,
         switch: 1,
       },
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
+}
+
+exports.testPdf = async function(req, res) {
+  try {
+    console.log('1: ', __dirname)
+    const pdfDoc = new HummusRecipe(
+      `${__dirname}/test.pdf`,
+      `${__dirname}/output.pdf`
+    )
+    pdfDoc
+      // edit 1st page
+      .editPage(1)
+      .text('Add some texts to an existing pdf file', 150, 300)
+      .rectangle(20, 20, 40, 100)
+      .comment('Add 1st comment annotaion', 200, 300)
+      //.image('/path/to/image.jpg', { width: 300, keepAspectRatio: true })
+      .endPage()
+      .endPDF()
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success for purchase',
+      },
+      data: {},
     })
   } catch (error) {
     console.log(error)
