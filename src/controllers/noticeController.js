@@ -42,6 +42,7 @@ const readJwt = token => {
 }
 
 exports.addNotice = async function(req, res) {
+  // token เป็น userid
   const token = req.body.token
   let data = {
     notificationTopic: req.body.notificationTopic,
@@ -55,7 +56,14 @@ exports.addNotice = async function(req, res) {
     data.userId = decodeToken.data._id
     const newNotice = new Notice(data)
     await newNotice.save()
-    res.status(200).send(newNotice)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success add notice',
+      },
+      data: newNotice,
+    })
   } catch (error) {
     console.log('error: ', error)
     res.status(500).send({
@@ -79,7 +87,14 @@ exports.updateIsRead = async function(req, res) {
       { isRead: isRead },
       { new: true }
     )
-    res.status(200).send(noticeData)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success update notice',
+      },
+      data: noticeData,
+    })
   } catch (error) {
     console.log('error: ', error)
     res.status(500).send({
@@ -103,7 +118,14 @@ exports.updateIsActive = async function(req, res) {
       { isActive: isActive },
       { new: true }
     )
-    res.status(200).send(noticeData)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success update isActive',
+      },
+      data: noticeData,
+    })
   } catch (error) {
     console.log('error: ', error)
     res.status(500).send({
@@ -127,7 +149,14 @@ exports.findByUser = async function(req, res) {
     }).sort({
       notificationDate: -1,
     })
-    res.status(200).send(noticeData)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch by user',
+      },
+      data: noticeData,
+    })
   } catch (error) {
     console.log('error: ', error)
     res.status(500).send({
@@ -145,7 +174,14 @@ exports.findAllUser = async function(req, res) {
   try {
     const decodeToken = await readJwt(token)
     const noticeData = await User.find({})
-    res.status(200).send(noticeData)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch all user',
+      },
+      data: noticeData,
+    })
   } catch (error) {
     console.log('error: ', error)
     res.status(500).send({
@@ -162,9 +198,15 @@ exports.findUserByProductId = async function(req, res) {
   const token = req.query.token
   const productId = req.query.productId
   try {
-    const decodeToken = await readJwt(token)
     const noticeData = await Order.find({ productId: productId })
-    res.status(200).send(noticeData)
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: true,
+        message: 'success fetch one user',
+      },
+      data: noticeData,
+    })
   } catch (error) {
     console.log('error: ', error)
     res.status(500).send({
