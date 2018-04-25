@@ -53,6 +53,7 @@
     "fs": "^0.0.1-security",
     "hooks-fixed": "^2.0.0",
     "http-errors": "^1.6.2",
+    "hummus": "^1.0.86",
     "hummus-recipe-th": "^1.6.9",
     "iconv-lite": "^0.4.19",
     "inherits": "^2.0.3",

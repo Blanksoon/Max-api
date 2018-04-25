@@ -267,4 +267,5 @@ module.exports = function(app) {
 
   app.get('/test-pdf', wechat.testPdf)
   app.get('/test-pdf2', wechat.testPdf2)
+  app.get('/test-pdf3', wechat.testPdf3)
 }
