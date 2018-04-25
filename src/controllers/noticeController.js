@@ -42,37 +42,48 @@ const readJwt = token => {
 }
 
 exports.addNotice = async function(req, res) {
-  // token เป็น userid
   const token = req.body.token
-  let data = {
-    notificationTopic: req.body.notificationTopic,
-    notificationContent: req.body.notificationContent,
-    notificationDate: Date.now(),
-    isRead: req.body.isRead,
-    isActive: req.body.isActive,
-  }
-  try {
-    const decodeToken = await readJwt(token)
-    data.userId = decodeToken.data._id
-    const newNotice = new Notice(data)
-    await newNotice.save()
+  const userId = req.body.userId
+  if (token != '2nabEXSyRndKwgxwejdAjpCjt8zHxJ4pqPjJy6uh') {
     res.status(200).send({
       status: {
         code: 200,
-        success: true,
-        message: 'success add notice',
-      },
-      data: newNotice,
-    })
-  } catch (error) {
-    console.log('error: ', error)
-    res.status(500).send({
-      status: {
-        code: 500,
-        success: true,
-        message: error,
+        success: false,
+        message: 'token is invalid',
       },
     })
+  } else {
+    let data = {
+      notificationTopic: req.body.notificationTopic,
+      notificationContent: req.body.notificationContent,
+      notificationDate: Date.now(),
+      isRead: req.body.isRead,
+      isActive: req.body.isActive,
+      userId: userId,
+    }
+    try {
+      //const decodeToken = await readJwt(token)
+      //data.userId = decodeToken.data._id
+      const newNotice = new Notice(data)
+      await newNotice.save()
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success add notice',
+        },
+        data: newNotice,
+      })
+    } catch (error) {
+      console.log('error: ', error)
+      res.status(500).send({
+        status: {
+          code: 500,
+          success: true,
+          message: error,
+        },
+      })
+    }
   }
 }
 
@@ -81,6 +92,9 @@ exports.updateIsRead = async function(req, res) {
   const isRead = req.body.isRead
   const id = req.body.id
   try {
+    if (isRead === undefined) {
+      throw 'isRead is undefind'
+    }
     const decodeToken = await readJwt(token)
     const noticeData = await Notice.findOneAndUpdate(
       { _id: id },
@@ -112,6 +126,9 @@ exports.updateIsActive = async function(req, res) {
   const isActive = req.body.isActive
   const id = req.body.id
   try {
+    if (isActive === undefined) {
+      throw 'isActive is undefind'
+    }
     const decodeToken = await readJwt(token)
     const noticeData = await Notice.findOneAndUpdate(
       { _id: id },
@@ -141,80 +158,110 @@ exports.updateIsActive = async function(req, res) {
 exports.findByUser = async function(req, res) {
   const token = req.query.token
   const userId = req.query.userId
-  try {
-    const decodeToken = await readJwt(token)
-    const noticeData = await Notice.find({
-      userId: userId,
-      isActive: 1,
-    }).sort({
-      notificationDate: -1,
-    })
+  if (token != '2nabEXSyRndKwgxwejdAjpCjt8zHxJ4pqPjJy6uh') {
     res.status(200).send({
       status: {
         code: 200,
-        success: true,
-        message: 'success fetch by user',
-      },
-      data: noticeData,
-    })
-  } catch (error) {
-    console.log('error: ', error)
-    res.status(500).send({
-      status: {
-        code: 500,
-        success: true,
-        message: error,
+        success: false,
+        message: 'token is invalid',
       },
     })
+  } else {
+    try {
+      //const decodeToken = await readJwt(token)
+      const noticeData = await Notice.find({
+        userId: userId,
+        isActive: 1,
+      }).sort({
+        notificationDate: -1,
+      })
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success fetch by user',
+        },
+        data: noticeData,
+      })
+    } catch (error) {
+      console.log('error: ', error)
+      res.status(500).send({
+        status: {
+          code: 500,
+          success: true,
+          message: error,
+        },
+      })
+    }
   }
 }
 
 exports.findAllUser = async function(req, res) {
   const token = req.query.token
-  try {
-    const decodeToken = await readJwt(token)
-    const noticeData = await User.find({})
+  if (token != '2nabEXSyRndKwgxwejdAjpCjt8zHxJ4pqPjJy6uh') {
     res.status(200).send({
       status: {
         code: 200,
-        success: true,
-        message: 'success fetch all user',
-      },
-      data: noticeData,
-    })
-  } catch (error) {
-    console.log('error: ', error)
-    res.status(500).send({
-      status: {
-        code: 500,
-        success: true,
-        message: error,
+        success: false,
+        message: 'token is invalid',
       },
     })
+  } else {
+    try {
+      //const decodeToken = await readJwt(token)
+      const noticeData = await User.find({})
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success fetch all user',
+        },
+        data: noticeData,
+      })
+    } catch (error) {
+      console.log('error: ', error)
+      res.status(500).send({
+        status: {
+          code: 500,
+          success: true,
+          message: error,
+        },
+      })
+    }
   }
 }
 
 exports.findUserByProductId = async function(req, res) {
   const token = req.query.token
   const productId = req.query.productId
-  try {
-    const noticeData = await Order.find({ productId: productId })
+  if (token != '2nabEXSyRndKwgxwejdAjpCjt8zHxJ4pqPjJy6uh') {
     res.status(200).send({
       status: {
         code: 200,
-        success: true,
-        message: 'success fetch one user',
-      },
-      data: noticeData,
-    })
-  } catch (error) {
-    console.log('error: ', error)
-    res.status(500).send({
-      status: {
-        code: 500,
-        success: true,
-        message: error,
+        success: false,
+        message: 'token is invalid',
       },
     })
+  } else {
+    try {
+      const noticeData = await Order.find({ productId: productId })
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success fetch one user',
+        },
+        data: noticeData,
+      })
+    } catch (error) {
+      console.log('error: ', error)
+      res.status(500).send({
+        status: {
+          code: 500,
+          success: true,
+          message: error,
+        },
+      })
+    }
   }
 }
