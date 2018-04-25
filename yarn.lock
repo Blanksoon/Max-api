@@ -1989,9 +1989,9 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-hummus-recipe@^1.6.9:
+hummus-recipe-th@^1.6.9:
   version "1.6.9"
-  resolved "https://registry.yarnpkg.com/hummus-recipe/-/hummus-recipe-1.6.9.tgz#10090fd0a54544b4fbca2f9404e874b9017a6eef"
+  resolved "https://registry.yarnpkg.com/hummus-recipe-th/-/hummus-recipe-th-1.6.9.tgz#7374dc1fc85fb7e25664a2cae88122bdf4cd474e"
   dependencies:
     hummus "^1.0.86"
     linebreak "^0.3.0"

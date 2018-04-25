@@ -251,7 +251,6 @@ exports.findUserByProductId = async function(req, res) {
         status: 'approved',
       })
       let userData = {}
-
       let i = 0
       let n = 0
       while (i < noticeData.length) {

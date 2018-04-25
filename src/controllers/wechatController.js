@@ -8,7 +8,7 @@ import Subscribe from '../models/subscribe'
 import User from '../models/user'
 import nodemailer from 'nodemailer'
 import moment from 'moment'
-import HummusRecipe from 'hummus-recipe'
+import HummusRecipe from 'hummus-recipe-th'
 import { createOrder } from '../utils/wechat'
 import { dirname } from 'path'
 
@@ -321,21 +321,360 @@ exports.testPdf = async function(req, res) {
     pdfDoc
       // edit 1st page
       .editPage(1)
-      .text(a, 10, 30)
-      .text('Add some texts to an existing pdf file', 150, 300)
-      .rectangle(20, 20, 40, 100)
-      .comment('Add 1st comment annotaion', 200, 300)
-      //.image('/path/to/image.jpg', { width: 300, keepAspectRatio: true })
+      // part one
+      .text('กกกกกก', 85.2, 114.48, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ขขขขขข', 249.6, 114.48, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฉฉฉฉฉฉ', 450.72, 114.48, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('คคคคคค', 450.72, 132, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('งงงงงงงง', 450.72, 150, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ยยยยยย', 450.72, 167.8, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('จจจจจจ', 80.4, 133, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ดดดดดด', 80.4, 150, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ออออออ', 80.4, 166.8, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('รับชำระ', 112.8, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('11111', 268.08, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('2222', 350.16, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('33333', 432.48, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('4444', 522.72, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฝฝฝฝฝฝ', 154.56, 295.5, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('5555', 522.72, 295.5, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      // part two
+      .text('มมมมมมม', 90.96, 515.32, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ททททท', 252.96, 515.7, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฑฑฑฑฑฑ', 464.88, 515.7, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('นนนนนน', 464.88, 533, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บบบบบบบ', 464.88, 550, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฆฆฆฆฆฆฆ', 464.88, 570, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ลลลลลลล', 90.96, 533, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('พพพพพพพพ', 90.96, 552, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('หหหหหหห', 90.96, 570.04, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('รับชำระ', 102.24, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('666666', 253.93, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('777777', 351.12, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('888888', 432.72, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('999999', 526.8, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ชชชชชชช', 163.92, 688.12, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('1717', 526.8, 688.8, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
       .endPage()
       .endPDF()
+    res.status(200).sendFile(`${__dirname}/output.pdf`)
+  } catch (error) {
+    console.log(error)
     res.status(200).send({
       status: {
-        code: 200,
-        success: true,
-        message: 'success for purchase',
+        code: error.code || 500,
+        success: false,
+        message: error.message,
       },
-      data: {},
+      data: [],
     })
+  }
+}
+
+exports.testPdf2 = async function(req, res) {
+  try {
+    console.log('1: ', __dirname)
+    const pdfDoc = new HummusRecipe(
+      `${__dirname}/test.pdf`,
+      `${__dirname}/output.pdf`
+    )
+    const a = 'hello how are you'
+    pdfDoc
+      // edit 1st page
+      .editPage(1)
+      // part one
+      .text('กกกกกก', 85.2, 114.48, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ขขขขขข', 249.6, 114.48, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฉฉฉฉฉฉ', 450.72, 114.48, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('คคคคคค', 450.72, 132, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('งงงงงงงง', 450.72, 150, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ยยยยยย', 450.72, 167.8, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('จจจจจจ', 80.4, 133, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ดดดดดด', 80.4, 150, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ออออออ', 80.4, 166.8, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('รับชำระ', 112.8, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('11111', 268.08, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('2222', 350.16, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('33333', 432.48, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('4444', 522.72, 263.76, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฝฝฝฝฝฝ', 154.56, 295.5, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('5555', 522.72, 295.5, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      // part two
+      .text('มมมมมมม', 90.96, 515.32, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ททททท', 252.96, 515.7, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฑฑฑฑฑฑ', 464.88, 515.7, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('นนนนนน', 464.88, 533, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บบบบบบบ', 464.88, 550, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ฆฆฆฆฆฆฆ', 464.88, 570, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ลลลลลลล', 90.96, 533, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('พพพพพพพพ', 90.96, 552, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('หหหหหหห', 90.96, 570.04, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('รับชำระ', 102.24, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('666666', 253.93, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('777777', 351.12, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('888888', 432.72, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('999999', 526.8, 665.24, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ชชชชชชช', 163.92, 688.12, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('1717', 526.8, 688.8, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .endPage()
+      .endPDF()
+    res.status(200).sendFile(`${__dirname}/output.pdf`)
   } catch (error) {
     console.log(error)
     res.status(200).send({
