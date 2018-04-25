@@ -9,6 +9,18 @@ const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const Notice = mongoose.model('Notifications')
 
+function findUserInNotice(userId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await User.findOne({ _id: userId })
+      resolve(user)
+    } catch (err) {
+      console.log('err: ', err)
+      reject(false)
+    }
+  })
+}
+
 const checkUser = async username => {
   try {
     const user = await User.findOne({ email: username })
@@ -157,42 +169,31 @@ exports.updateIsActive = async function(req, res) {
 
 exports.findByUser = async function(req, res) {
   const token = req.query.token
-  const userId = req.query.userId
-  if (token != '2nabEXSyRndKwgxwejdAjpCjt8zHxJ4pqPjJy6uh') {
+  try {
+    const decodeToken = await readJwt(token)
+    const noticeData = await Notice.find({
+      userId: decodeToken.data._id,
+      isActive: 1,
+    }).sort({
+      notificationDate: -1,
+    })
     res.status(200).send({
       status: {
         code: 200,
-        success: false,
-        message: 'token is invalid',
+        success: true,
+        message: 'success fetch by user',
+      },
+      data: noticeData,
+    })
+  } catch (error) {
+    console.log('error: ', error)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: error,
       },
     })
-  } else {
-    try {
-      //const decodeToken = await readJwt(token)
-      const noticeData = await Notice.find({
-        userId: userId,
-        isActive: 1,
-      }).sort({
-        notificationDate: -1,
-      })
-      res.status(200).send({
-        status: {
-          code: 200,
-          success: true,
-          message: 'success fetch by user',
-        },
-        data: noticeData,
-      })
-    } catch (error) {
-      console.log('error: ', error)
-      res.status(500).send({
-        status: {
-          code: 500,
-          success: true,
-          message: error,
-        },
-      })
-    }
   }
 }
 
@@ -244,14 +245,43 @@ exports.findUserByProductId = async function(req, res) {
     })
   } else {
     try {
-      const noticeData = await Order.find({ productId: productId })
+      const outputData = []
+      const noticeData = await Order.find({
+        productId: productId,
+        status: 'approved',
+      })
+      let userData = {}
+
+      let i = 0
+      let n = 0
+      while (i < noticeData.length) {
+        userData = await findUserInNotice(noticeData[i].userId)
+        // if (userData !== null) {
+        //   console.log('userData.deviceToken ', userData.deviceToken)
+        // if (userData.deviceToken === undefined) {
+        //   outputData[i] = {
+        //     userId: userData._id,
+        //     notificationToken: null,
+        //     email: noticeData[i].email,
+        //   }
+        // } else {
+        outputData[i] = {
+          userId: userData._id,
+          notificationToken: userData.deviceToken,
+          email: noticeData[i].email,
+        }
+        //}
+        // n++
+        //}
+        i++
+      }
       res.status(200).send({
         status: {
           code: 200,
           success: true,
-          message: 'success fetch one user',
+          message: 'success fetch order by product',
         },
-        data: noticeData,
+        data: outputData,
       })
     } catch (error) {
       console.log('error: ', error)
