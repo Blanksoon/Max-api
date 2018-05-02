@@ -2,5 +2,9 @@
   {
     "username": "admin@email.com",
     "password": "maxadmin2016"
+  },
+  {
+    "username": "maxnews@email.com",
+    "password": "writer"
   }
 ]

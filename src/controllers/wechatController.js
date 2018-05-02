@@ -315,10 +315,10 @@ exports.payPerViewPackageWechat = async function(req, res) {
 
 exports.testPdf = async function(req, res) {
   try {
-    console.log('1: ', __dirname)
+    //console.log('1: ', __dirname)
     const pdfDoc = new HummusRecipe(
-      `${__dirname}/test.pdf`,
-      `${__dirname}/output.pdf`
+      `${__dirname}/pdf/test.pdf`,
+      `${__dirname}/pdf/output.pdf`
     )
     const a = 'hello how are you'
     pdfDoc
@@ -488,7 +488,7 @@ exports.testPdf = async function(req, res) {
       })
       .endPage()
       .endPDF()
-    res.status(200).sendFile(`${__dirname}/output.pdf`)
+    res.status(200).sendFile(`${__dirname}/pdf/output.pdf`)
   } catch (error) {
     console.log(error)
     res.status(200).send({
@@ -505,10 +505,10 @@ exports.testPdf = async function(req, res) {
 exports.testPdf2 = async function(req, res) {
   //let y = 0
   try {
-    console.log('1: ', __dirname)
+    //console.log('1: ', __dirname)
     const pdfDoc = new HummusRecipe(
-      `${__dirname}/statement.pdf`,
-      `${__dirname}/statementOutput.pdf`
+      `${__dirname}/pdf/statement.pdf`,
+      `${__dirname}/pdf/statementOutput.pdf`
     )
     const a = 'hello how are you'
     pdfDoc
@@ -731,6 +731,7 @@ exports.testPdf2 = async function(req, res) {
       blockTypeC(pdfDoc, baseY, incrementValue)
       i++
     }
+    y = 0
     console.log('1. y:', y)
     //part 3
     pdfDoc
@@ -771,7 +772,7 @@ exports.testPdf2 = async function(req, res) {
       })
       .endPage()
       .endPDF()
-    res.status(200).sendFile(`${__dirname}/statementOutput.pdf`)
+    res.status(200).sendFile(`${__dirname}/pdf/statementOutput.pdf`)
   } catch (error) {
     console.log(error)
     res.status(200).send({
@@ -999,9 +1000,12 @@ function blockTypeC(pdfDoc, baseY, incrementValue) {
 }
 
 exports.testPdf3 = async function(req, res) {
-  var pdfWriter = hummus.createWriterToModify(`${__dirname}/statement.pdf`, {
-    modifiedFilePath: `${__dirname}/statementOutput.pdf`,
-  })
+  var pdfWriter = hummus.createWriterToModify(
+    `${__dirname}/pdf/statement.pdf`,
+    {
+      modifiedFilePath: `${__dirname}/pdf/statementOutput.pdf`,
+    }
+  )
 
   var pageModifier = new hummus.PDFPageModifier(pdfWriter, 0, true)
   pageModifier
@@ -1017,5 +1021,287 @@ exports.testPdf3 = async function(req, res) {
 
   pageModifier.endContext().writePage()
   pdfWriter.end()
-  res.status(200).sendFile(`${__dirname}/statementOutput.pdf`)
+  res.status(200).sendFile(`${__dirname}/pdf/statementOutput.pdf`)
+}
+
+exports.testPdf4 = async function(req, res) {
+  try {
+    const pdfDoc = new HummusRecipe(
+      `${__dirname}/pdf/ittp-statement.pdf`,
+      `${__dirname}/pdf/ittp-statement-output.pdf`
+    )
+    const a = 'hello how are you'
+    pdfDoc
+      // edit 1st page
+      .editPage(1)
+      // part 1
+      .text('เลขที่ : 000000', 475, 29, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('นางสาวใจดี ดีต่อใจ', 69, 75, {
+        color: '000000',
+        fontSize: 15,
+        font: 'THSarabunNew',
+      })
+      .text('บริษัท ไอทีทีพี จำกัด', 69, 95, {
+        color: '000000',
+        fontSize: 15,
+        font: 'THSarabunNew',
+      })
+      .text('183 ซอย ลาดพร้าว 71', 69, 115, {
+        color: '000000',
+        fontSize: 15,
+        font: 'THSarabunNew',
+      })
+      .text('แขวงสะพานสอง เขตวังทองหลาง', 69, 135, {
+        color: '000000',
+        fontSize: 15,
+        font: 'THSarabunNew',
+      })
+      .text('กรุงเทพมหานคร 10310', 69, 155, {
+        color: '000000',
+        fontSize: 15,
+        font: 'THSarabunNew',
+      })
+      .text('00-00-00-1234', 350, 60, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('40000', 350, 80, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      // .text('บาท', 400, 85, {
+      //   color: '000000',
+      //   fontSize: 13,
+      //   font: 'THSarabunNew',
+      // })
+      .text('สินเชื่อใจดี', 490, 60, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('28%', 490, 80, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('15/02/2018', 300, 132, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('02/03/2018', 300, 177, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('7,373.25', 440, 177, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บาท', 480, 177, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('40,803.44', 440, 132, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บาท', 480, 132, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 235, 227, {
+        //payment received
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('300.00', 305, 227, {
+        //payment received
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('200.00', 370, 227, {
+        //payment received
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 443, 227, {
+        //payment received
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('500.00', 505, 227, {
+        //payment received
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 235, 247, {
+        //past due
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('300.00', 305, 247, {
+        //past due
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('200.00', 370, 247, {
+        //past due
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 443, 247, {
+        //past due
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('500.00', 505, 247, {
+        //past due
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 235, 267, {
+        //remaining balance
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('300.00', 305, 267, {
+        //remaining balance
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('200.00', 370, 267, {
+        //remaining balance
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 443, 267, {
+        //remaining balance
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('500.00', 505, 267, {
+        //remaining balance
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 235, 286, {
+        //excess amounts
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('300.00', 305, 286, {
+        //excess amounts
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('200.00', 370, 286, {
+        //excess amounts
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0.00', 443, 286, {
+        //excess amounts
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('500.00', 505, 286, {
+        //excess amounts
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+    //part 2
+    const baseY = 333
+    const incrementValue = 11.2
+    let i = 0
+    while (i < 1) {
+      blockTypeA(pdfDoc, baseY, incrementValue)
+      blockTypeB(pdfDoc, baseY, incrementValue)
+      blockTypeB(pdfDoc, baseY, incrementValue)
+      blockTypeC(pdfDoc, baseY, incrementValue)
+      i++
+    }
+    y = 0
+    console.log('1. y:', y)
+    //part 3
+    pdfDoc
+      // .text('ITTP', 74, 577, {
+      //   color: '000000',
+      //   fontSize: 13,
+      //   font: 'THSarabunNew',
+      // })
+      .text('0000001234', 145, 577, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('20,000', 280, 577, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บาท', 315, 577, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('นางสาวใจดี ดีต่อใจ', 145, 713, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('20,000', 430, 713, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บาท', 460, 713, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .endPage()
+      .endPDF()
+    res.status(200).sendFile(`${__dirname}/pdf/ittp-statement-output.pdf`)
+  } catch (error) {
+    console.log(error)
+    res.status(200).send({
+      status: {
+        code: error.code || 500,
+        success: false,
+        message: error.message,
+      },
+      data: [],
+    })
+  }
 }

@@ -246,9 +246,11 @@ exports.findUserByProductId = async function(req, res) {
   } else {
     try {
       const outputData = []
+      const today = Date.now()
       const noticeData = await Order.find({
         productId: productId,
         status: 'approved',
+        expiredDate: { $gte: today },
       })
       let userData = {}
       let i = 0
