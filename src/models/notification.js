@@ -7,13 +7,21 @@ var NoticeSchema = new Schema({
     type: String,
     required: 'userId is required',
   },
-  notificationTopic: {
+  notificationTopicEn: {
     type: String,
     required: 'notificationTopic is required',
   },
-  notificationContent: {
+  notificationContentEn: {
     type: String,
     required: 'notificationContent is required',
+  },
+  notificationTopicTh: {
+    type: String,
+    required: 'notificationTopicTh is required',
+  },
+  notificationContentTh: {
+    type: String,
+    required: 'notificationContentTh is required',
   },
   notificationDate: {
     type: Date,
@@ -26,6 +34,10 @@ var NoticeSchema = new Schema({
   isActive: {
     type: String,
     required: 'isActive is required',
+  },
+  notificationType: {
+    type: String,
+    default: null,
   },
   versionKey: false,
 })

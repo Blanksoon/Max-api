@@ -13,7 +13,7 @@ import hummus from 'hummus'
 import { createOrder } from '../utils/wechat'
 import { dirname } from 'path'
 
-let y = 0 // use in testPdf2
+// let y = 0 // use in testPdf2
 
 const sendEmail = (text, email, subject) => {
   return new Promise((resolve, reject) => {
@@ -786,217 +786,188 @@ exports.testPdf2 = async function(req, res) {
   }
 }
 
-function blockTypeA(pdfDoc, baseY, incrementValue) {
-  let outputTypeA = {}
-  outputTypeA = pdfDoc
-    .text('02/02/2018', 65, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('ชำระเงิน', 148, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('ค่าติดตามทวงถาม', 215, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('200.00', 462, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-  y = y + incrementValue
+function blockTypeA(pdfDoc, baseY, incrementValue, y) {
+  let yPoint = y
   pdfDoc
-    .text('ดอกเบี้ยงวดปัจจุบัน', 215, baseY + y, {
-      //excess amounts
+    .text('02/02/2018', 93, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('300.00', 462, baseY + y, {
-      //excess amounts
+    .text('ชำระเงิน', 179, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
+    .text('ค่าติดตามทวงถาม', 220, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+    .text('200.00', 475, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+  yPoint += incrementValue
   pdfDoc
-    .text('ค่าติดตามทวงถาม', 215, baseY + y, {
-      //excess amounts
+    .text('ดอกเบี้ยงวดปัจจุบัน', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('200.00', 462, baseY + y, {
-      //excess amounts
+    .text('300.00', 475, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
+  yPoint += incrementValue
   pdfDoc
-    .text('ดอกเบี้ยงวดปัจจุบัน', 215, baseY + y, {
-      //excess amounts
+    .text('ค่าติดตามทวงถาม', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('300.00', 462, baseY + y, {
-      //excess amounts
+    .text('200.00', 475, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
+  yPoint += incrementValue
   pdfDoc
-    .text('รวม', 215, baseY + y, {
-      //excess amounts
+    .text('ดอกเบี้ยงวดปัจจุบัน', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('500.00', 462, baseY + y, {
-      //excess amounts
+    .text('300.00', 475, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
-  return outputTypeA
+  yPoint += incrementValue
+  pdfDoc
+    .text('รวม', 220, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+    .text('500.00', 475, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+  yPoint += incrementValue
+  return yPoint
 }
 
-function blockTypeB(pdfDoc, baseY, incrementValue) {
-  let outputTypeB = {}
-  outputTypeB = pdfDoc
-    .text('ชำระเงิน', 148, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('ค่าติดตามทวงถาม', 215, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('200.00', 462, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-  y = y + incrementValue
+function blockTypeB(pdfDoc, baseY, incrementValue, y) {
+  let yPoint = y
   pdfDoc
-    .text('ดอกเบี้ยงวดปัจจุบัน', 215, baseY + y, {
-      //excess amounts
+    .text('ชำระเงิน', 179, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('300.00', 462, baseY + y, {
-      //excess amounts
+    .text('ค่าติดตามทวงถาม', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
+    .text('200.00', 475, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+  yPoint += incrementValue
   pdfDoc
-    .text('รวม', 215, baseY + y, {
-      //excess amounts
+    .text('ดอกเบี้ยงวดปัจจุบัน', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('500.00', 462, baseY + y, {
-      //excess amounts
+    .text('300.00', 475, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
-  return outputTypeB
+  yPoint += incrementValue
+  pdfDoc
+    .text('รวม', 220, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+    .text('500.00', 475, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+  yPoint += incrementValue
+  return yPoint
 }
 
-function blockTypeC(pdfDoc, baseY, incrementValue) {
-  let outputTypeC = {}
-  outputTypeC = pdfDoc
-    .text('02/02/2018', 65, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('สรุปยอด', 148, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('ยอดชั้นต่ำ งวดปัจจุบัน', 215, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-    .text('200.00', 462, baseY + y, {
-      //excess amounts
-      color: '000000',
-      fontSize: 12,
-      font: 'THSarabunNew',
-    })
-  y = y + incrementValue
+function blockTypeC(pdfDoc, baseY, incrementValue, y) {
+  let yPoint = y
   pdfDoc
-    .text('ยอดชั้นต่ำ งวดปัจจุบัน', 215, baseY + y, {
-      //excess amounts
+    .text('02/02/2018', 93, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('200.00', 462, baseY + y, {
-      //excess amounts
+    .text('สรุปยอด', 179, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
+    .text('ยอดชั้นต่ำ งวดปัจจุบัน', 220, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+    .text('200.00', 475, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+  yPoint += incrementValue
   pdfDoc
-    .text('ยอดค่าติดตามทวงถาม งวดปัจจุบัน', 215, baseY + y, {
-      //excess amounts
+    .text('ยอดชั้นต่ำ งวดปัจจุบัน', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('300.00', 462, baseY + y, {
-      //excess amounts
+    .text('200.00', 475, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
+  yPoint += incrementValue
   pdfDoc
-    .text('รวม', 215, baseY + y, {
-      //excess amounts
+    .text('ยอดค่าติดตามทวงถาม งวดปัจจุบัน', 220, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-    .text('500.00', 462, baseY + y, {
-      //excess amounts
+    .text('300.00', 475, baseY + yPoint, {
       color: '000000',
       fontSize: 12,
       font: 'THSarabunNew',
     })
-  y = y + incrementValue
-  return outputTypeC
+  yPoint += incrementValue
+  pdfDoc
+    .text('รวม', 220, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+    .text('500.00', 475, baseY + yPoint, {
+      color: '000000',
+      fontSize: 12,
+      font: 'THSarabunNew',
+    })
+  yPoint += incrementValue
+  return yPoint
 }
 
 exports.testPdf3 = async function(req, res) {
@@ -1025,52 +996,58 @@ exports.testPdf3 = async function(req, res) {
 }
 
 exports.testPdf4 = async function(req, res) {
+  let y = 0
   try {
     const pdfDoc = new HummusRecipe(
-      `${__dirname}/pdf/ittp-statement.pdf`,
-      `${__dirname}/pdf/ittp-statement-output.pdf`
+      `${__dirname}/pdf/ittp-statement-v2.pdf`,
+      `${__dirname}/pdf/ittp-statement-v2-output.pdf`
     )
     const a = 'hello how are you'
     pdfDoc
       // edit 1st page
       .editPage(1)
       // part 1
-      .text('เลขที่ : 000000', 475, 29, {
+      .text('000000', 502, 27, {
         color: 'ffffff',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('นางสาวใจดี ดีต่อใจ', 69, 75, {
+      .text('นางสาวใจดี ดีต่อใจ', 100, 62, {
         color: '000000',
         fontSize: 15,
         font: 'THSarabunNew',
       })
-      .text('บริษัท ไอทีทีพี จำกัด', 69, 95, {
+      .text('บริษัท ไอทีทีพี จำกัด', 100, 82, {
         color: '000000',
         fontSize: 15,
         font: 'THSarabunNew',
       })
-      .text('183 ซอย ลาดพร้าว 71', 69, 115, {
+      .text('183 ซอย ลาดพร้าว 71', 100, 102, {
         color: '000000',
         fontSize: 15,
         font: 'THSarabunNew',
       })
-      .text('แขวงสะพานสอง เขตวังทองหลาง', 69, 135, {
+      .text('แขวงสะพานสอง เขตวังทองหลาง', 100, 122, {
         color: '000000',
         fontSize: 15,
         font: 'THSarabunNew',
       })
-      .text('กรุงเทพมหานคร 10310', 69, 155, {
+      .text('กรุงเทพมหานคร 10310', 100, 142, {
         color: '000000',
         fontSize: 15,
         font: 'THSarabunNew',
       })
-      .text('00-00-00-1234', 350, 60, {
+      .text('00-00-00-1234', 345.6, 55, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('40000', 350, 80, {
+      .text('สินเชื่อใจดี', 492.48, 55, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('40000', 345.6, 76.08, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
@@ -1080,179 +1057,180 @@ exports.testPdf4 = async function(req, res) {
       //   fontSize: 13,
       //   font: 'THSarabunNew',
       // })
-      .text('สินเชื่อใจดี', 490, 60, {
+      .text('28%', 492.48, 76.08, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('28%', 490, 80, {
+      .text('15/02/2018', 310, 122, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('40,803.44', 437.76, 122, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บาท', 480, 122, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('02/03/2018', 310, 159, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('7,373.25', 437.76, 159, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('บาท', 480, 159, {
+        color: 'ffffff',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('ประจำรอบ 16/01/18 - 15/02/18', 105, 188, {
+        //payment received
         color: '000000',
-        fontSize: 13,
+        fontSize: 9,
         font: 'THSarabunNew',
       })
-      .text('15/02/2018', 300, 132, {
-        color: 'ffffff',
-        fontSize: 13,
-        font: 'THSarabunNew',
-      })
-      .text('02/03/2018', 300, 177, {
-        color: 'ffffff',
-        fontSize: 13,
-        font: 'THSarabunNew',
-      })
-      .text('7,373.25', 440, 177, {
-        color: 'ffffff',
-        fontSize: 13,
-        font: 'THSarabunNew',
-      })
-      .text('บาท', 480, 177, {
-        color: 'ffffff',
-        fontSize: 13,
-        font: 'THSarabunNew',
-      })
-      .text('40,803.44', 440, 132, {
-        color: 'ffffff',
-        fontSize: 13,
-        font: 'THSarabunNew',
-      })
-      .text('บาท', 480, 132, {
-        color: 'ffffff',
-        fontSize: 13,
-        font: 'THSarabunNew',
-      })
-      .text('0.00', 235, 227, {
+      .text('0.00', 250, 201, {
         //payment received
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('300.00', 305, 227, {
+      .text('300.00', 310, 201, {
         //payment received
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('200.00', 370, 227, {
+      .text('200.00', 375, 201, {
         //payment received
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 443, 227, {
+      .text('0.00', 444, 201, {
         //payment received
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('500.00', 505, 227, {
+      .text('500.00', 505, 201, {
         //payment received
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 235, 247, {
+      .text('0.00', 250, 216.5, {
         //past due
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('300.00', 305, 247, {
+      .text('300.00', 310, 216.5, {
         //past due
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('200.00', 370, 247, {
+      .text('200.00', 375, 216.5, {
         //past due
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 443, 247, {
+      .text('0.00', 444, 216.5, {
         //past due
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('500.00', 505, 247, {
+      .text('500.00', 505, 216.5, {
         //past due
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 235, 267, {
+      .text('0.00', 250, 232, {
         //remaining balance
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('300.00', 305, 267, {
+      .text('300.00', 310, 232, {
         //remaining balance
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('200.00', 370, 267, {
+      .text('200.00', 375, 232, {
         //remaining balance
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 443, 267, {
+      .text('0.00', 444, 232, {
         //remaining balance
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('500.00', 505, 267, {
+      .text('500.00', 505, 232, {
         //remaining balance
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 235, 286, {
+      .text('0.00', 250, 247.5, {
         //excess amounts
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('300.00', 305, 286, {
+      .text('300.00', 310, 247.5, {
         //excess amounts
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('200.00', 370, 286, {
+      .text('200.00', 375, 247.5, {
         //excess amounts
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('0.00', 443, 286, {
+      .text('0.00', 444, 247.5, {
         //excess amounts
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('500.00', 505, 286, {
+      .text('500.00', 505, 247.5, {
         //excess amounts
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
     //part 2
-    const baseY = 333
-    const incrementValue = 11.2
+    const baseY = 294
+    const incrementValue = 10.5
     let i = 0
     while (i < 1) {
-      blockTypeA(pdfDoc, baseY, incrementValue)
-      blockTypeB(pdfDoc, baseY, incrementValue)
-      blockTypeB(pdfDoc, baseY, incrementValue)
-      blockTypeC(pdfDoc, baseY, incrementValue)
+      y = blockTypeA(pdfDoc, baseY, incrementValue, y)
+      y = blockTypeB(pdfDoc, baseY, incrementValue, y)
+      y = blockTypeB(pdfDoc, baseY, incrementValue, y)
+      y = blockTypeC(pdfDoc, baseY, incrementValue, y)
       i++
     }
     y = 0
-    console.log('1. y:', y)
+    //console.log('1. y:', y)
     //part 3
     pdfDoc
       // .text('ITTP', 74, 577, {
@@ -1260,39 +1238,44 @@ exports.testPdf4 = async function(req, res) {
       //   fontSize: 13,
       //   font: 'THSarabunNew',
       // })
-      .text('0000001234', 145, 577, {
+      .text('0000001234', 165, 552, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('20,000', 280, 577, {
+      .text('20,000', 287, 552, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('บาท', 315, 577, {
+      .text('บาท', 322, 552, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('นางสาวใจดี ดีต่อใจ', 145, 713, {
+      .text('นางสาวใจดี ดีต่อใจ', 180, 645, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('20,000', 430, 713, {
+      .text('20,000', 473.28, 645, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
-      .text('บาท', 460, 713, {
+      .text('บาท', 510, 645, {
+        color: '000000',
+        fontSize: 13,
+        font: 'THSarabunNew',
+      })
+      .text('0000001234', 370, 662, {
         color: '000000',
         fontSize: 13,
         font: 'THSarabunNew',
       })
       .endPage()
       .endPDF()
-    res.status(200).sendFile(`${__dirname}/pdf/ittp-statement-output.pdf`)
+    res.status(200).sendFile(`${__dirname}/pdf/ittp-statement-v2-output.pdf`)
   } catch (error) {
     console.log(error)
     res.status(200).send({

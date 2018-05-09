@@ -66,12 +66,15 @@ exports.addNotice = async function(req, res) {
     })
   } else {
     let data = {
-      notificationTopic: req.body.notificationTopic,
-      notificationContent: req.body.notificationContent,
+      notificationTopicEn: req.body.notificationTopicEn,
+      notificationContentEn: req.body.notificationContentEn,
+      notificationTopicTh: req.body.notificationTopicTh,
+      notificationContentTh: req.body.notificationContentTh,
       notificationDate: Date.now(),
       isRead: req.body.isRead,
       isActive: req.body.isActive,
       userId: userId,
+      notificationType: req.body.notificationType,
     }
     try {
       //const decodeToken = await readJwt(token)
