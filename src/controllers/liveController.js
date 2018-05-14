@@ -611,8 +611,8 @@ exports.updateLivesCms = async function(req, res) {
   //console.log(moment(req.body.data.startTime).format('HH:mm:ss'))
   const token = req.body.token
   const data = req.body.data
-  data.startTime = moment(req.body.data.startTime).format('HH:mm:ss')
-  data.endTime = moment(req.body.data.endTime).format('HH:mm:ss')
+  data.startTime = String(moment(req.body.data.startTime).format('HH:mm:ss'))
+  data.endTime = String(moment(req.body.data.endTime).format('HH:mm:ss'))
   data.liveDay = checkDayBeforeSave(data.liveDay)
   data.promoUrl = `manifests/${req.body.data.promoUrl}.m3u8`
   //console.log('data: ', data)
