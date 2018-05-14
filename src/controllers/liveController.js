@@ -531,8 +531,16 @@ exports.insertLivesCms = async function(req, res) {
   //console.log('req.body.liveDay', req.body.liveDay)
   const live = new Live(req.body.data)
   live.promoUrl = `manifests/${req.body.data.promoUrl}.m3u8`
-  live.startTime = moment(req.body.data.startTime).format('HH:mm:ss')
-  live.endTime = moment(req.body.data.endTime).format('HH:mm:ss')
+  live.startTime = String(
+    moment(req.body.data.startTime)
+      .add(7, 'hours')
+      .format('HH:mm:ss')
+  )
+  live.endTime = String(
+    moment(req.body.data.endTime)
+      .add(7, 'hours')
+      .format('HH:mm:ss')
+  )
   //console.log('live: ', live)
   let result = ''
   const productId = await Live.find(
