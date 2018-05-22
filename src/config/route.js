@@ -264,9 +264,4 @@ module.exports = function(app) {
 
   //Images
   app.post('/upload/image', upload.single('upload'), maxnews.uploadImage)
-
-  app.get('/test-pdf', wechat.testPdf)
-  app.get('/test-pdf2', wechat.testPdf2)
-  app.get('/test-pdf3', wechat.testPdf3)
-  app.get('/test-pdf4', wechat.testPdf4)
 }

@@ -8,11 +8,8 @@ import Subscribe from '../models/subscribe'
 import User from '../models/user'
 import nodemailer from 'nodemailer'
 import moment from 'moment'
-import HummusRecipe from 'hummus-recipe-th'
-import hummus from 'hummus'
 import { createOrder } from '../utils/wechat'
 import { dirname } from 'path'
-import PDFMerge from 'pdf-merge'
 import merge from 'easy-pdf-merge'
 // let y = 0 // use in testPdf2
 
