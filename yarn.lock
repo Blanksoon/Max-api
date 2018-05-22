@@ -1337,6 +1337,10 @@ duplexify@^3.4.2, duplexify@^3.5.3:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
+easy-pdf-merge@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/easy-pdf-merge/-/easy-pdf-merge-0.1.3.tgz#741c74a20d8163e0d01c0daa3b34c75aace374b3"
+
 ecc-jsbn@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz#0fc73a9ed5f0d53c38193398523ef7e543777505"
@@ -3449,7 +3453,7 @@ os-locale@^2.0.0:
     lcid "^1.0.0"
     mem "^1.1.0"
 
-os-tmpdir@^1.0.0, os-tmpdir@^1.0.1:
+os-tmpdir@^1.0.0, os-tmpdir@^1.0.1, os-tmpdir@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
 
@@ -3616,6 +3620,14 @@ paypal-rest-sdk@^1.7.1:
     buffer-crc32 "^0.2.3"
     semver "^5.0.3"
     uuid "^2.0.1"
+
+pdf-merge@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/pdf-merge/-/pdf-merge-1.0.2.tgz#2ee9d50c2b965d47105db0ac228d13b32aee8eee"
+  dependencies:
+    bluebird "^3.5.0"
+    shell-escape "^0.2.0"
+    tmp "0.0.26"
 
 performance-now@^2.1.0:
   version "2.1.0"
@@ -3878,7 +3890,7 @@ read@1, read@~1.0.1, read@~1.0.7:
   dependencies:
     mute-stream "~0.0.4"
 
-"readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.6, readable-stream@^2.1.4, readable-stream@^2.1.5, readable-stream@^2.3.5, readable-stream@~2.3.3:
+"readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.6, readable-stream@^2.1.4, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.3.5, readable-stream@~2.3.3:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
   dependencies:
@@ -3911,7 +3923,7 @@ readable-stream@2.2.7:
     string_decoder "~1.0.0"
     util-deprecate "~1.0.1"
 
-readable-stream@^2.2.2, readable-stream@^2.3.3:
+readable-stream@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.3.tgz#368f2512d79f9d46fdfc71349ae7878bbc1eb95c"
   dependencies:
@@ -4236,6 +4248,10 @@ shebang-command@^1.2.0:
 shebang-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
+
+shell-escape@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/shell-escape/-/shell-escape-0.2.0.tgz#68fd025eb0490b4f567a027f0bf22480b5f84133"
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
@@ -4621,6 +4637,12 @@ timed-out@^4.0.0:
 tiny-inflate@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.2.tgz#93d9decffc8805bd57eae4310f0b745e9b6fb3a7"
+
+tmp@0.0.26:
+  version "0.0.26"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.26.tgz#9efa820ce2a10f81f8979555bace3f15526ce1f2"
+  dependencies:
+    os-tmpdir "~1.0.0"
 
 to-fast-properties@^1.0.3:
   version "1.0.3"
