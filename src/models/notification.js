@@ -35,6 +35,14 @@ var NoticeSchema = new Schema({
     type: String,
     required: 'isActive is required',
   },
+  isSent: {
+    type: String,
+    default: '0',
+  },
+  messageCode: {
+    type: String,
+    default: null,
+  },
   notificationType: {
     type: String,
     default: null,

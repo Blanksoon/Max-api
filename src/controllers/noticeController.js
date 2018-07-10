@@ -53,6 +53,39 @@ const readJwt = token => {
   })
 }
 
+const verifyToken = (token, req, output) => {
+  var query = {}
+  return new Promise(async (resolve, reject) => {
+    await jwt.verify(token, env.JWT_SECRET, function(err, decoded) {
+      if (err) {
+        resolve(undefined)
+      } else {
+        //console.log('decoded.data.email', decoded.data.email)
+        if (
+          decoded.data.email == undefined ||
+          decoded.data.email == 'undefined'
+        ) {
+          //console.log('fisofjo')
+          query = {
+            email: decoded.data[0].email,
+            password: decoded.data[0].password,
+            status: 'authorize',
+          }
+          resolve(query)
+        } else {
+          //console.log('hiiiii')
+          query = {
+            email: decoded.data.email,
+            password: decoded.data.password,
+            status: 'authorize',
+          }
+          resolve(query)
+        }
+      }
+    })
+  })
+}
+
 exports.addNotice = async function(req, res) {
   const token = req.body.token
   const userId = req.body.userId
@@ -73,6 +106,8 @@ exports.addNotice = async function(req, res) {
       notificationDate: Date.now(),
       isRead: req.body.isRead,
       isActive: req.body.isActive,
+      isSent: req.body.isSent,
+      messageCode: req.body.messageCode,
       userId: userId,
       notificationType: req.body.notificationType,
     }
@@ -297,5 +332,44 @@ exports.findUserByProductId = async function(req, res) {
         },
       })
     }
+  }
+}
+
+exports.updateDeviceToken = async function(req, res) {
+  const token = req.body.token
+  const deviceToken = req.body.deviceToken
+  try {
+    const decoded = await verifyToken(token, req)
+    if (decoded === undefined) {
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: false,
+          message: 'token is invalid',
+        },
+      })
+    } else {
+      const user = await User.findOne({ email: decoded.email }, { email: 1 })
+      user.deviceToken = deviceToken
+
+      await user.save()
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'update device token success',
+          data: user,
+        },
+      })
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({
+      status: {
+        code: 500,
+        success: true,
+        message: err,
+      },
+    })
   }
 }
