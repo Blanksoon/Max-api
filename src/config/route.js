@@ -262,6 +262,7 @@ module.exports = function(app) {
   app.get(`/notice/find/user`, notice.findAllUser)
   app.get(`/notice/find/by-product`, notice.findUserByProductId)
   app.post(`/notice/update/devicetoken`, notice.updateDeviceToken)
+  app.get(`/notice/find/lives`, notice.findAllLives)
 
   //Images
   app.post('/upload/image', upload.single('upload'), maxnews.uploadImage)

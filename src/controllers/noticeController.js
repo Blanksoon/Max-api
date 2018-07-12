@@ -4,6 +4,7 @@ import env from '../config/env'
 import moment from 'moment'
 import User from '../models/user'
 import Order from '../models/order'
+import Live from '../models/live'
 
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
@@ -371,5 +372,38 @@ exports.updateDeviceToken = async function(req, res) {
         message: err,
       },
     })
+  }
+}
+
+exports.findAllLives = async function(req, res) {
+  const token = req.query.token
+  if (token != '2nabEXSyRndKwgxwejdAjpCjt8zHxJ4pqPjJy6uh') {
+    res.status(200).send({
+      status: {
+        code: 200,
+        success: false,
+        message: 'token is invalid',
+      },
+    })
+  } else {
+    try {
+      const noticeLive = await await Live.find({})
+      res.status(200).send({
+        status: {
+          code: 200,
+          success: true,
+          message: 'success fetch all product',
+        },
+        data: noticeLive,
+      })
+    } catch (error) {
+      res.status(500).send({
+        status: {
+          code: 500,
+          success: true,
+          message: error,
+        },
+      })
+    }
   }
 }
