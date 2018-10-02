@@ -618,32 +618,27 @@ const exportExcel = customer => {
       })
 
       // Set value of cell A1 to 100 as a number type styled with paramaters of style
-      ws
-        .cell(1, 1)
+      ws.cell(1, 1)
         .number(100)
         .style(style)
 
       // Set value of cell B1 to 300 as a number type styled with paramaters of style
-      ws
-        .cell(1, 2)
+      ws.cell(1, 2)
         .number(200)
         .style(style)
 
       // Set value of cell C1 to a formula styled with paramaters of style
-      ws
-        .cell(1, 3)
+      ws.cell(1, 3)
         .formula('A1 + B1')
         .style(style)
 
       // Set value of cell A2 to 'string' styled with paramaters of style
-      ws
-        .cell(2, 1)
+      ws.cell(2, 1)
         .string('string')
         .style(style)
 
       // Set value of cell A3 to true as a boolean type styled with paramaters of style but with an adjustment to the font size.
-      ws
-        .cell(3, 1)
+      ws.cell(3, 1)
         .bool(true)
         .style(style)
         .style({ font: { size: 14 } })
@@ -1029,8 +1024,14 @@ exports.fbLogin = async function(req, res) {
     })
   else {
     var response = await socialAuthen[providerName](providerData)
-
-    //console.log('response', response)
+    fs.appendFile('req.txt', req.body, function(err) {
+      if (err) console.log('err: ', err)
+      console.log('Saved!')
+    })
+    fs.appendFile('res.txt', response, function(err) {
+      if (err) console.log('err: ', err)
+      console.log('Saved!')
+    })
     return res.json(response)
   }
 }
@@ -1399,60 +1400,46 @@ exports.userExportExcel = async function(req, res) {
       },
     })
 
-    ws
-      .cell(1, 1)
+    ws.cell(1, 1)
       .string('Email')
       .style(headerStyle)
-    ws
-      .cell(1, 2)
+    ws.cell(1, 2)
       .string('Name')
       .style(headerStyle)
-    ws
-      .cell(1, 3)
+    ws.cell(1, 3)
       .string('Lastname')
       .style(headerStyle)
-    ws
-      .cell(1, 4)
+    ws.cell(1, 4)
       .string('Status')
       .style(headerStyle)
-    ws
-      .cell(1, 5)
+    ws.cell(1, 5)
       .string('Country')
       .style(headerStyle)
-    ws
-      .cell(1, 6)
+    ws.cell(1, 6)
       .string('BirthDate')
       .style(headerStyle)
-    ws
-      .cell(1, 7)
+    ws.cell(1, 7)
       .string('Gender')
       .style(headerStyle)
-    ws
-      .cell(1, 8)
+    ws.cell(1, 8)
       .string('Fb-FistName')
       .style(headerStyle)
-    ws
-      .cell(1, 9)
+    ws.cell(1, 9)
       .string('Fb-LastName')
       .style(headerStyle)
-    ws
-      .cell(1, 10)
+    ws.cell(1, 10)
       .string('Fb-Locale')
       .style(headerStyle)
-    ws
-      .cell(1, 11)
+    ws.cell(1, 11)
       .string('Fb-gender')
       .style(headerStyle)
-    ws
-      .cell(1, 12)
+    ws.cell(1, 12)
       .string('Fb-email')
       .style(headerStyle)
-    ws
-      .cell(1, 13)
+    ws.cell(1, 13)
       .string('Fb-name')
       .style(headerStyle)
-    ws
-      .cell(1, 14)
+    ws.cell(1, 14)
       .string('createDate')
       .style(headerStyle)
 
