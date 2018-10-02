@@ -57,11 +57,12 @@ socialAuthen['facebook'] = async function(providerData) {
       'https://graph.facebook.com/me?access_token=' + facebookData.accessToken
     ).then(response => response.json())
     if (response.error) {
+      console.log('1', response.error.message)
       return {
         status: {
           code: 400,
           success: false,
-          message: response.error.message,
+          // message: response.error.message,
         },
         data: [],
       }
@@ -81,7 +82,7 @@ socialAuthen['facebook'] = async function(providerData) {
       status: {
         code: 400,
         success: false,
-        message: `can't access facebook data with this token`,
+        message: err.message,
       },
       data: [],
     }
