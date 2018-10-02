@@ -57,14 +57,13 @@ socialAuthen['facebook'] = async function(providerData) {
       'https://graph.facebook.com/me?access_token=' + facebookData.accessToken
     ).then(response => response.json())
     if (response.error) {
-      console.log('1', response.error.message)
       return {
         status: {
           code: 400,
           success: false,
-          // message: response.error.message,
+          message: response.error.message,
         },
-        data: [],
+        data: {},
       }
     }
     if (response.id != facebookData.id || response.name != facebookData.name) {
@@ -74,7 +73,7 @@ socialAuthen['facebook'] = async function(providerData) {
           success: false,
           message: 'token is invalid',
         },
-        data: [],
+        data: {},
       }
     }
   } catch (err) {
@@ -84,7 +83,7 @@ socialAuthen['facebook'] = async function(providerData) {
         success: false,
         message: err.message,
       },
-      data: [],
+      data: {},
     }
   }
 
@@ -127,7 +126,7 @@ socialAuthen['facebook'] = async function(providerData) {
             success: false,
             message: err.message,
           },
-          data: [],
+          data: {},
         }
       }
       token = await jwt.sign({ data: user }, env.JWT_SECRET, {
@@ -234,7 +233,7 @@ socialAuthen['facebook'] = async function(providerData) {
         success: false,
         message: err.message,
       },
-      data: [],
+      data: {},
     }
   }
 }
@@ -1025,16 +1024,6 @@ exports.fbLogin = async function(req, res) {
     })
   else {
     var response = await socialAuthen[providerName](providerData)
-    fs.writeFile('req.txt', JSON.stringify(req.body), function(err) {
-      if (err) console.log('err: ', err)
-      console.log('Saved!')
-    })
-    fs.writeFile('res.txt', JSON.stringify(response), function(err) {
-      if (err) console.log('err: ', err)
-      console.log('Saved!')
-    })
-    const testJson = { status: 400 }
-    console.log('testJson: ', typeof testJson)
     console.log('response: ', response)
     return res.json(response)
   }
