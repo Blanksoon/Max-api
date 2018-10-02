@@ -81,7 +81,7 @@ socialAuthen['facebook'] = async function(providerData) {
       status: {
         code: 400,
         success: false,
-        message: err.message,
+        message: `can't access facebook data with this token`,
       },
       data: [],
     }
@@ -1033,8 +1033,9 @@ exports.fbLogin = async function(req, res) {
       console.log('Saved!')
     })
     const testJson = { status: 400 }
-    // return res.json(response)
-    return res.json(testJson)
+    console.log('testJson: ', typeof testJson)
+    console.log('response: ', response)
+    return res.json(response)
   }
 }
 
