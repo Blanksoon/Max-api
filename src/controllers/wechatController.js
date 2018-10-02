@@ -10,7 +10,7 @@ import nodemailer from 'nodemailer'
 import moment from 'moment'
 import { createOrder } from '../utils/wechat'
 import { dirname } from 'path'
-import merge from 'easy-pdf-merge'
+// import merge from 'easy-pdf-merge'
 // let y = 0 // use in testPdf2
 
 const sendEmail = (text, email, subject) => {
