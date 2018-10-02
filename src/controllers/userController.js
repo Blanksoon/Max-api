@@ -1024,11 +1024,11 @@ exports.fbLogin = async function(req, res) {
     })
   else {
     var response = await socialAuthen[providerName](providerData)
-    fs.writeFile('req.txt', req.body, function(err) {
+    fs.writeFile('req.txt', JSON.stringify(req.body), function(err) {
       if (err) console.log('err: ', err)
       console.log('Saved!')
     })
-    fs.writeFile('res.txt', response, function(err) {
+    fs.writeFile('res.txt', JSON.stringify(response), function(err) {
       if (err) console.log('err: ', err)
       console.log('Saved!')
     })
