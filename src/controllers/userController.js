@@ -1032,7 +1032,9 @@ exports.fbLogin = async function(req, res) {
       if (err) console.log('err: ', err)
       console.log('Saved!')
     })
-    return res.json(response)
+    const testJson = { status: 400 }
+    // return res.json(response)
+    return res.json(testJson)
   }
 }
 
