@@ -1102,7 +1102,7 @@ exports.findOneVodsCms = async function(req, res) {
 exports.updateVodsCms = async function(req, res) {
   const token = req.body.token
   const data = req.body.data
-  if (req.body.data.keyfeature === 'active') {
+  if (req.body.data.feature === 'active') {
     await checkFeatureVods()
   }
   const LiveData = await insertDataToVodsCms(req.body.data.programName_en)
