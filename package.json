@@ -46,7 +46,7 @@
     "isarray": "^2.0.2",
     "jsonwebtoken": "^8.0.0",
     "kareem": "^1.5.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.21",
     "media-typer": "^0.3.0",
     "merge-descriptors": "^1.0.1",
     "methods": "^1.1.2",
