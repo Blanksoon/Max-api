@@ -1315,9 +1315,13 @@ mongoose@^4.11.11:
     regexp-clone "0.0.1"
     sliced "1.0.1"
 
-mpath@0.3.0, mpath@^0.3.0:
+mpath@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.3.0.tgz#7a58f789e9b5fd3c94520634157960f26bd5ef44"
+
+mpath@^0.8.4:
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.8.4.tgz#6b566d9581621d9e931dd3b142ed3618e7599313"
 
 mpromise@0.5.5, mpromise@^0.5.5:
   version "0.5.5"
