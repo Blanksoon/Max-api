@@ -63,7 +63,7 @@
     "ms": "^2.0.0",
     "muri": "^1.2.2",
     "negotiator": "^0.6.1",
-    "node-fetch": "^1.7.3",
+    "node-fetch": "^2.6.7",
     "nodemailer": "^4.1.1",
     "nodemon": "^1.12.1",
     "on-finished": "^2.3.0",
