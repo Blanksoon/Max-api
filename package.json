@@ -71,7 +71,7 @@
     "path-to-regexp": "^2.0.0",
     "process-nextick-args": "^1.0.7",
     "proxy-addr": "^2.0.1",
-    "qs": "^6.5.1",
+    "qs": "^6.5.3",
     "range-parser": "^1.2.0",
     "raw-body": "^2.3.2",
     "readable-stream": "^2.3.3",
